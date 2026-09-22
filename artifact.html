@@ -333,6 +333,148 @@ ol.qs{margin:0; padding-left:20px; font-size:13px; color:var(--ink-2); display:f
 input[type="search"],input[type="text"]{padding:9px 12px; border:1px solid var(--line-2);
   border-radius:4px; background:var(--surface); color:var(--ink); font:inherit; width:100%}
 @media (prefers-reduced-motion:reduce){*{transition:none!important; animation:none!important}}
+
+/* ===== Sidebar agrupado ===== */
+.nav-grp{padding:0 10px; margin-bottom:14px}
+.nav-grp-t{font-family:"IBM Plex Mono",monospace; font-size:9.5px; letter-spacing:.13em;
+  text-transform:uppercase; color:var(--muted); padding:0 10px 6px}
+@media (max-width:900px){
+  .rail{position:static; max-height:none; border-right:0; border-bottom:1px solid var(--line)}
+  .nav-grp{display:inline-flex; gap:6px; padding:0 6px; margin:0}
+  .nav-grp-t{display:none}
+  .nav-wrap{display:flex; overflow-x:auto; padding:0 10px 6px}
+}
+
+/* ===== Cabecera de página sin texto descriptivo ===== */
+.ph{display:flex; align-items:center; gap:14px; flex-wrap:wrap; margin-bottom:18px}
+.ph-t{display:flex; flex-direction:column; gap:2px; min-width:0}
+.ph-t h2{font-size:21px; font-weight:700}
+.ph-meta{display:flex; gap:8px; flex-wrap:wrap; align-items:center}
+.ph-act{margin-left:auto; display:flex; gap:8px; flex-wrap:wrap}
+.pill{display:inline-flex; align-items:center; gap:6px; font-family:"IBM Plex Mono",monospace;
+  font-size:11px; color:var(--ink-2); background:var(--surface-2); border-radius:999px; padding:3px 10px}
+.pill b{font-weight:600; color:var(--ink)}
+
+/* ===== Pestañas ===== */
+.tabs{display:flex; gap:2px; border-bottom:1px solid var(--line); margin-bottom:18px; overflow-x:auto}
+.tab{padding:9px 14px; font-size:13px; color:var(--muted); white-space:nowrap;
+  border-bottom:2px solid transparent; margin-bottom:-1px}
+.tab:hover{color:var(--ink)}
+.tab.is-on{color:var(--accent); border-bottom-color:var(--accent); font-weight:600}
+
+/* ===== Pipeline ===== */
+.pipe{display:grid; grid-template-columns:repeat(5,1fr); gap:10px}
+@media (max-width:980px){.pipe{grid-template-columns:repeat(2,1fr)}}
+@media (max-width:520px){.pipe{grid-template-columns:1fr}}
+.pipe-col{background:var(--surface); border:1px solid var(--line); border-radius:9px; overflow:hidden}
+.pipe-h{padding:10px 12px; border-bottom:1px solid var(--line); background:var(--surface-3)}
+.pipe-h b{display:block; font-family:Archivo; font-size:12.5px; font-weight:600}
+.pipe-h span{font-family:"IBM Plex Mono",monospace; font-size:11px; color:var(--muted)}
+.pipe-b{padding:8px; display:flex; flex-direction:column; gap:7px; min-height:60px}
+.pcard{border:1px solid var(--line); border-radius:7px; padding:9px 10px; background:var(--surface);
+  cursor:pointer; text-align:left; width:100%; transition:border-color .13s}
+.pcard:hover{border-color:var(--accent)}
+.pcard b{display:block; font-size:12.5px; font-weight:600; margin-bottom:2px}
+.pcard span{display:block; font-size:11px; color:var(--muted)}
+.pcard .val{font-family:"IBM Plex Mono",monospace; font-size:11.5px; color:var(--accent); margin-top:4px}
+
+/* ===== Zona de carga ===== */
+.drop{border:1.5px dashed var(--line-2); border-radius:10px; padding:26px 18px; text-align:center;
+  background:var(--surface-3); transition:border-color .14s, background .14s}
+.drop.is-over{border-color:var(--action); background:var(--action-soft)}
+.drop-i{width:38px; height:38px; border-radius:10px; background:var(--surface-2); color:var(--ink-2);
+  display:flex; align-items:center; justify-content:center; margin:0 auto 10px}
+.drop b{display:block; font-size:13.5px; font-weight:600; margin-bottom:3px}
+.drop span{font-size:12px; color:var(--muted)}
+
+/* ===== Árbol de carpetas ===== */
+.tree{display:flex; flex-direction:column}
+.tnode{display:flex; align-items:center; gap:10px; padding:8px 12px; border-bottom:1px solid var(--line);
+  font-size:13px; width:100%; text-align:left; cursor:pointer}
+.tnode:last-child{border-bottom:0}
+.tnode:hover{background:var(--surface-3)}
+.tnode.is-on{background:var(--accent-soft); color:var(--accent-ink); font-weight:500}
+:root[data-theme="dark"] .tnode.is-on{color:var(--accent-2)}
+.tnode-n{flex:1; min-width:0}
+.tnode-c{font-family:"IBM Plex Mono",monospace; font-size:11px; color:var(--muted)}
+
+/* ===== Paginación ===== */
+.pg{display:flex; align-items:center; gap:8px; padding:11px 16px; border-top:1px solid var(--line);
+  flex-wrap:wrap; font-size:12.5px; color:var(--muted)}
+.pg-b{margin-left:auto; display:flex; gap:5px}
+.pg-btn{border:1px solid var(--line-2); background:var(--surface); border-radius:6px; padding:4px 10px;
+  font-size:12.5px; color:var(--ink-2); min-width:32px}
+.pg-btn:hover:not(:disabled){border-color:var(--accent); color:var(--ink)}
+.pg-btn.is-on{background:var(--accent); border-color:var(--accent); color:#fff; font-weight:600}
+:root[data-theme="dark"] .pg-btn.is-on{color:#0B1220}
+.pg-btn:disabled{opacity:.4; cursor:not-allowed}
+
+/* ===== Modal ===== */
+.mbg{position:fixed; inset:0; background:rgba(15,23,42,.55); z-index:70; display:flex;
+  align-items:center; justify-content:center; padding:16px}
+.modal{background:var(--surface); border:1px solid var(--line); border-radius:12px;
+  box-shadow:var(--shadow-2); width:100%; max-width:560px; max-height:86vh; display:flex; flex-direction:column}
+.modal-h{padding:15px 18px; border-bottom:1px solid var(--line); display:flex; align-items:center; gap:12px}
+.modal-h h3{font-size:15px; font-weight:600; flex:1}
+.modal-b{padding:18px; overflow-y:auto}
+.modal-f{padding:13px 18px; border-top:1px solid var(--line); display:flex; gap:8px; justify-content:flex-end}
+
+/* ===== Barra apilada ===== */
+.sbar{display:flex; height:8px; border-radius:4px; overflow:hidden; background:var(--surface-2); gap:2px}
+.sbar i{display:block; height:100%}
+.legend{display:flex; gap:14px; flex-wrap:wrap; margin-top:10px; font-size:12px; color:var(--ink-2)}
+.legend i{width:9px; height:9px; border-radius:2px; display:inline-block; margin-right:5px}
+
+/* ===== Vista previa de archivo ===== */
+.fprev{background:var(--surface-2); border:1px solid var(--line); border-radius:8px;
+  height:170px; display:flex; align-items:center; justify-content:center; color:var(--muted);
+  font-family:"IBM Plex Mono",monospace; font-size:12px; margin-bottom:14px}
+.kvlist{display:flex; flex-direction:column; gap:0}
+.kvrow{display:flex; gap:12px; padding:8px 0; border-bottom:1px solid var(--line); font-size:13px}
+.kvrow:last-child{border-bottom:0}
+.kvrow span:first-child{color:var(--muted); min-width:120px}
+.kvrow span:last-child{flex:1; text-align:right; font-weight:500}
+
+/* ===== Layout de dos columnas ===== */
+.grid2{display:grid; grid-template-columns:1fr 1fr; gap:18px; align-items:start}
+@media (max-width:900px){.grid2{grid-template-columns:1fr}}
+.grid2 .card{margin-bottom:0}
+
+/* ===== Layout documental ===== */
+.doc-layout{display:grid; grid-template-columns:230px 1fr; gap:18px; align-items:start}
+@media (max-width:860px){.doc-layout{grid-template-columns:1fr}}
+.filter-row{display:flex; gap:10px; flex-wrap:wrap; align-items:center}
+.filter-row input[type="search"]{flex:1; min-width:180px; max-width:300px; width:auto}
+.filter-row select{padding:9px 11px; border:1px solid var(--line-2); border-radius:7px;
+  background:var(--surface); color:var(--ink); font:inherit; max-width:210px}
+.filter-row .btn{margin-left:auto}
+@media (max-width:620px){.filter-row .btn{margin-left:0; width:100%}}
+
+/* ===== Mapa esquemático ===== */
+.mapbox{background:var(--surface-2); border-radius:9px; padding:18px 16px}
+.mapbox-pts{display:flex; justify-content:space-between; font-family:"IBM Plex Mono",monospace;
+  font-size:11.5px; color:var(--ink-2); margin-bottom:10px}
+.mapbox-rail{position:relative; height:6px; background:var(--line-2); border-radius:3px}
+.mapbox-rail i{display:block; height:100%; background:var(--accent); border-radius:3px}
+.mapbox-dot{position:absolute; top:50%; width:13px; height:13px; border-radius:50%;
+  background:var(--action); border:2.5px solid var(--surface); transform:translate(-50%,-50%);
+  box-shadow:var(--shadow-1)}
+.mapbox-pos{margin-top:12px; font-size:11.5px; color:var(--muted); text-align:center}
+
+/* ===== Nombre de archivo ===== */
+.fname{max-width:260px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap}
+.doc-layout table{min-width:720px}
+
+/* ===== Ajustes de tabla ===== */
+tr.pick td{background:var(--ok-soft)}
+tr.excl td{background:var(--surface-3)}
+tr.excl td:first-child{color:var(--muted)}
+.score-bar{height:6px; background:var(--surface-2); border-radius:3px; overflow:hidden;
+  width:58px; display:inline-block; vertical-align:middle}
+.score-bar i{display:block; height:100%; background:var(--accent); border-radius:3px}
+.doc-i{font-family:"IBM Plex Mono",monospace; font-size:9.5px; font-weight:500; letter-spacing:.04em;
+  display:inline-block; min-width:38px; text-align:center; padding:3px 5px; border-radius:4px;
+  background:var(--surface-2); color:var(--muted)}
 </style>
 
 <div id="login" class="login">
@@ -345,17 +487,13 @@ input[type="search"],input[type="text"]{padding:9px 12px; border:1px solid var(-
         </svg>
       </span>
       <span class="login-brand-t">
-        <span class="eyebrow">DMS BOLIVIA S.R.L. · DEMO</span>
+        <span class="eyebrow">DMS BOLIVIA S.R.L.</span>
         <h1>Puerto a Puerta</h1>
       </span>
     </div>
-
-    <p class="login-sub">Elegí un rol para recorrer la operación de <b>DMS Bolivia S.R.L.</b></p>
-
-    <div class="roles" id="roles" role="radiogroup" aria-label="Rol con el que entrar"></div>
-
+    <div class="roles" id="roles" role="radiogroup" aria-label="Rol"></div>
     <div class="login-go">
-      <div class="login-pick" id="login-pick"><span class="t-sub">Ningún rol seleccionado.</span></div>
+      <div class="login-pick" id="login-pick"><span class="t-sub">Sin rol seleccionado</span></div>
       <button class="btn btn-primary btn-enter" id="btn-enter" disabled>Entrar</button>
     </div>
   </div>
@@ -364,14 +502,13 @@ input[type="search"],input[type="text"]{padding:9px 12px; border:1px solid var(-
 <div id="app" class="shell" hidden>
   <aside class="rail">
     <div class="rail-brand"><span class="brand-mark">DMS</span><span class="brand-sub">PUERTO A PUERTA</span></div>
-    <nav class="nav-group" id="nav" aria-label="Secciones"></nav>
+    <div class="nav-wrap" id="nav"></div>
   </aside>
   <div class="main">
     <header class="topbar">
       <div class="who"><b id="who-name">—</b><span id="who-rol">—</span></div>
       <div class="topbar-actions">
         <span class="demo-flag">Datos ficticios</span>
-        <button class="btn" id="btn-guion">Guion de demo</button>
         <button class="btn" id="btn-salir">Cambiar rol</button>
       </div>
     </header>
@@ -379,1123 +516,1673 @@ input[type="search"],input[type="text"]{padding:9px 12px; border:1px solid var(-
   </div>
 </div>
 
-<div id="sheet-bg" class="sheet-bg" hidden></div>
-<aside id="sheet" class="sheet" hidden aria-label="Guion de demo">
-  <div class="sheet-head"><h3>Guion de demo — DMS</h3>
-    <button class="btn" id="btn-cerrar-guion">Cerrar</button></div>
-  <div class="sheet-body" id="sheet-body"></div>
-</aside>
+<div id="modal-root"></div>
 
 <script>
 (function(){
 "use strict";
-var HOY="17 sep 2026", HOY_ISO="2026-09-17";
-var nf=function(n){return n.toLocaleString("de-DE");};
+var HOY="22 sep 2026";
+var $=function(id){return document.getElementById(id);};
+var nf=function(n){return (n||0).toLocaleString("de-DE");};
 var mb=function(n){return n>=1024?(n/1024).toFixed(1).replace(".",",")+" GB":n.toFixed(1).replace(".",",")+" MB";};
-var pctf=function(n){return Math.round(n)+"%";};
-var r1=function(n){return String(n).replace(".",",");};
+var esc=function(t){return String(t).replace(/[&<>"]/g,function(c){
+  return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c];});};
 
-/* ===================== EXPEDIENTES (puertas adentro) ===================== */
-var CATALOG={
- imp:[{id:"factura",n:"Factura comercial",f:"PDF",sz:2.1},
-  {id:"bl",n:"Bill of Lading (BL)",f:"PDF escaneado",sz:7.8},
-  {id:"packing",n:"Packing list",f:"XLSX",sz:0.5},
-  {id:"origen",n:"Certificado de origen",f:"PDF escaneado",sz:4.9},
-  {id:"poliza",n:"Póliza de seguro de carga",f:"PDF",sz:1.7},
-  {id:"dui",n:"DUI — Declaración Única de Importación",f:"PDF",sz:3.2},
-  {id:"micdta",n:"MIC/DTA — Tránsito aduanero",f:"PDF escaneado",sz:6.1},
-  {id:"carta",n:"Carta porte internacional",f:"PDF escaneado",sz:4.6},
-  {id:"fotos",n:"Fotos de inspección física",f:"JPG · lote",sz:31.4},
-  {id:"gastos",n:"Planilla de gastos portuarios",f:"PDF",sz:1.8},
-  {id:"tributos",n:"Comprobante de pago de tributos",f:"PDF",sz:1.3},
-  {id:"recepcion",n:"Parte de recepción",f:"PDF escaneado",sz:5.4}],
- exp:[{id:"factura",n:"Factura comercial de exportación",f:"PDF",sz:2.0},
-  {id:"packing",n:"Packing list",f:"XLSX",sz:0.6},
-  {id:"origen",n:"Certificado de origen",f:"PDF escaneado",sz:4.5},
-  {id:"senasag",n:"Certificado SENASAG / fitosanitario",f:"PDF escaneado",sz:6.0},
-  {id:"poliza",n:"Póliza de seguro de carga",f:"PDF",sz:1.6},
-  {id:"dex",n:"DEX — Declaración de Exportación",f:"PDF",sz:2.7},
-  {id:"micdta",n:"MIC/DTA — Tránsito aduanero",f:"PDF escaneado",sz:5.5},
-  {id:"booking",n:"Booking naviera / BL",f:"PDF escaneado",sz:7.2},
-  {id:"fotos",n:"Fotos de consolidación y precintado",f:"JPG · lote",sz:34.8},
-  {id:"carta",n:"Carta porte internacional",f:"PDF escaneado",sz:4.3},
-  {id:"gastos",n:"Planilla de gastos portuarios",f:"PDF",sz:2.0},
-  {id:"cedeim",n:"Solicitud de reintegro CEDEIM",f:"PDF",sz:3.3}]};
-var docMeta=function(t,id){var l=CATALOG[t];for(var i=0;i<l.length;i++){if(l[i].id===id)return l[i];}return {id:id,n:id,f:"PDF",sz:1};};
+/* Generador determinista: el demo se ve igual en cada carga */
+var _seed=20260922;
+function rnd(){_seed=(_seed*1103515245+12345)&0x7fffffff;return _seed/0x7fffffff;}
+function pick(a){return a[Math.floor(rnd()*a.length)];}
+function ri(a,b){return a+Math.floor(rnd()*(b-a+1));}
 
-var EXPEDIENTES=[
- {code:"IMP-2026-0847",tipo:"imp",cliente:"Ferretería Illimani S.R.L.",ruta:"Arica → Tambo Quemado → La Paz",
-  modal:"FCL 40'",peso:24100,carga:"Conductores eléctricos de cobre · partida 8544.49.00.00",
-  estado:"En tránsito terrestre",est:"transito",abierto:"02 sep 2026",precinto:"BO-4471829",
-  docs:{factura:2.4,bl:8.1,packing:0.6,origen:5.2,poliza:1.8,dui:3.1,micdta:6.7,carta:4.8,fotos:34.2,gastos:1.9}},
- {code:"IMP-2026-0839",tipo:"imp",cliente:"Químicos del Altiplano S.R.L.",ruta:"Ilo → Desaguadero → La Paz",
-  modal:"LCL",peso:6480,carga:"Insumos químicos industriales · partida 2833.25.00.00",
-  estado:"Aforo aduanero",est:"aduana",abierto:"28 ago 2026",precinto:"BO-4468104",
-  docs:{factura:1.9,bl:7.4,packing:0.5,origen:4.6,poliza:2.1,dui:3.4,micdta:6.2,carta:5.1,fotos:41.8,gastos:2.2,tributos:1.4,recepcion:5.6}},
- {code:"EXP-2026-0213",tipo:"exp",cliente:"AgroSur Bolivia S.A.",ruta:"Santa Cruz → Puerto Suárez → Santos",
-  modal:"FCL 40' HC",peso:26000,carga:"Quinua real orgánica en grano · 1.040 sacos de 25 kg · partida 1008.50.00.00",
-  estado:"Armado de documentación",est:"docs",abierto:"09 sep 2026",precinto:"MSCU-778341",
-  docs:{factura:2.2,packing:0.7,origen:4.9,senasag:6.3,poliza:1.7,dex:2.8,fotos:28.6}},
- {code:"IMP-2026-0851",tipo:"imp",cliente:"Repuestos Tunari S.A.",ruta:"Iquique → Pisiga → Oruro → Cochabamba",
-  modal:"LCL",peso:3940,carga:"Repuestos automotrices · partida 8708.99.00.00",
-  estado:"Desconsolidación LCL",est:"transito",abierto:"08 sep 2026",precinto:"MEDU-4471902",
-  docs:{factura:1.6,bl:6.9,packing:0.4,poliza:1.5,micdta:5.8,fotos:22.4}},
- {code:"EXP-2026-0209",tipo:"exp",cliente:"Andina Textil S.A.",ruta:"La Paz → Arica → Callao",
-  modal:"FCL 20'",peso:8200,carga:"Prendas de punto de alpaca · partida 6110.11.00.00",
-  estado:"Entregado y cerrado",est:"cerrado",abierto:"14 ago 2026",precinto:"CMAU-661207",
-  docs:{factura:2.0,packing:0.6,origen:4.4,senasag:5.9,poliza:1.6,dex:2.6,micdta:5.4,booking:7.1,fotos:37.9,carta:4.2,gastos:2.0,cedeim:3.3}},
- {code:"IMP-2026-0855",tipo:"imp",cliente:"Ferretería Illimani S.R.L.",ruta:"Arica → Tambo Quemado → La Paz",
-  modal:"FCL 20'",peso:18300,carga:"Herramienta manual y ferretería · partida 8205.59.00.00",
-  estado:"Pendiente de retiro de puerto",est:"puerto",abierto:"15 sep 2026",precinto:"—",
-  docs:{factura:1.8,bl:7.6,packing:0.5,poliza:1.7,gastos:1.6}}];
-var estBadge=function(e){var m={transito:["b-accent","En tránsito"],aduana:["b-warn","Aforo aduanero"],
- docs:["b-neutral","Documentación"],cerrado:["b-ok","Cerrado"],puerto:["b-warn","En puerto"]};return m[e]||["b-neutral","—"];};
-var expTotal=function(e){var t=0;for(var k in e.docs){t+=e.docs[k];}return t;};
-var expCount=function(e){return Object.keys(e.docs).length;};
-var expReq=function(e){return CATALOG[e.tipo].length;};
-var expFalta=function(e){return CATALOG[e.tipo].filter(function(d){return !(d.id in e.docs);});};
-var expBy=function(c){for(var i=0;i<EXPEDIENTES.length;i++){if(EXPEDIENTES[i].code===c)return EXPEDIENTES[i];}return null;};
+/* ===================== SERVICIOS ===================== */
+var SERVICIOS=[
+ {id:"imp",n:"Importación"},{id:"exp",n:"Exportación"},
+ {id:"tnac",n:"Transporte nacional"},{id:"tint",n:"Transporte internacional"},
+ {id:"adu",n:"Aduana"},{id:"alm",n:"Almacenamiento"},
+ {id:"seg",n:"Seguro de carga"},{id:"p2p",n:"Entrega puerta a puerta"}];
+var servN=function(id){for(var i=0;i<SERVICIOS.length;i++){if(SERVICIOS[i].id===id)return SERVICIOS[i].n;}return id;};
 
-var OCR=[
- {code:"IMP-2026-0847",doc:"micdta",snip:"…precinto aduanero N° BO-4471829 colocado en puerto Arica y verificado en el control de Tambo Quemado sin novedad…"},
- {code:"IMP-2026-0847",doc:"factura",snip:"…conductores eléctricos de cobre aislados, partida 8544.49.00.00, valor FOB USD 41.280,00…"},
- {code:"IMP-2026-0847",doc:"carta",snip:"…transportista Transportes Illimani S.R.L., placa 1842-KLP, conductor J. Mamani, licencia cat. C vigente…"},
- {code:"IMP-2026-0839",doc:"dui",snip:"…DUI N° 2026/201/C-38471, insumos químicos, partida 2833.25.00.00, tributos pagados Bs 187.430,00…"},
- {code:"IMP-2026-0839",doc:"poliza",snip:"…póliza de seguro de carga N° BSA-2026-44182, cobertura todo riesgo hasta USD 120.000…"},
- {code:"EXP-2026-0213",doc:"factura",snip:"…quinua real orgánica en grano, 1.040 sacos de 25 kg, partida 1008.50.00.00, valor FOB USD 78.520,00…"},
- {code:"EXP-2026-0213",doc:"senasag",snip:"…certificado fitosanitario SENASAG N° 2026-SC-11407, libre de plagas cuarentenarias…"},
- {code:"EXP-2026-0213",doc:"fotos",snip:"…precinto naviera MSCU-778341 registrado en acta de consolidación, 12 tomas fotográficas…"},
- {code:"IMP-2026-0851",doc:"bl",snip:"…Bill of Lading MEDU-4471902, 14 bultos LCL, puerto de embarque Iquique, consignatario Repuestos Tunari S.A…"},
- {code:"EXP-2026-0209",doc:"cedeim",snip:"…solicitud de reintegro CEDEIM por Bs 62.140,00 sobre exportación de prendas de alpaca…"}];
+/* ===================== CLIENTES ===================== */
+var ETAPAS=[
+ {id:"prospecto",n:"Prospecto"},{id:"contactado",n:"Contactado"},
+ {id:"oportunidad",n:"Oportunidad"},{id:"activo",n:"Cliente activo"},
+ {id:"fidelizacion",n:"Fidelización"}];
+var etapaN=function(id){for(var i=0;i<ETAPAS.length;i++){if(ETAPAS[i].id===id)return ETAPAS[i].n;}return id;};
+var etapaBadge=function(id){
+  var m={prospecto:"b-neutral",contactado:"b-accent",oportunidad:"b-warn",
+         activo:"b-ok",fidelizacion:"b-ok"};
+  return [m[id]||"b-neutral",etapaN(id)];
+};
 
-/* ===================== CERTIFICACIONES Y TRANSPORTISTAS ===================== */
-var CERTS={
- licencia:{n:"Licencia de conducir categoría C",sub:"Habilita carga pesada y remolque",oblig:true},
- seguro:{n:"Seguro de carga",sub:"Cobertura todo riesgo sobre la mercadería",oblig:true},
- habilitacion:{n:"Habilitación del Viceministerio de Transporte",sub:"Transporte internacional de carga",oblig:true},
- antecedentes:{n:"Antecedentes del conductor",sub:"Certificado REJAP vigente",oblig:true},
- defensivo:{n:"Certificación de manejo defensivo",sub:"Curso vigente · suma puntaje en la asignación",oblig:false},
- peligrosa:{n:"Certificación de transporte de carga peligrosa",sub:"Requisito para mercadería clasificada",oblig:false}};
-var CERT_KEYS=["licencia","seguro","habilitacion","antecedentes","defensivo","peligrosa"];
+var CLIENTES=[
+ {id:"C001",n:"Comercial Andina S.R.L.",nit:"1028374650",ciudad:"La Paz",tipo:"Importador",
+  etapa:"fidelizacion",ejecutivo:"Ana Quispe",desde:"mar 2023",
+  serv:["imp","adu","tint","alm","p2p"],ultima:"19 sep 2026",proximo:"25 sep 2026",
+  contactos:[{n:"Rosa Medina",c:"Gerente de Comercio Exterior",t:"+591 2 244-8890",m:"rmedina@andina.demo"},
+             {n:"Luis Paredes",c:"Jefe de Logística",t:"+591 7 112-3345",m:"lparedes@andina.demo"}]},
+ {id:"C002",n:"AgroSur Bolivia S.A.",nit:"1099231470",ciudad:"Santa Cruz",tipo:"Exportador",
+  etapa:"activo",ejecutivo:"Ana Quispe",desde:"ago 2024",
+  serv:["exp","adu","tint"],ultima:"17 sep 2026",proximo:"24 sep 2026",
+  contactos:[{n:"Carlos Vaca",c:"Gerente General",t:"+591 3 336-2210",m:"cvaca@agrosur.demo"}]},
+ {id:"C003",n:"Químicos del Altiplano S.R.L.",nit:"1044556780",ciudad:"La Paz",tipo:"Importador",
+  etapa:"activo",ejecutivo:"Rodrigo Salazar",desde:"feb 2025",
+  serv:["imp","adu","seg"],ultima:"16 sep 2026",proximo:"26 sep 2026",
+  contactos:[{n:"Elena Ríos",c:"Compras",t:"+591 2 279-4412",m:"erios@quimicos.demo"}]},
+ {id:"C004",n:"Ferretería Illimani S.R.L.",nit:"1077889230",ciudad:"La Paz",tipo:"Importador",
+  etapa:"activo",ejecutivo:"Ana Quispe",desde:"nov 2025",
+  serv:["imp","adu"],ultima:"20 sep 2026",proximo:"23 sep 2026",
+  contactos:[{n:"Marcela Ortiz",c:"Gerente de Operaciones",t:"+591 2 231-7788",m:"mortiz@illimani.demo"}]},
+ {id:"C005",n:"Andina Textil S.A.",nit:"1033445590",ciudad:"El Alto",tipo:"Exportador",
+  etapa:"fidelizacion",ejecutivo:"Rodrigo Salazar",desde:"ene 2022",
+  serv:["exp","adu","tint","seg","p2p"],ultima:"12 sep 2026",proximo:"29 sep 2026",
+  contactos:[{n:"Jorge Ayala",c:"Director Comercial",t:"+591 2 284-9901",m:"jayala@textil.demo"}]},
+ {id:"C006",n:"Repuestos Tunari S.A.",nit:"1066778890",ciudad:"Cochabamba",tipo:"Importador",
+  etapa:"activo",ejecutivo:"Ana Quispe",desde:"jun 2025",
+  serv:["imp","tnac"],ultima:"08 sep 2026",proximo:"30 sep 2026",
+  contactos:[{n:"Pablo Rocha",c:"Gerente",t:"+591 4 452-3310",m:"procha@tunari.demo"}]},
+ {id:"C007",n:"Minerales del Sur S.A.",nit:"1011223340",ciudad:"Oruro",tipo:"Exportador",
+  etapa:"oportunidad",ejecutivo:"Rodrigo Salazar",desde:"—",
+  serv:[],ultima:"18 sep 2026",proximo:"24 sep 2026",
+  contactos:[{n:"Silvia Mamani",c:"Gerente de Exportaciones",t:"+591 2 527-1120",m:"smamani@minsur.demo"}]},
+ {id:"C008",n:"Distribuidora Oriental Ltda.",nit:"1055667780",ciudad:"Santa Cruz",tipo:"Importador",
+  etapa:"oportunidad",ejecutivo:"Ana Quispe",desde:"—",
+  serv:[],ultima:"15 sep 2026",proximo:"23 sep 2026",
+  contactos:[{n:"Hugo Terceros",c:"Compras",t:"+591 3 341-8820",m:"hterceros@oriental.demo"}]},
+ {id:"C009",n:"Farmacéutica Boliviana S.A.",nit:"1088990010",ciudad:"La Paz",tipo:"Importador",
+  etapa:"contactado",ejecutivo:"Ana Quispe",desde:"—",
+  serv:[],ultima:"14 sep 2026",proximo:"25 sep 2026",
+  contactos:[{n:"Diana Cruz",c:"Cadena de Suministro",t:"+591 2 211-4455",m:"dcruz@farmabol.demo"}]},
+ {id:"C010",n:"Maderas del Beni S.R.L.",nit:"1022334450",ciudad:"Trinidad",tipo:"Exportador",
+  etapa:"contactado",ejecutivo:"Rodrigo Salazar",desde:"—",
+  serv:[],ultima:"11 sep 2026",proximo:"26 sep 2026",
+  contactos:[{n:"Raúl Suárez",c:"Propietario",t:"+591 3 462-7701",m:"rsuarez@maderasbeni.demo"}]},
+ {id:"C011",n:"Textiles Pacajes Ltda.",nit:"1077001120",ciudad:"El Alto",tipo:"Exportador",
+  etapa:"prospecto",ejecutivo:"Ana Quispe",desde:"—",serv:[],ultima:"10 sep 2026",proximo:"27 sep 2026",
+  contactos:[{n:"Nora Choque",c:"Gerente",t:"+591 2 282-3390",m:"nchoque@pacajes.demo"}]},
+ {id:"C012",n:"Importadora Central S.A.",nit:"1099887760",ciudad:"Cochabamba",tipo:"Importador",
+  etapa:"prospecto",ejecutivo:"Rodrigo Salazar",desde:"—",serv:[],ultima:"09 sep 2026",proximo:"28 sep 2026",
+  contactos:[{n:"Iván Peña",c:"Gerente Comercial",t:"+591 4 425-6612",m:"ipena@central.demo"}]},
+ {id:"C013",n:"Agroindustrias Yapacaní S.A.",nit:"1044009980",ciudad:"Santa Cruz",tipo:"Exportador",
+  etapa:"prospecto",ejecutivo:"Ana Quispe",desde:"—",serv:[],ultima:"05 sep 2026",proximo:"01 oct 2026",
+  contactos:[{n:"Tomás Áñez",c:"Operaciones",t:"+591 3 392-4478",m:"tanez@yapacani.demo"}]}];
+var cliBy=function(id){for(var i=0;i<CLIENTES.length;i++){if(CLIENTES[i].id===id)return CLIENTES[i];}return null;};
 
-var CARRIERS=[
- {id:"illimani",n:"Transportes Illimani S.R.L.",base:"La Paz",flota:14,rating:4.8,viajes:212,
-  cap:28,corr:["Arica–La Paz","Ilo–La Paz"],unidadEn:"Arica",asignadas30d:7,gps:true,
-  unidad:"Scania R450 2022",placa:"1842-KLP",conductor:"Javier Mamani",
-  docs:{licencia:{st:"aprobado",vence:"30 jun 2027",hasta:"2027-06-30"},
-        seguro:{st:"aprobado",vence:"12 mar 2027",hasta:"2027-03-12"},
-        habilitacion:{st:"aprobado",vence:"18 ene 2027",hasta:"2027-01-18"},
-        antecedentes:{st:"aprobado",vence:"vigente",hasta:"2027-05-01"},
-        defensivo:{st:"aprobado",vence:"04 feb 2027",hasta:"2027-02-04"},
-        peligrosa:{st:"ausente",vence:"—",hasta:null}}},
- {id:"sur",n:"Flota del Sur S.A.",base:"Santa Cruz",flota:22,rating:4.9,viajes:341,
-  cap:34,corr:["Santa Cruz–Santos","Arica–La Paz"],unidadEn:"Santa Cruz",asignadas30d:11,gps:true,
-  unidad:"Volvo FH16 2023",placa:"2284-MTQ",conductor:"R. Céspedes",
-  docs:{licencia:{st:"aprobado",vence:"22 abr 2027",hasta:"2027-04-22"},
-        seguro:{st:"aprobado",vence:"05 nov 2027",hasta:"2027-11-05"},
-        habilitacion:{st:"aprobado",vence:"09 sep 2027",hasta:"2027-09-09"},
-        antecedentes:{st:"aprobado",vence:"vigente",hasta:"2027-08-01"},
-        defensivo:{st:"aprobado",vence:"19 jul 2027",hasta:"2027-07-19"},
-        peligrosa:{st:"aprobado",vence:"28 ene 2027",hasta:"2027-01-28"}}},
- {id:"andina",n:"Multimodal Andina S.R.L.",base:"Cochabamba",flota:11,rating:4.7,viajes:187,
-  cap:30,corr:["Ilo–La Paz","Arica–Cochabamba"],unidadEn:"Ilo",asignadas30d:5,gps:true,
-  unidad:"Mercedes Actros 2023",placa:"4419-PSD",conductor:"E. Rojas",
-  docs:{licencia:{st:"aprobado",vence:"14 dic 2026",hasta:"2026-12-14"},
-        seguro:{st:"aprobado",vence:"27 feb 2027",hasta:"2027-02-27"},
-        habilitacion:{st:"aprobado",vence:"03 may 2027",hasta:"2027-05-03"},
-        antecedentes:{st:"aprobado",vence:"vigente",hasta:"2027-03-01"},
-        defensivo:{st:"aprobado",vence:"11 nov 2026",hasta:"2026-11-11"},
-        peligrosa:{st:"aprobado",vence:"16 jun 2027",hasta:"2027-06-16"}}},
- {id:"andes",n:"Andes Cargo Bolivia",base:"Oruro",flota:8,rating:4.6,viajes:156,
-  cap:30,corr:["Arica–La Paz","Iquique–Oruro"],unidadEn:"Arica",asignadas30d:3,gps:true,
-  unidad:"Volvo FH 2021",placa:"3271-XRB",conductor:"M. Choque",
-  docs:{licencia:{st:"aprobado",vence:"07 jul 2027",hasta:"2027-07-07"},
-        seguro:{st:"aprobado",vence:"19 ago 2027",hasta:"2027-08-19"},
-        habilitacion:{st:"aprobado",vence:"29 mar 2027",hasta:"2027-03-29"},
-        antecedentes:{st:"aprobado",vence:"vigente",hasta:"2027-06-01"},
-        defensivo:{st:"ausente",vence:"—",hasta:null},
-        peligrosa:{st:"ausente",vence:"—",hasta:null}}},
- {id:"vargas",n:"Transportes Vargas Hnos.",base:"La Paz",flota:6,rating:4.4,viajes:98,
-  cap:26,corr:["Arica–La Paz","Ilo–La Paz"],unidadEn:"La Paz",asignadas30d:2,gps:false,
-  unidad:"Iveco Stralis 2019",placa:"5518-TGR",conductor:"Marco Vargas",
-  docs:{licencia:{st:"aprobado",vence:"11 may 2027",hasta:"2027-05-11"},
-        seguro:{st:"aprobado",vence:"20 sep 2026",hasta:"2026-09-20"},
-        habilitacion:{st:"aprobado",vence:"24 feb 2027",hasta:"2027-02-24"},
-        antecedentes:{st:"aprobado",vence:"vigente",hasta:"2027-04-01"},
-        defensivo:{st:"ausente",vence:"—",hasta:null},
-        peligrosa:{st:"ausente",vence:"—",hasta:null}}},
- {id:"quispe",n:"Transportes Quispe",base:"El Alto",flota:3,rating:3.9,viajes:41,
-  cap:18,corr:["Desaguadero–La Paz","Arica–La Paz"],unidadEn:"El Alto",asignadas30d:1,gps:false,
-  unidad:"Hino 500 2016",placa:"7702-NCB",conductor:"S. Quispe",
-  docs:{licencia:{st:"aprobado",vence:"08 oct 2026",hasta:"2026-10-08"},
-        seguro:{st:"vencido",vence:"30 jun 2026",hasta:"2026-06-30"},
-        habilitacion:{st:"aprobado",vence:"12 oct 2026",hasta:"2026-10-12"},
-        antecedentes:{st:"ausente",vence:"sin presentar",hasta:null},
-        defensivo:{st:"ausente",vence:"—",hasta:null},
-        peligrosa:{st:"ausente",vence:"—",hasta:null}}},
- {id:"chuquiago",n:"Transportes Chuquiago S.R.L.",base:"El Alto",flota:4,rating:0,viajes:0,nuevo:true,
-  cap:32,corr:["Arica–La Paz"],unidadEn:"El Alto",asignadas30d:0,gps:true,
-  unidad:"Freightliner Cascadia 2022",placa:"6140-QWX",conductor:"D. Apaza",
-  docs:{licencia:{st:"pendiente",vence:"03 mar 2028",hasta:"2028-03-03"},
-        seguro:{st:"pendiente",vence:"15 ene 2028",hasta:"2028-01-15"},
-        habilitacion:{st:"pendiente",vence:"21 nov 2027",hasta:"2027-11-21"},
-        antecedentes:{st:"pendiente",vence:"vigente",hasta:"2027-12-01"},
-        defensivo:{st:"ausente",vence:"—",hasta:null},
-        peligrosa:{st:"ausente",vence:"—",hasta:null}}}];
-var carrierBy=function(id){for(var i=0;i<CARRIERS.length;i++){if(CARRIERS[i].id===id)return CARRIERS[i];}return null;};
+/* ===================== OPORTUNIDADES ===================== */
+var OPORTUNIDADES=[
+ {id:"OP-041",cli:"C007",t:"Exportación de concentrado de zinc",serv:"exp",valor:48000,etapa:"oportunidad",prob:65,cierre:"10 oct 2026"},
+ {id:"OP-042",cli:"C008",t:"Importación de línea blanca",serv:"imp",valor:32500,etapa:"oportunidad",prob:50,cierre:"15 oct 2026"},
+ {id:"OP-043",cli:"C009",t:"Importación de insumos farmacéuticos",serv:"imp",valor:27800,etapa:"contactado",prob:30,cierre:"28 oct 2026"},
+ {id:"OP-044",cli:"C010",t:"Exportación de madera certificada",serv:"exp",valor:19400,etapa:"contactado",prob:25,cierre:"05 nov 2026"},
+ {id:"OP-045",cli:"C001",t:"Ampliación: seguro de carga",serv:"seg",valor:9800,etapa:"oportunidad",prob:70,cierre:"02 oct 2026"},
+ {id:"OP-046",cli:"C004",t:"Ampliación: almacenamiento en La Paz",serv:"alm",valor:14200,etapa:"oportunidad",prob:55,cierre:"08 oct 2026"},
+ {id:"OP-047",cli:"C002",t:"Ampliación: entrega puerta a puerta",serv:"p2p",valor:16600,etapa:"oportunidad",prob:45,cierre:"18 oct 2026"},
+ {id:"OP-048",cli:"C011",t:"Exportación de prendas de alpaca",serv:"exp",valor:22300,etapa:"prospecto",prob:15,cierre:"20 nov 2026"},
+ {id:"OP-049",cli:"C012",t:"Importación de repuestos industriales",serv:"imp",valor:35100,etapa:"prospecto",prob:10,cierre:"25 nov 2026"},
+ {id:"OP-050",cli:"C006",t:"Ampliación: transporte internacional",serv:"tint",valor:12900,etapa:"oportunidad",prob:40,cierre:"12 oct 2026"},
+ {id:"OP-051",cli:"C013",t:"Exportación de soya en grano",serv:"exp",valor:41200,etapa:"prospecto",prob:15,cierre:"30 nov 2026"},
+ {id:"OP-052",cli:"C003",t:"Ampliación: almacenamiento aduanero",serv:"alm",valor:11500,etapa:"oportunidad",prob:50,cierre:"14 oct 2026"}];
 
-/* Estado global del perfil */
-function perfilEstado(c){
+/* ===================== ACTIVIDADES ===================== */
+var ACT_TIPOS={llamada:"Llamada",email:"Correo",reunion:"Reunión",visita:"Visita",tarea:"Tarea"};
+var ACTIVIDADES=[
+ {id:"A-201",cli:"C004",tipo:"llamada",fecha:"23 sep 2026",asunto:"Confirmar retiro en puerto Arica",estado:"pendiente",resp:"Ana Quispe"},
+ {id:"A-202",cli:"C008",tipo:"reunion",fecha:"23 sep 2026",asunto:"Presentación de propuesta",estado:"pendiente",resp:"Ana Quispe"},
+ {id:"A-203",cli:"C007",tipo:"visita",fecha:"24 sep 2026",asunto:"Visita a planta en Oruro",estado:"pendiente",resp:"Rodrigo Salazar"},
+ {id:"A-204",cli:"C002",tipo:"email",fecha:"24 sep 2026",asunto:"Enviar cotización de puerta a puerta",estado:"pendiente",resp:"Ana Quispe"},
+ {id:"A-205",cli:"C001",tipo:"tarea",fecha:"25 sep 2026",asunto:"Revisar póliza para ampliación de seguro",estado:"pendiente",resp:"Ana Quispe"},
+ {id:"A-206",cli:"C009",tipo:"llamada",fecha:"25 sep 2026",asunto:"Seguimiento de propuesta inicial",estado:"pendiente",resp:"Ana Quispe"},
+ {id:"A-207",cli:"C003",tipo:"reunion",fecha:"26 sep 2026",asunto:"Cierre de ampliación de almacenamiento",estado:"pendiente",resp:"Rodrigo Salazar"},
+ {id:"A-208",cli:"C010",tipo:"email",fecha:"26 sep 2026",asunto:"Requisitos de certificación forestal",estado:"pendiente",resp:"Rodrigo Salazar"},
+ {id:"A-209",cli:"C001",tipo:"reunion",fecha:"19 sep 2026",asunto:"Revisión trimestral de operaciones",estado:"hecha",resp:"Ana Quispe"},
+ {id:"A-210",cli:"C004",tipo:"llamada",fecha:"20 sep 2026",asunto:"Aviso de demora en Tambo Quemado",estado:"hecha",resp:"Ana Quispe"},
+ {id:"A-211",cli:"C007",tipo:"llamada",fecha:"18 sep 2026",asunto:"Primer contacto comercial",estado:"hecha",resp:"Rodrigo Salazar"},
+ {id:"A-212",cli:"C002",tipo:"visita",fecha:"17 sep 2026",asunto:"Inspección de carga en planta",estado:"hecha",resp:"Ana Quispe"},
+ {id:"A-213",cli:"C005",tipo:"email",fecha:"12 sep 2026",asunto:"Confirmación de embarque a Callao",estado:"hecha",resp:"Rodrigo Salazar"},
+ {id:"A-214",cli:"C006",tipo:"tarea",fecha:"08 sep 2026",asunto:"Cargar documentos de desaduanización",estado:"hecha",resp:"Ana Quispe"}];
+
+/* ===================== OPERACIONES ===================== */
+var OPERACIONES=[
+ {id:"IMP-2026-0847",cli:"C004",tipo:"imp",ruta:"Arica → Tambo Quemado → La Paz",modal:"FCL 40'",peso:24100,
+  merc:"Conductores eléctricos de cobre",estado:"transito",abierta:"02 sep 2026",fob:41280},
+ {id:"IMP-2026-0855",cli:"C004",tipo:"imp",ruta:"Arica → Tambo Quemado → La Paz",modal:"FCL 20'",peso:18300,
+  merc:"Herramienta manual y ferretería",estado:"puerto",abierta:"15 sep 2026",fob:22750},
+ {id:"IMP-2026-0839",cli:"C003",tipo:"imp",ruta:"Ilo → Desaguadero → La Paz",modal:"LCL",peso:6480,
+  merc:"Insumos químicos industriales",estado:"aduana",abierta:"28 ago 2026",fob:68400},
+ {id:"EXP-2026-0213",cli:"C002",tipo:"exp",ruta:"Santa Cruz → Puerto Suárez → Santos",modal:"FCL 40' HC",peso:26000,
+  merc:"Quinua real orgánica en grano",estado:"docs",abierta:"09 sep 2026",fob:78520},
+ {id:"IMP-2026-0851",cli:"C006",tipo:"imp",ruta:"Iquique → Pisiga → Oruro → Cochabamba",modal:"LCL",peso:3940,
+  merc:"Repuestos automotrices",estado:"transito",abierta:"08 sep 2026",fob:19300},
+ {id:"EXP-2026-0209",cli:"C005",tipo:"exp",ruta:"La Paz → Arica → Callao",modal:"FCL 20'",peso:8200,
+  merc:"Prendas de punto de alpaca",estado:"cerrada",abierta:"14 ago 2026",fob:96400},
+ {id:"IMP-2026-0801",cli:"C001",tipo:"imp",ruta:"Arica → Tambo Quemado → La Paz",modal:"FCL 40'",peso:27400,
+  merc:"Electrodomésticos de línea blanca",estado:"cerrada",abierta:"05 jul 2026",fob:134800},
+ {id:"IMP-2026-0812",cli:"C001",tipo:"imp",ruta:"Ilo → Desaguadero → La Paz",modal:"FCL 40'",peso:25900,
+  merc:"Material de construcción",estado:"cerrada",abierta:"22 jul 2026",fob:88300},
+ {id:"IMP-2026-0826",cli:"C001",tipo:"imp",ruta:"Arica → Tambo Quemado → La Paz",modal:"LCL",peso:7100,
+  merc:"Repuestos y accesorios",estado:"cerrada",abierta:"11 ago 2026",fob:31200},
+ {id:"IMP-2026-0844",cli:"C001",tipo:"imp",ruta:"Iquique → Pisiga → Oruro → La Paz",modal:"FCL 40'",peso:26800,
+  merc:"Equipos de refrigeración",estado:"aduana",abierta:"30 ago 2026",fob:102600},
+ {id:"IMP-2026-0858",cli:"C001",tipo:"imp",ruta:"Arica → Tambo Quemado → La Paz",modal:"FCL 40' HC",peso:28200,
+  merc:"Mobiliario y menaje",estado:"transito",abierta:"16 sep 2026",fob:74900},
+ {id:"EXP-2026-0198",cli:"C001",tipo:"exp",ruta:"La Paz → Arica",modal:"LCL",peso:4600,
+  merc:"Artesanía y textil andino",estado:"cerrada",abierta:"18 jun 2026",fob:28400}];
+var opBy=function(id){for(var i=0;i<OPERACIONES.length;i++){if(OPERACIONES[i].id===id)return OPERACIONES[i];}return null;};
+var opEstado=function(e){
+  var m={transito:["b-accent","En tránsito"],aduana:["b-warn","En aduana"],puerto:["b-warn","En puerto"],
+         docs:["b-neutral","Documentación"],cerrada:["b-ok","Cerrada"]};
+  return m[e]||["b-neutral","—"];};
+
+/* ===================== DOCUMENTOS ===================== */
+var DOC_CATS=[
+ {id:"factura",n:"Factura comercial",fmt:"PDF"},
+ {id:"packing",n:"Packing list",fmt:"XLSX"},
+ {id:"transporte",n:"Documento de transporte",fmt:"PDF"},
+ {id:"origen",n:"Certificado de origen",fmt:"PDF"},
+ {id:"aduana",n:"Documentos aduaneros",fmt:"PDF"},
+ {id:"cotizacion",n:"Cotizaciones",fmt:"PDF"},
+ {id:"contrato",n:"Contratos",fmt:"PDF"},
+ {id:"clientedoc",n:"Documentación del cliente",fmt:"PDF"},
+ {id:"inspeccion",n:"Fotos de inspección",fmt:"JPG"},
+ {id:"seguro",n:"Póliza de seguro",fmt:"PDF"}];
+var catN=function(id){for(var i=0;i<DOC_CATS.length;i++){if(DOC_CATS[i].id===id)return DOC_CATS[i];}return {id:id,n:id,fmt:"PDF"};};
+var DOC_ESTADOS={aprobado:["b-ok","Aprobado"],pendiente:["b-warn","Pendiente"],
+  rechazado:["b-crit","Rechazado"],vencido:["b-crit","Vencido"]};
+
+var DOCS=[];
+(function genDocs(){
+  var meses=["jun","jul","ago","sep"];
+  var seq=1000;
+  OPERACIONES.forEach(function(op){
+    /* Comercial Andina concentra el volumen alto: es el caso de prueba */
+    var densidad = op.cli==="C001" ? ri(26,34) : ri(8,14);
+    for(var i=0;i<densidad;i++){
+      var cat=pick(DOC_CATS);
+      var esFoto=cat.id==="inspeccion";
+      var size=esFoto?ri(18,42)+rnd():(cat.fmt==="XLSX"?0.3+rnd()*0.9:1.2+rnd()*7.5);
+      var est=rnd()<0.70?"aprobado":(rnd()<0.75?"pendiente":(rnd()<0.6?"rechazado":"vencido"));
+      seq++;
+      DOCS.push({
+        id:"D"+seq, cli:op.cli, op:op.id, cat:cat.id, fmt:cat.fmt,
+        n:cat.n.replace(/ /g,"_")+"_"+op.id+(esFoto?"_lote"+ri(1,3):"_v"+ri(1,3))+"."+cat.fmt.toLowerCase(),
+        size:Math.round(size*10)/10, estado:est,
+        fecha:ri(1,28)+" "+pick(meses)+" 2026",
+        por:pick(["Ana Quispe","Rodrigo Salazar","Marcela Ortiz","Sistema"]),
+        dup:false});
+    }
+  });
+  /* Duplicados deliberados: el sistema debe detectarlos */
+  var base=DOCS.filter(function(d){return d.cli==="C001";});
+  for(var k=0;k<4;k++){
+    var o=base[ri(0,base.length-1)];
+    seq++;
+    DOCS.push({id:"D"+seq,cli:o.cli,op:o.op,cat:o.cat,fmt:o.fmt,n:o.n,size:o.size,
+      estado:"pendiente",fecha:"21 sep 2026",por:"Marcela Ortiz",dup:true});
+  }
+})();
+var docsDe=function(cli){return DOCS.filter(function(d){return d.cli===cli;});};
+
+/* ===================== TRANSPORTISTAS ===================== */
+var CERT_TIPOS=[
+ {id:"licencia",n:"Licencia categoría C",oblig:true},
+ {id:"seguro",n:"Seguro de carga",oblig:true},
+ {id:"habilitacion",n:"Habilitación Viceministerio",oblig:true},
+ {id:"antecedentes",n:"Antecedentes del conductor",oblig:true},
+ {id:"defensivo",n:"Manejo defensivo",oblig:false},
+ {id:"peligrosa",n:"Carga peligrosa",oblig:false}];
+var certN=function(id){for(var i=0;i<CERT_TIPOS.length;i++){if(CERT_TIPOS[i].id===id)return CERT_TIPOS[i].n;}return id;};
+
+var TRANSPORTISTAS=[
+ {id:"T01",n:"Transportes Illimani S.R.L.",contacto:"Javier Mamani",tel:"+591 7 145-2230",
+  tipo:"Internacional",cobertura:["Arica–La Paz","Ilo–La Paz"],cap:28,
+  vehiculos:["Tracto + semirremolque","Furgón 15 t"],disp:"disponible",viajes:212,cumpl:96,
+  unidad:"Scania R450 2022",placa:"1842-KLP",base:"La Paz",asignadas30d:7,en:"Arica",
+  certs:{licencia:{est:"aprobado",em:"30 jun 2024",ven:"30 jun 2027"},
+         seguro:{est:"aprobado",em:"12 mar 2025",ven:"12 mar 2027"},
+         habilitacion:{est:"aprobado",em:"18 ene 2025",ven:"18 ene 2027"},
+         antecedentes:{est:"aprobado",em:"01 may 2025",ven:"01 may 2027"},
+         defensivo:{est:"aprobado",em:"04 feb 2025",ven:"04 feb 2027"},
+         peligrosa:{est:"ausente",em:"—",ven:"—"}}},
+ {id:"T02",n:"Flota del Sur S.A.",contacto:"Rodrigo Céspedes",tel:"+591 7 332-6610",
+  tipo:"Internacional",cobertura:["Santa Cruz–Santos","Arica–La Paz"],cap:34,
+  vehiculos:["Tracto + semirremolque","Portacontenedor 40'"],disp:"disponible",viajes:341,cumpl:98,
+  unidad:"Volvo FH16 2023",placa:"2284-MTQ",base:"Santa Cruz",asignadas30d:11,en:"Santa Cruz",
+  certs:{licencia:{est:"aprobado",em:"22 abr 2024",ven:"22 abr 2027"},
+         seguro:{est:"aprobado",em:"05 nov 2024",ven:"05 nov 2027"},
+         habilitacion:{est:"aprobado",em:"09 sep 2024",ven:"09 sep 2027"},
+         antecedentes:{est:"aprobado",em:"01 ago 2025",ven:"01 ago 2027"},
+         defensivo:{est:"aprobado",em:"19 jul 2024",ven:"19 jul 2027"},
+         peligrosa:{est:"aprobado",em:"28 ene 2025",ven:"28 ene 2027"}}},
+ {id:"T03",n:"Multimodal Andina S.R.L.",contacto:"Elena Rojas",tel:"+591 7 441-9982",
+  tipo:"Internacional",cobertura:["Ilo–La Paz","Arica–Cochabamba"],cap:30,
+  vehiculos:["Tracto + semirremolque","Cisterna 25 m³"],disp:"en_viaje",viajes:187,cumpl:94,
+  unidad:"Mercedes Actros 2023",placa:"4419-PSD",base:"Cochabamba",asignadas30d:5,en:"Ilo",
+  certs:{licencia:{est:"aprobado",em:"14 dic 2023",ven:"14 dic 2026"},
+         seguro:{est:"aprobado",em:"27 feb 2025",ven:"27 feb 2027"},
+         habilitacion:{est:"aprobado",em:"03 may 2025",ven:"03 may 2027"},
+         antecedentes:{est:"aprobado",em:"01 mar 2025",ven:"01 mar 2027"},
+         defensivo:{est:"aprobado",em:"11 nov 2023",ven:"11 nov 2026"},
+         peligrosa:{est:"aprobado",em:"16 jun 2025",ven:"16 jun 2027"}}},
+ {id:"T04",n:"Andes Cargo Bolivia",contacto:"Marco Choque",tel:"+591 7 228-4471",
+  tipo:"Internacional",cobertura:["Arica–La Paz","Iquique–Oruro"],cap:30,
+  vehiculos:["Tracto + semirremolque"],disp:"disponible",viajes:156,cumpl:93,
+  unidad:"Volvo FH 2021",placa:"3271-XRB",base:"Oruro",asignadas30d:3,en:"Arica",
+  certs:{licencia:{est:"aprobado",em:"07 jul 2024",ven:"07 jul 2027"},
+         seguro:{est:"aprobado",em:"19 ago 2024",ven:"19 ago 2027"},
+         habilitacion:{est:"aprobado",em:"29 mar 2025",ven:"29 mar 2027"},
+         antecedentes:{est:"aprobado",em:"01 jun 2025",ven:"01 jun 2027"},
+         defensivo:{est:"ausente",em:"—",ven:"—"},
+         peligrosa:{est:"ausente",em:"—",ven:"—"}}},
+ {id:"T05",n:"Transportes Vargas Hnos.",contacto:"Marco Vargas",tel:"+591 7 119-3302",
+  tipo:"Internacional",cobertura:["Arica–La Paz","Ilo–La Paz"],cap:26,
+  vehiculos:["Furgón 20 t"],disp:"disponible",viajes:98,cumpl:88,
+  unidad:"Iveco Stralis 2019",placa:"5518-TGR",base:"La Paz",asignadas30d:2,en:"La Paz",
+  certs:{licencia:{est:"aprobado",em:"11 may 2024",ven:"11 may 2027"},
+         seguro:{est:"vencido",em:"20 sep 2025",ven:"20 sep 2026"},
+         habilitacion:{est:"aprobado",em:"24 feb 2025",ven:"24 feb 2027"},
+         antecedentes:{est:"aprobado",em:"01 abr 2025",ven:"01 abr 2027"},
+         defensivo:{est:"ausente",em:"—",ven:"—"},
+         peligrosa:{est:"ausente",em:"—",ven:"—"}}},
+ {id:"T06",n:"Transportes Quispe",contacto:"Sergio Quispe",tel:"+591 7 556-2218",
+  tipo:"Nacional",cobertura:["Desaguadero–La Paz","Arica–La Paz"],cap:18,
+  vehiculos:["Camión rígido 10 t"],disp:"no_disponible",viajes:41,cumpl:79,
+  unidad:"Hino 500 2016",placa:"7702-NCB",base:"El Alto",asignadas30d:1,en:"El Alto",
+  certs:{licencia:{est:"aprobado",em:"08 oct 2023",ven:"08 oct 2026"},
+         seguro:{est:"vencido",em:"30 jun 2025",ven:"30 jun 2026"},
+         habilitacion:{est:"aprobado",em:"12 oct 2024",ven:"12 oct 2026"},
+         antecedentes:{est:"ausente",em:"—",ven:"—"},
+         defensivo:{est:"ausente",em:"—",ven:"—"},
+         peligrosa:{est:"ausente",em:"—",ven:"—"}}},
+ {id:"T07",n:"Transportes Chuquiago S.R.L.",contacto:"Daniel Apaza",tel:"+591 7 663-1140",
+  tipo:"Internacional",cobertura:["Arica–La Paz"],cap:32,
+  vehiculos:["Tracto + semirremolque"],disp:"disponible",viajes:0,cumpl:0,nuevo:true,
+  unidad:"Freightliner Cascadia 2022",placa:"6140-QWX",base:"El Alto",asignadas30d:0,en:"El Alto",
+  certs:{licencia:{est:"pendiente",em:"03 mar 2025",ven:"03 mar 2028"},
+         seguro:{est:"pendiente",em:"15 ene 2025",ven:"15 ene 2028"},
+         habilitacion:{est:"pendiente",em:"21 nov 2024",ven:"21 nov 2027"},
+         antecedentes:{est:"pendiente",em:"01 dic 2025",ven:"01 dic 2027"},
+         defensivo:{est:"ausente",em:"—",ven:"—"},
+         peligrosa:{est:"ausente",em:"—",ven:"—"}}}];
+var traBy=function(id){for(var i=0;i<TRANSPORTISTAS.length;i++){if(TRANSPORTISTAS[i].id===id)return TRANSPORTISTAS[i];}return null;};
+
+var CERT_EST={aprobado:["b-ok","Aprobado"],pendiente:["b-warn","Pendiente"],
+  vencido:["b-crit","Vencido"],ausente:["b-neutral","No presentado"]};
+function certEstado(t){
   var pend=0,mal=0;
-  for(var i=0;i<CERT_KEYS.length;i++){
-    var k=CERT_KEYS[i], d=c.docs[k];
-    if(!CERTS[k].oblig) continue;
-    if(d.st==="pendiente") pend++;
-    else if(d.st!=="aprobado") mal++;
-  }
-  if(mal>0) return {cls:"b-crit",txt:"No habilitado",code:"bloqueado"};
-  if(pend>0) return {cls:"b-warn",txt:"En revisión ("+pend+")",code:"revision"};
-  return {cls:"b-ok",txt:"Habilitado",code:"habilitado"};
+  CERT_TIPOS.forEach(function(c){
+    if(!c.oblig) return;
+    var d=t.certs[c.id];
+    if(d.est==="pendiente") pend++; else if(d.est!=="aprobado") mal++;});
+  if(mal>0) return {cls:"b-crit",txt:"No certificado",code:"no"};
+  if(pend>0) return {cls:"b-warn",txt:"Validación pendiente",code:"pend"};
+  return {cls:"b-ok",txt:"Certificado",code:"ok"};
 }
-function pendientesDe(c){
-  return CERT_KEYS.filter(function(k){return c.docs[k].st==="pendiente";});
-}
-function totalPendientes(){
-  return CARRIERS.reduce(function(a,c){return a+pendientesDe(c).length;},0);
-}
+var DISP={disponible:["b-ok","Disponible"],en_viaje:["b-accent","En viaje"],no_disponible:["b-neutral","No disponible"]};
 
-/* ===================== CARGAS Y MOTOR DE ASIGNACIÓN ===================== */
-var LOADS=[
- {id:"CG-2026-0412",exp:"IMP-2026-0847",cliente:"Ferretería Illimani S.R.L.",
-  origen:"Arica",destino:"La Paz",corredor:"Arica–La Paz",peso:24100,
-  carga:"Conductores eléctricos de cobre · carga general",peligrosa:false,
-  retiro:"19 sep 2026 · 07:00",entregaISO:"2026-09-21",entrega:"21 sep 2026",asignado:null},
- {id:"CG-2026-0413",exp:"IMP-2026-0839",cliente:"Químicos del Altiplano S.R.L.",
-  origen:"Ilo",destino:"La Paz",corredor:"Ilo–La Paz",peso:6480,
-  carga:"Insumos químicos industriales · carga peligrosa clase 8",peligrosa:true,
-  retiro:"21 sep 2026 · 06:00",entregaISO:"2026-09-24",entrega:"24 sep 2026",asignado:null}];
-var loadBy=function(id){for(var i=0;i<LOADS.length;i++){if(LOADS[i].id===id)return LOADS[i];}return null;};
+/* ===================== DEMANDAS DE CARGA ===================== */
+var PRIOR={alta:["b-crit","Alta"],media:["b-warn","Media"],baja:["b-neutral","Baja"]};
+var DEM_EST={borrador:["b-neutral","Borrador"],publicada:["b-accent","Publicada"],
+  asignada:["b-warn","Asignada"],confirmada:["b-ok","Confirmada"],cerrada:["b-ok","Cerrada"]};
+var DEMANDAS=[
+ {id:"DC-0412",cli:"C004",op:"IMP-2026-0847",origen:"Arica",destino:"La Paz",corredor:"Arica–La Paz",
+  carga:"24 sep 2026",entrega:"26 sep 2026",entregaISO:"2026-09-26",merc:"Conductores eléctricos de cobre",
+  peligrosa:false,peso:24100,vol:58,vehiculo:"Tracto + semirremolque",prior:"alta",
+  estado:"confirmada",tra:"T01"},
+ {id:"DC-0413",cli:"C003",op:"IMP-2026-0839",origen:"Ilo",destino:"La Paz",corredor:"Ilo–La Paz",
+  carga:"25 sep 2026",entrega:"28 sep 2026",entregaISO:"2026-09-28",merc:"Insumos químicos clase 8",
+  peligrosa:true,peso:6480,vol:22,vehiculo:"Cisterna 25 m³",prior:"alta",
+  estado:"publicada",tra:null},
+ {id:"DC-0414",cli:"C001",op:"IMP-2026-0858",origen:"Arica",destino:"La Paz",corredor:"Arica–La Paz",
+  carga:"26 sep 2026",entrega:"28 sep 2026",entregaISO:"2026-09-28",merc:"Mobiliario y menaje",
+  peligrosa:false,peso:28200,vol:76,vehiculo:"Tracto + semirremolque",prior:"media",
+  estado:"publicada",tra:null},
+ {id:"DC-0415",cli:"C006",op:"IMP-2026-0851",origen:"Iquique",destino:"Cochabamba",corredor:"Iquique–Oruro",
+  carga:"27 sep 2026",entrega:"01 oct 2026",entregaISO:"2026-10-01",merc:"Repuestos automotrices",
+  peligrosa:false,peso:3940,vol:14,vehiculo:"Camión rígido 10 t",prior:"baja",
+  estado:"asignada",tra:"T04"},
+ {id:"DC-0416",cli:"C002",op:"EXP-2026-0213",origen:"Santa Cruz",destino:"Santos",corredor:"Santa Cruz–Santos",
+  carga:"29 sep 2026",entrega:"04 oct 2026",entregaISO:"2026-10-04",merc:"Quinua real orgánica",
+  peligrosa:false,peso:26000,vol:68,vehiculo:"Portacontenedor 40'",prior:"media",
+  estado:"borrador",tra:null}];
+var demBy=function(id){for(var i=0;i<DEMANDAS.length;i++){if(DEMANDAS[i].id===id)return DEMANDAS[i];}return null;};
 
-/* Reglas de elegibilidad, en orden. Devuelve null si pasa, o el motivo del rechazo. */
-function evaluar(c,l){
-  var st=perfilEstado(c);
-  if(st.code==="bloqueado"){
-    var faltan=CERT_KEYS.filter(function(k){return CERTS[k].oblig && c.docs[k].st!=="aprobado";})
-      .map(function(k){return CERTS[k].n.toLowerCase();});
-    return {motivo:"Documentación obligatoria no vigente: "+faltan.join(", "),regla:1};
-  }
-  if(st.code==="revision") return {motivo:"Perfil en revisión — documentos aún sin aprobar",regla:1};
-  if(c.docs.seguro.hasta && c.docs.seguro.hasta < l.entregaISO)
-    return {motivo:"El seguro de carga vence el "+c.docs.seguro.vence+", antes de la entrega ("+l.entrega+")",regla:2};
-  if(l.peligrosa && c.docs.peligrosa.st!=="aprobado")
-    return {motivo:"Sin certificación de transporte de carga peligrosa",regla:3};
-  if(c.corr.indexOf(l.corredor)<0)
-    return {motivo:"No cubre el corredor "+l.corredor,regla:4};
-  if(c.cap*1000 < l.peso)
-    return {motivo:"Capacidad insuficiente: "+c.cap+" t contra "+nf(l.peso)+" kg",regla:5};
+/* ===================== MATCHING ===================== */
+function evaluar(t,d){
+  var st=certEstado(t);
+  if(st.code==="no"){
+    var f=CERT_TIPOS.filter(function(c){return c.oblig&&t.certs[c.id].est!=="aprobado";})
+      .map(function(c){return c.n.toLowerCase();});
+    return {motivo:"Certificación no vigente: "+f.join(", "),regla:1};}
+  if(st.code==="pend") return {motivo:"Validación de documentos pendiente",regla:1};
+  if(t.certs.seguro.est==="aprobado"&&isoDe(t.certs.seguro.ven)<d.entregaISO)
+    return {motivo:"Seguro vence el "+t.certs.seguro.ven+", antes de la entrega",regla:2};
+  if(d.peligrosa&&t.certs.peligrosa.est!=="aprobado")
+    return {motivo:"Sin certificación de carga peligrosa",regla:3};
+  if(t.cobertura.indexOf(d.corredor)<0) return {motivo:"No cubre "+d.corredor,regla:4};
+  if(t.cap*1000<d.peso) return {motivo:"Capacidad "+t.cap+" t < "+nf(d.peso)+" kg",regla:5};
+  if(t.disp==="no_disponible") return {motivo:"No disponible en la fecha de carga",regla:6};
   return null;
 }
-function puntaje(c,l){
-  var calif=(c.rating/5)*40;
-  var rot=((12-Math.min(c.asignadas30d,12))/12)*35;
-  var prox=(c.unidadEn===l.origen)?25:8;
-  var bonus=(c.docs.defensivo.st==="aprobado")?5:0;
-  return {total:Math.round(calif+rot+prox+bonus),calif:Math.round(calif),
-          rot:Math.round(rot),prox:prox,bonus:bonus};
+var MESES={ene:"01",feb:"02",mar:"03",abr:"04",may:"05",jun:"06",jul:"07",ago:"08",sep:"09",oct:"10",nov:"11",dic:"12"};
+function isoDe(f){
+  var p=String(f).split(" ");
+  if(p.length<3) return "2099-12-31";
+  return p[2]+"-"+(MESES[p[1]]||"01")+"-"+("0"+p[0]).slice(-2);
 }
-function evaluarTodos(l){
-  var elegibles=[],excluidos=[];
-  CARRIERS.forEach(function(c){
-    var no=evaluar(c,l);
-    if(no) excluidos.push({c:c,motivo:no.motivo,regla:no.regla});
-    else elegibles.push({c:c,p:puntaje(c,l)});
-  });
-  elegibles.sort(function(a,b){return b.p.total-a.p.total;});
-  excluidos.sort(function(a,b){return a.regla-b.regla;});
-  return {elegibles:elegibles,excluidos:excluidos};
+function puntaje(t,d){
+  var cumpl=(t.cumpl/100)*40;
+  var rot=((12-Math.min(t.asignadas30d,12))/12)*30;
+  var prox=(t.en===d.origen)?20:6;
+  var disp=(t.disp==="disponible")?10:0;
+  return {total:Math.round(cumpl+rot+prox+disp),cumpl:Math.round(cumpl),
+          rot:Math.round(rot),prox:prox,disp:disp};
+}
+function candidatos(d){
+  var ok=[],no=[];
+  TRANSPORTISTAS.forEach(function(t){
+    var r=evaluar(t,d);
+    if(r) no.push({t:t,motivo:r.motivo,regla:r.regla}); else ok.push({t:t,p:puntaje(t,d)});});
+  ok.sort(function(a,b){return b.p.total-a.p.total;});
+  no.sort(function(a,b){return a.regla-b.regla;});
+  return {ok:ok,no:no};
 }
 
-/* ===================== TRÁNSITO ===================== */
-var SHIPMENTS=[
- {code:"IMP-2026-0847",estado:"incidencia",cliente:"Ferretería Illimani S.R.L.",carrierId:"illimani",
-  placa:"1842-KLP",ruta:"Arica → Tambo Quemado → La Paz",pct:62,eta:"18 sep 2026 · 10:00",
-  gps:"Ruta 11-CH · km 218 · 3.940 m s.n.m. · señal hace 6 min",
-  alerta:{t:"Demora en frontera Tambo Quemado",
-   d:"Cola declarada de 6 h en el control fronterizo. ETA de entrega recalculada +4 h. El cliente fue notificado automáticamente el 17 sep · 11:42, sin que nadie del equipo tuviera que llamar."},
-  hitos:[{n:"Arribo de la nave a puerto Arica",t:"12 sep · 08:20",s:"done"},
-   {n:"Desconsolidación y retiro de puerto",t:"15 sep · 09:40",s:"done"},
-   {n:"Precintado y emisión de MIC/DTA",t:"15 sep · 16:15",s:"done"},
-   {n:"Tránsito Arica → Tambo Quemado",t:"en curso · km 218",s:"now"},
-   {n:"Control de frontera Tambo Quemado",t:"ETA 18 sep · 02:30",s:"next"},
-   {n:"Tránsito Tambo Quemado → La Paz",t:"ETA 18 sep · 08:00",s:"next"},
-   {n:"Entrega en almacén del cliente",t:"ETA 18 sep · 10:00",s:"next"}]},
- {code:"IMP-2026-0839",estado:"curso",cliente:"Químicos del Altiplano S.R.L.",carrierId:"andina",
-  placa:"4419-PSD",ruta:"Ilo → Desaguadero → La Paz",pct:85,eta:"18 sep 2026 · 16:00",
-  gps:"Recinto aduanero La Paz · en aforo",alerta:null,
-  hitos:[{n:"Arribo a puerto Ilo",t:"05 sep · 11:05",s:"done"},
-   {n:"Tránsito Ilo → Desaguadero",t:"09 sep · 19:30",s:"done"},
-   {n:"Control de frontera Desaguadero",t:"10 sep · 04:10",s:"done"},
-   {n:"Ingreso a recinto aduanero La Paz",t:"10 sep · 14:50",s:"done"},
-   {n:"Aforo aduanero",t:"en curso · canal rojo",s:"now"},
-   {n:"Entrega en planta del cliente",t:"ETA 18 sep · 16:00",s:"next"}]},
- {code:"IMP-2026-0851",estado:"curso",cliente:"Repuestos Tunari S.A.",carrierId:"andes",
-  placa:"3271-XRB",ruta:"Iquique → Pisiga → Oruro → Cochabamba",pct:28,eta:"22 sep 2026 · 12:00",
-  gps:"Depósito LCL Iquique · desconsolidando",alerta:null,
-  hitos:[{n:"Arribo a puerto Iquique",t:"14 sep · 07:40",s:"done"},
-   {n:"Desconsolidación LCL",t:"en curso · 14 bultos",s:"now"},
-   {n:"Tránsito Iquique → Pisiga",t:"ETA 19 sep · 06:00",s:"next"},
-   {n:"Control de frontera Pisiga",t:"ETA 19 sep · 13:00",s:"next"},
-   {n:"Tránsito Oruro → Cochabamba",t:"ETA 21 sep · 18:00",s:"next"},
-   {n:"Entrega en almacén del cliente",t:"ETA 22 sep · 12:00",s:"next"}]},
- {code:"EXP-2026-0213",estado:"curso",cliente:"AgroSur Bolivia S.A.",carrierId:"sur",
-  placa:"2284-MTQ",ruta:"Santa Cruz → Puerto Suárez → Santos",pct:12,eta:"29 sep 2026 · 09:00",
-  gps:"Planta del exportador · pendiente de consolidación",alerta:null,
-  hitos:[{n:"Reserva de booking naviera",t:"11 sep · 10:20",s:"done"},
-   {n:"Armado de documentación de exportación",t:"en curso · 7 de 12 documentos",s:"now"},
-   {n:"Consolidación y precintado en planta",t:"ETA 20 sep · 08:00",s:"next"},
-   {n:"Tránsito Santa Cruz → Puerto Suárez",t:"ETA 22 sep · 20:00",s:"next"},
-   {n:"Embarque en Santos",t:"ETA 29 sep · 09:00",s:"next"}]},
- {code:"EXP-2026-0209",estado:"entregado",cliente:"Andina Textil S.A.",carrierId:"sur",
-  placa:"2284-MTQ",ruta:"La Paz → Arica → Callao",pct:100,eta:"10 sep 2026 · 14:00",
-  entregado:"10 sep 2026 · 13:20",puntual:true,gps:"Entregado en puerto Arica",alerta:null,
-  hitos:[{n:"Consolidación y precintado en planta",t:"02 sep · 07:30",s:"done"},
-   {n:"Tránsito La Paz → Arica",t:"04 sep · 18:40",s:"done"},
-   {n:"Control de frontera Tambo Quemado",t:"05 sep · 01:15",s:"done"},
-   {n:"Ingreso a puerto Arica",t:"05 sep · 12:00",s:"done"},
-   {n:"Embarque y entrega documental",t:"10 sep · 13:20",s:"done"}]},
- {code:"IMP-2026-0834",estado:"entregado",cliente:"Repuestos Tunari S.A.",carrierId:"andes",
-  placa:"3271-XRB",ruta:"Arica → Tambo Quemado → La Paz",pct:100,eta:"06 sep 2026 · 09:00",
-  entregado:"06 sep 2026 · 08:35",puntual:true,gps:"Entregado en almacén del cliente",alerta:null,
-  hitos:[{n:"Retiro de puerto Arica",t:"03 sep · 10:20",s:"done"},
-   {n:"Tránsito Arica → Tambo Quemado",t:"04 sep · 21:00",s:"done"},
-   {n:"Control de frontera Tambo Quemado",t:"05 sep · 03:40",s:"done"},
-   {n:"Entrega en almacén del cliente",t:"06 sep · 08:35",s:"done"}]},
- {code:"IMP-2026-0828",estado:"entregado",cliente:"Químicos del Altiplano S.R.L.",carrierId:"andina",
-  placa:"4419-PSD",ruta:"Ilo → Desaguadero → La Paz",pct:100,eta:"01 sep 2026 · 12:00",
-  entregado:"02 sep 2026 · 07:10",puntual:false,gps:"Entregado en planta del cliente",alerta:null,
-  hitos:[{n:"Retiro de puerto Ilo",t:"28 ago · 09:00",s:"done"},
-   {n:"Tránsito Ilo → Desaguadero",t:"30 ago · 16:20",s:"done"},
-   {n:"Control de frontera Desaguadero",t:"31 ago · 22:45",s:"done"},
-   {n:"Entrega en planta del cliente",t:"02 sep · 07:10",s:"done"}]}];
-var shipmentBy=function(c){for(var i=0;i<SHIPMENTS.length;i++){if(SHIPMENTS[i].code===c)return SHIPMENTS[i];}return null;};
+/* ===================== VIAJES ===================== */
+var VIAJE_EST={pendiente:["b-neutral","Pendiente"],asignado:["b-warn","Asignado"],
+  confirmado:["b-accent","Confirmado"],carga:["b-accent","En carga"],
+  transito:["b-accent","En tránsito"],reparto:["b-accent","En reparto"],
+  entregado:["b-ok","Entregado"],incidencia:["b-crit","Con incidencia"],cancelado:["b-neutral","Cancelado"]};
+var VIAJES=[
+ {id:"VJ-1180",dem:"DC-0412",cli:"C004",tra:"T01",origen:"Arica",destino:"La Paz",
+  estado:"incidencia",pct:62,eta:"26 sep 2026 · 10:00",pos:"Ruta 11-CH · km 218 · 3.940 m s.n.m.",
+  inc:"Cola de 6 h en control fronterizo Tambo Quemado. ETA recalculada +4 h.",
+  hitos:[{n:"Asignado",t:"18 sep · 09:10",s:"done"},{n:"Confirmado por transportista",t:"18 sep · 14:25",s:"done"},
+    {n:"En carga — retiro de puerto Arica",t:"22 sep · 09:40",s:"done"},
+    {n:"En tránsito Arica → Tambo Quemado",t:"en curso · km 218",s:"now"},
+    {n:"Control de frontera Tambo Quemado",t:"ETA 26 sep · 02:30",s:"next"},
+    {n:"En reparto La Paz",t:"ETA 26 sep · 08:00",s:"next"},
+    {n:"Entregado",t:"ETA 26 sep · 10:00",s:"next"}],
+  log:[{t:"22 sep · 11:42",m:"Incidencia registrada: demora en frontera"},
+       {t:"22 sep · 11:43",m:"Cliente notificado automáticamente"},
+       {t:"22 sep · 09:40",m:"Estado: en carga → en tránsito"}]},
+ {id:"VJ-1181",dem:"DC-0415",cli:"C006",tra:"T04",origen:"Iquique",destino:"Cochabamba",
+  estado:"asignado",pct:12,eta:"01 oct 2026 · 12:00",pos:"Depósito LCL Iquique",inc:null,
+  hitos:[{n:"Asignado",t:"21 sep · 16:30",s:"done"},{n:"Confirmado por transportista",t:"pendiente",s:"now"},
+    {n:"En carga",t:"ETA 27 sep · 07:00",s:"next"},{n:"En tránsito",t:"ETA 27 sep · 14:00",s:"next"},
+    {n:"En reparto",t:"ETA 01 oct · 09:00",s:"next"},{n:"Entregado",t:"ETA 01 oct · 12:00",s:"next"}],
+  log:[{t:"21 sep · 16:30",m:"Transportista asignado: Andes Cargo Bolivia"}]},
+ {id:"VJ-1178",dem:"DC-0410",cli:"C003",tra:"T03",origen:"Ilo",destino:"La Paz",
+  estado:"transito",pct:85,eta:"23 sep 2026 · 16:00",pos:"Recinto aduanero La Paz",inc:null,
+  hitos:[{n:"Asignado",t:"04 sep · 10:00",s:"done"},{n:"Confirmado",t:"04 sep · 15:20",s:"done"},
+    {n:"En carga — puerto Ilo",t:"05 sep · 11:05",s:"done"},
+    {n:"En tránsito Ilo → Desaguadero",t:"09 sep · 19:30",s:"done"},
+    {n:"Aforo aduanero La Paz",t:"en curso · canal rojo",s:"now"},
+    {n:"Entregado",t:"ETA 23 sep · 16:00",s:"next"}],
+  log:[{t:"10 sep · 14:50",m:"Ingreso a recinto aduanero"}]},
+ {id:"VJ-1165",dem:"DC-0405",cli:"C005",tra:"T02",origen:"La Paz",destino:"Arica",
+  estado:"entregado",pct:100,eta:"10 sep 2026 · 14:00",pos:"Entregado en puerto Arica",inc:null,
+  entregado:"10 sep 2026 · 13:20",puntual:true,
+  hitos:[{n:"Asignado",t:"01 sep · 08:00",s:"done"},{n:"Confirmado",t:"01 sep · 11:10",s:"done"},
+    {n:"En carga",t:"02 sep · 07:30",s:"done"},{n:"En tránsito",t:"04 sep · 18:40",s:"done"},
+    {n:"Entregado",t:"10 sep · 13:20",s:"done"}],log:[]},
+ {id:"VJ-1160",dem:"DC-0401",cli:"C006",tra:"T04",origen:"Arica",destino:"La Paz",
+  estado:"entregado",pct:100,eta:"06 sep 2026 · 09:00",pos:"Entregado en almacén",inc:null,
+  entregado:"06 sep 2026 · 08:35",puntual:true,
+  hitos:[{n:"Asignado",t:"01 sep · 09:00",s:"done"},{n:"Confirmado",t:"01 sep · 12:00",s:"done"},
+    {n:"En carga",t:"03 sep · 10:20",s:"done"},{n:"En tránsito",t:"04 sep · 21:00",s:"done"},
+    {n:"Entregado",t:"06 sep · 08:35",s:"done"}],log:[]},
+ {id:"VJ-1152",dem:"DC-0396",cli:"C003",tra:"T03",origen:"Ilo",destino:"La Paz",
+  estado:"entregado",pct:100,eta:"01 sep 2026 · 12:00",pos:"Entregado en planta",inc:null,
+  entregado:"02 sep 2026 · 07:10",puntual:false,
+  hitos:[{n:"Asignado",t:"26 ago · 08:00",s:"done"},{n:"Confirmado",t:"26 ago · 10:30",s:"done"},
+    {n:"En carga",t:"28 ago · 09:00",s:"done"},{n:"En tránsito",t:"30 ago · 16:20",s:"done"},
+    {n:"Entregado",t:"02 sep · 07:10",s:"done"}],log:[]}];
+var viaBy=function(id){for(var i=0;i<VIAJES.length;i++){if(VIAJES[i].id===id)return VIAJES[i];}return null;};
 
-var PERF={
-  periodo:"Septiembre 2026", total:128, aTiempo:119, tarde:9, incidencias:5,
-  horasMedias:41, mejorCorredor:"Arica – La Paz",
-  corredores:[
-    {n:"Arica – La Paz",       envios:58, puntual:95, horas:38, incid:1},
-    {n:"Ilo – La Paz",         envios:31, puntual:94, horas:42, incid:1},
-    {n:"Iquique – Cochabamba", envios:22, puntual:91, horas:56, incid:2},
-    {n:"Santa Cruz – Santos",  envios:17, puntual:88, horas:64, incid:1}]};
+var PERF={periodo:"Septiembre 2026",total:128,aTiempo:119,tarde:9,incidencias:5,horas:41,
+ corredores:[{n:"Arica – La Paz",envios:58,puntual:95,horas:38,incid:1},
+   {n:"Ilo – La Paz",envios:31,puntual:94,horas:42,incid:1},
+   {n:"Iquique – Cochabamba",envios:22,puntual:91,horas:56,incid:2},
+   {n:"Santa Cruz – Santos",envios:17,puntual:88,horas:64,incid:1}]};
 
-var BA=[
- {l:"Tiempo medio para conseguir camión en el tramo terrestre",a:"1,8 días",b:"12 min"},
- {l:"Llamadas por despacho para conseguir y confirmar unidad",a:"8 a 15",b:"0"},
- {l:"Horas/semana del equipo en seguimiento telefónico de carga",a:"31 h",b:"6 h"},
- {l:"Despachos con transportista de documentación verificada",a:"46%",b:"100%"},
- {l:"Expedientes con documentación completa al cierre",a:"71%",b:"96%"}];
-
-/* ===================== ROLES ===================== */
+/* ===================== ROLES Y NAVEGACIÓN ===================== */
 var ROLES=[
- {id:"ops",name:"Operaciones",mail:"operaciones@dms.demo",
-  rol:"Expedientes, asignación de carga y aprobación de papeles",
-  entidad:"DMS Bolivia S.R.L.",
+ {id:"ops",name:"Operaciones",mail:"operaciones@dms.demo",entidad:"DMS Bolivia S.R.L.",
+  rol:"CRM, documentos, demandas y viajes",
   icon:'<path d="M3 5.5h10M3 9h10M3 12.5h7"/>',
-  secs:["tablero","transito","asignacion","expedientes","aprobaciones","rendimiento"]},
- {id:"ger",name:"Gerencia",mail:"gerencia@dms.demo",
-  rol:"Tablero y resultados, sin detalle operativo",
-  entidad:"DMS Bolivia S.R.L.",
+  mods:["dashboard","clientes","pipeline","actividades","documentos","operaciones","demandas","viajes","directorio","certificaciones","reportes"]},
+ {id:"ger",name:"Gerencia",mail:"gerencia@dms.demo",entidad:"DMS Bolivia S.R.L.",
+  rol:"Tablero, pipeline y reportes",
   icon:'<rect x="2.5" y="2.5" width="4.5" height="4.5" rx="1"/><rect x="9" y="2.5" width="4.5" height="4.5" rx="1"/><rect x="2.5" y="9" width="4.5" height="4.5" rx="1"/><rect x="9" y="9" width="4.5" height="4.5" rx="1"/>',
-  secs:["tablero","transito","rendimiento","expedientes","asignacion"]},
- {id:"cli",name:"Cliente importador",mail:"cliente@dms.demo",
-  rol:"Solo sus cargas y sus documentos",
-  entidad:"Ferretería Illimani S.R.L.",
+  mods:["dashboard","clientes","pipeline","operaciones","viajes","directorio","reportes"]},
+ {id:"cli",name:"Cliente",mail:"cliente@dms.demo",entidad:"Comercial Andina S.R.L.",
+  rol:"Sus operaciones, documentos y viajes",cliente:"C001",
   icon:'<path d="M2.5 5.5 8 2.5l5.5 3v5L8 13.5l-5.5-3z"/><path d="M2.5 5.5 8 8.5l5.5-3M8 8.5v5"/>',
-  secs:["tablero","transito","expedientes"],cliente:"Ferretería Illimani S.R.L."},
- {id:"tra",name:"Transportista",mail:"transportista@dms.demo",
-  rol:"Su perfil, sus papeles y las cargas disponibles",
-  entidad:"Transportes Vargas Hnos.",
+  mods:["dashboard","operaciones","documentos","viajes"]},
+ {id:"tra",name:"Transportista",mail:"transportista@dms.demo",entidad:"Transportes Vargas Hnos.",
+  rol:"Demandas, viajes y certificaciones",traId:"T05",
   icon:'<path d="M1.5 4.5h7.5v6H1.5z"/><path d="M9 6.5h2.5L14 9v1.5H9z"/><circle cx="4" cy="11.5" r="1.4"/><circle cx="11" cy="11.5" r="1.4"/>',
-  secs:["tablero","perfil","cargas"],carrierId:"vargas"}];
-var SEC_LABEL={tablero:"Tablero",expedientes:"Expedientes",asignacion:"Asignación de carga",
- aprobaciones:"Aprobaciones",transito:"Envíos",rendimiento:"Rendimiento",nuevo:"Nuevo envío",perfil:"Mi perfil y papeles",cargas:"Cargas disponibles"};
+  mods:["dashboard","demandas","viajes","certificaciones"]}];
 
-var S={filtro:"todos",track:"",role:null,sec:"tablero",expOpen:null,shipOpen:null,loadOpen:null,q:""};
-var $=function(id){return document.getElementById(id);};
-var visibleExps=function(){return S.role&&S.role.cliente?EXPEDIENTES.filter(function(e){return e.cliente===S.role.cliente;}):EXPEDIENTES;};
-var visibleShips=function(){return S.role&&S.role.cliente?SHIPMENTS.filter(function(s){return s.cliente===S.role.cliente;}):SHIPMENTS;};
+var MODS={dashboard:"Dashboard",clientes:"Clientes",pipeline:"Pipeline",actividades:"Actividades",
+ documentos:"Documentos",operaciones:"Operaciones",demandas:"Demandas de carga",viajes:"Viajes",
+ directorio:"Directorio",certificaciones:"Certificaciones",reportes:"Reportes"};
+var GRUPOS=[
+ {t:"General",items:["dashboard"]},
+ {t:"CRM",items:["clientes","pipeline","actividades","documentos"]},
+ {t:"Operaciones",items:["operaciones","demandas","viajes"]},
+ {t:"Transportistas",items:["directorio","certificaciones"]},
+ {t:"Análisis",items:["reportes"]}];
+
+var S={role:null,mod:"dashboard",cliOpen:null,cliTab:"resumen",demOpen:null,viaOpen:null,
+  traOpen:null,docCat:"todas",docEstado:"todos",docOp:"todas",docQ:"",docPage:1,
+  q:"",filtro:"todos",modal:null};
+
+/* ===================== HELPERS DE UI ===================== */
+function badge(c,t){return '<span class="badge '+c+'"><span class="dot"></span>'+t+'</span>';}
+function bd(pair){return badge(pair[0],pair[1]);}
+function pill(l,v){return '<span class="pill">'+l+' <b>'+v+'</b></span>';}
+function ph(o){
+  return '<div class="ph"><div class="ph-t">'
+    +(o.eyebrow?'<span class="eyebrow">'+o.eyebrow+'</span>':'')
+    +'<h2>'+o.t+'</h2></div>'
+    +(o.meta?'<div class="ph-meta">'+o.meta+'</div>':'')
+    +(o.act?'<div class="ph-act">'+o.act+'</div>':'')+'</div>';
+}
+function tiles(a){return '<div class="tiles">'+a.map(function(t){
+  return '<div class="tile"><span class="tile-k">'+t.k+'</span><span class="tile-v">'+t.v
+    +(t.u?'<small>'+t.u+'</small>':'')+'</span>'+(t.n?'<span class="tile-n">'+t.n+'</span>':'')+'</div>';
+}).join("")+'</div>';}
+function card(title,body,act,note){
+  return '<div class="card"><div class="card-head"><h3>'+title+'</h3>'
+    +(act?'<span class="spacer"></span>'+act:'')+'</div>'+body
+    +(note?'<div class="card-note">'+note+'</div>':'')+'</div>';
+}
+function tbl(cols,rows){
+  return '<div class="tw"><table><thead><tr>'
+    +cols.map(function(c){return '<th'+(c.r?' class="r"':'')+'>'+c.t+'</th>';}).join("")
+    +'</tr></thead><tbody>'+(rows||'')+'</tbody></table></div>';
+}
+function meter(p,cls){
+  return '<div class="meter-row"><div class="meter'+(cls||"")+'"><i style="width:'+p+'%"></i></div>'
+    +'<span class="mono">'+p+'%</span></div>';
+}
+function alerta(t,d,cls){
+  return '<div class="alert '+(cls||"")+'"><span class="dot"></span><div><b>'+t+'</b>'
+    +(d?'<p>'+d+'</p>':'')+'</div></div>';
+}
+function emptyRow(n,msg){return '<tr><td colspan="'+n+'" class="t-sub" style="padding:22px;text-align:center">'+msg+'</td></tr>';}
+
+var toastT=null;
+function toast(m){
+  var o=document.querySelector(".toast"); if(o) o.remove();
+  var d=document.createElement("div"); d.className="toast"; d.textContent=m;
+  document.body.appendChild(d);
+  if(toastT) clearTimeout(toastT);
+  toastT=setTimeout(function(){if(d.parentNode)d.remove();},4200);
+}
+function openModal(title,body,footer){
+  S.modal=true;
+  $("modal-root").innerHTML='<div class="mbg" id="mbg"><div class="modal" role="dialog" aria-modal="true">'
+    +'<div class="modal-h"><h3>'+title+'</h3><button class="btn" id="m-x">Cerrar</button></div>'
+    +'<div class="modal-b">'+body+'</div>'
+    +(footer?'<div class="modal-f">'+footer+'</div>':'')+'</div></div>';
+  $("m-x").addEventListener("click",closeModal);
+  $("mbg").addEventListener("click",function(e){if(e.target.id==="mbg")closeModal();});
+  wireModal();
+}
+function closeModal(){S.modal=null;$("modal-root").innerHTML="";}
 
 /* ===================== LOGIN ===================== */
-var pendingRole=null;
-
+var pend=null;
 function renderLogin(){
   $("roles").innerHTML=ROLES.map(function(r){
-    return '<button class="role" type="button" role="radio" aria-checked="false" data-role="'+r.id+'">'+
-      '<span class="role-icon" aria-hidden="true"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" '+
-        'stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round">'+r.icon+'</svg></span>'+
-      '<span class="role-txt">'+
-        '<span class="role-who">'+r.name+'</span>'+
-        '<span class="role-rol">'+r.rol+'</span>'+
-        '<span class="role-mail">'+r.mail+'</span>'+
-      '</span>'+
-      '<span class="role-chev" aria-hidden="true">'+
-        '<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" '+
-        'stroke-linecap="round" stroke-linejoin="round"><path d="M6 3.5 10.5 8 6 12.5"/></svg></span>'+
-    '</button>';}).join("");
+    return '<button class="role" type="button" role="radio" aria-checked="false" data-role="'+r.id+'">'
+      +'<span class="role-icon" aria-hidden="true"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" '
+      +'stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round">'+r.icon+'</svg></span>'
+      +'<span class="role-txt"><span class="role-who">'+r.name+'</span>'
+      +'<span class="role-rol">'+r.rol+'</span><span class="role-mail">'+r.mail+'</span></span>'
+      +'<span class="role-chev" aria-hidden="true"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" '
+      +'stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M6 3.5 10.5 8 6 12.5"/></svg></span>'
+    +'</button>';}).join("");
   Array.prototype.forEach.call($("roles").querySelectorAll(".role"),function(b){
-    b.addEventListener("click",function(){pick(b.getAttribute("data-role"));});
-    b.addEventListener("dblclick",function(){pick(b.getAttribute("data-role"));enter(pendingRole);});
-  });
-  $("btn-enter").addEventListener("click",function(){ if(pendingRole) enter(pendingRole); });
-  document.addEventListener("keydown",function(ev){
-    if($("login").hidden) return;
-    if(ev.key==="Enter"&&pendingRole){ ev.preventDefault(); enter(pendingRole); }
-  });
+    b.addEventListener("click",function(){pickRole(b.getAttribute("data-role"));});
+    b.addEventListener("dblclick",function(){pickRole(b.getAttribute("data-role"));enter(pend);});});
+  $("btn-enter").addEventListener("click",function(){if(pend)enter(pend);});
+  document.addEventListener("keydown",function(e){
+    if(e.key==="Escape"&&S.modal){closeModal();return;}
+    if($("login").hidden)return;
+    if(e.key==="Enter"&&pend){e.preventDefault();enter(pend);}});
   resetPick();
 }
 function resetPick(){
-  pendingRole=null;
+  pend=null;
   Array.prototype.forEach.call($("roles").querySelectorAll(".role"),function(b){
-    b.classList.remove("is-picked"); b.setAttribute("aria-checked","false");});
-  $("login-pick").innerHTML='<span class="t-sub">Ningún rol seleccionado.</span>';
-  $("btn-enter").disabled=true;
-  $("btn-enter").textContent="Entrar";
+    b.classList.remove("is-picked");b.setAttribute("aria-checked","false");});
+  $("login-pick").innerHTML='<span class="t-sub">Sin rol seleccionado</span>';
+  $("btn-enter").disabled=true;$("btn-enter").textContent="Entrar";
 }
-function pick(id){
-  var r=null;
-  for(var i=0;i<ROLES.length;i++){if(ROLES[i].id===id)r=ROLES[i];}
-  if(!r) return;
-  pendingRole=id;
+function pickRole(id){
+  var r=null;for(var i=0;i<ROLES.length;i++){if(ROLES[i].id===id)r=ROLES[i];}
+  if(!r)return;
+  pend=id;
   Array.prototype.forEach.call($("roles").querySelectorAll(".role"),function(b){
     var on=b.getAttribute("data-role")===id;
-    b.classList.toggle("is-picked",on); b.setAttribute("aria-checked",on?"true":"false");});
-  var secs=r.secs.map(function(x){return SEC_LABEL[x];}).join(" · ");
-  $("login-pick").innerHTML='<b>'+r.name+' — '+r.entidad+'</b>'+
-    '<span class="t-sub">'+secs+'</span>';
-  $("btn-enter").disabled=false;
-  $("btn-enter").textContent="Entrar como "+r.name;
+    b.classList.toggle("is-picked",on);b.setAttribute("aria-checked",on?"true":"false");});
+  $("login-pick").innerHTML='<b>'+r.name+'</b><span class="t-sub">'+r.entidad+'</span>';
+  $("btn-enter").disabled=false;$("btn-enter").textContent="Entrar";
 }
 function enter(id){
   for(var i=0;i<ROLES.length;i++){if(ROLES[i].id===id)S.role=ROLES[i];}
-  if(!S.role) return;
-  S.sec=S.role.secs[0];S.expOpen=null;S.shipOpen=null;S.loadOpen=null;S.carrierOpen=null;
+  if(!S.role)return;
+  S.mod=S.role.mods[0];S.cliOpen=null;S.demOpen=null;S.viaOpen=null;S.traOpen=null;
   $("login").hidden=true;$("app").hidden=false;
   $("who-name").textContent=S.role.name;$("who-rol").textContent=S.role.entidad;
   renderNav();render();window.scrollTo(0,0);
 }
 function leave(){S.role=null;$("app").hidden=true;$("login").hidden=false;resetPick();window.scrollTo(0,0);}
 
-/* ===================== NAV ===================== */
 function renderNav(){
-  var pend=totalPendientes();
-  var counts={expedientes:visibleExps().length,asignacion:LOADS.filter(function(l){return !l.asignado;}).length,
-    aprobaciones:pend,transito:visibleShips().length,cargas:LOADS.length,
-    rendimiento:null,nuevo:null};
-  var html='<div class="eyebrow">Operación</div>';
-  html+=S.role.secs.map(function(s){
-    var c="";
-    if(counts[s]!=null) c='<span class="nav-count'+(s==="aprobaciones"&&pend>0?" alert":"")+'">'+counts[s]+'</span>';
-    return '<button class="nav-item" data-sec="'+s+'" aria-current="'+(S.sec===s)+'">'+SEC_LABEL[s]+c+'</button>';}).join("");
+  var pendCerts=TRANSPORTISTAS.reduce(function(a,t){
+    return a+CERT_TIPOS.filter(function(c){return t.certs[c.id].est==="pendiente";}).length;},0);
+  var cnt={clientes:CLIENTES.length,pipeline:OPORTUNIDADES.length,
+    actividades:ACTIVIDADES.filter(function(a){return a.estado==="pendiente";}).length,
+    documentos:visibleDocs().length,operaciones:visibleOps().length,
+    demandas:DEMANDAS.length,viajes:visibleViajes().length,
+    directorio:TRANSPORTISTAS.length,certificaciones:pendCerts};
+  var html="";
+  GRUPOS.forEach(function(g){
+    var items=g.items.filter(function(m){return S.role.mods.indexOf(m)>=0;});
+    if(!items.length)return;
+    html+='<div class="nav-grp"><div class="nav-grp-t">'+g.t+'</div>'
+      +items.map(function(m){
+        var c=cnt[m]!=null?'<span class="nav-count'+(m==="certificaciones"&&cnt[m]>0?" alert":"")+'">'+cnt[m]+'</span>':'';
+        return '<button class="nav-item" data-mod="'+m+'" aria-current="'+(S.mod===m)+'">'+MODS[m]+c+'</button>';
+      }).join("")+'</div>';});
   $("nav").innerHTML=html;
   Array.prototype.forEach.call($("nav").querySelectorAll(".nav-item"),function(b){
-    b.addEventListener("click",function(){S.sec=b.getAttribute("data-sec");
-      S.expOpen=null;S.shipOpen=null;S.loadOpen=null;renderNav();render();window.scrollTo(0,0);});});
+    b.addEventListener("click",function(){go(b.getAttribute("data-mod"));});});
+}
+function go(m){
+  S.mod=m;S.cliOpen=null;S.demOpen=null;S.viaOpen=null;S.traOpen=null;
+  S.docPage=1;S.q="";
+  renderNav();render();window.scrollTo(0,0);
 }
 
-/* ===================== HELPERS ===================== */
-function badge(c,t){return '<span class="badge '+c+'"><span class="dot"></span>'+t+'</span>';}
-function meter(n,t){var p=t?(n/t*100):0;var cls=p>=100?" is-full":(p<60?" is-low":"");
-  return '<div class="meter-row"><div class="meter'+cls+'"><i style="width:'+p+'%"></i></div><span class="mono">'+n+'/'+t+'</span></div>';}
-function pageHead(e,t,s){return '<div class="page-head"><div class="eyebrow">'+e+'</div><h2>'+t+'</h2><p>'+s+'</p></div>';}
-function tiles(a){return '<div class="tiles">'+a.map(function(t){
-  return '<div class="tile"><span class="tile-k">'+t.k+'</span><span class="tile-v">'+t.v+(t.u?'<small>'+t.u+'</small>':'')+'</span><span class="tile-n">'+t.n+'</span></div>';}).join("")+'</div>';}
-function alertBox(a,cls){return '<div class="alert '+(cls||"")+'"><span class="dot"></span><div><b>'+a.t+'</b><p>'+a.d+'</p></div></div>';}
-function certBadge(st){
-  if(st==="aprobado") return badge("b-ok","Aprobado");
-  if(st==="pendiente") return badge("b-warn","Pendiente de aprobación");
-  if(st==="vencido") return badge("b-crit","Vencido");
-  if(st==="rechazado") return badge("b-crit","Rechazado");
-  return badge("b-neutral","No presentado");
-}
+/* ===================== ALCANCE POR ROL ===================== */
+function visibleOps(){
+  return S.role&&S.role.cliente?OPERACIONES.filter(function(o){return o.cli===S.role.cliente;}):OPERACIONES;}
+function visibleDocs(){
+  return S.role&&S.role.cliente?DOCS.filter(function(d){return d.cli===S.role.cliente;}):DOCS;}
+function visibleViajes(){
+  if(S.role&&S.role.cliente)return VIAJES.filter(function(v){return v.cli===S.role.cliente;});
+  if(S.role&&S.role.traId)return VIAJES.filter(function(v){return v.tra===S.role.traId;});
+  return VIAJES;}
 
-/* ===================== TABLERO ===================== */
-function viewTablero(){
-  var exps=visibleExps(),ships=visibleShips();
-  var hab=CARRIERS.filter(function(c){return perfilEstado(c).code==="habilitado";}).length;
-  var pend=totalPendientes();
-  var sinAsignar=LOADS.filter(function(l){return !l.asignado;}).length;
+/* ===================== DASHBOARD ===================== */
+function vDashboard(){
+  if(S.role.cliente) return vDashCliente();
+  if(S.role.traId) return vDashTransportista();
+  var act=CLIENTES.filter(function(c){return c.etapa==="activo"||c.etapa==="fidelizacion";});
+  var pros=CLIENTES.filter(function(c){return c.etapa==="prospecto"||c.etapa==="contactado";});
+  var opAb=OPORTUNIDADES.filter(function(o){return o.etapa!=="activo";});
+  var valor=opAb.reduce(function(a,o){return a+o.valor;},0);
+  var sinAct=CLIENTES.filter(function(c){return isoDe(c.ultima)<"2026-09-15";});
+  var actPend=ACTIVIDADES.filter(function(a){return a.estado==="pendiente";});
+  var docPend=DOCS.filter(function(d){return d.estado==="pendiente";});
+  var enRuta=VIAJES.filter(function(v){return ["confirmado","carga","transito","reparto"].indexOf(v.estado)>=0;});
+  var inci=VIAJES.filter(function(v){return v.estado==="incidencia";});
+  var demAb=DEMANDAS.filter(function(d){return d.estado==="publicada"||d.estado==="borrador";});
+  var dispo=TRANSPORTISTAS.filter(function(t){return t.disp==="disponible"&&certEstado(t).code==="ok";});
 
-  if(S.role.id==="ger"){
-    return pageHead("Gerencia general","Qué cambia cuando el sistema asigna",
-      "El tramo terrestre deja de negociarse camión por camión. La asignación la hace una regla, y la regla no puede elegir a un transportista con papeles vencidos.")
-      +tiles([{k:"Despachos sin asignar",v:String(sinAsignar),n:"Esperando que corra el motor"},
-        {k:"Transportistas habilitados",v:hab+"/"+CARRIERS.length,n:"Con documentación aprobada y vigente"},
-        {k:"Papeles por revisar",v:String(pend),n:"Subidos por los propios transportistas"},
-        {k:"Riesgo de asignación",v:"0",n:"Despachos a transportista no verificado"}])
-      +'<div class="card"><div class="card-head"><h3>Antes y ahora</h3><span class="spacer"></span><span class="demo-flag">Proyección a validar</span></div><div>'
-      +BA.map(function(r){return '<div class="ba-row"><span class="ba-l">'+r.l+'</span><span class="ba-antes">'+r.a+'</span><span class="ba-arrow">→</span><span class="ba-ahora">'+r.b+'</span></div>';}).join("")
-      +'</div><div class="card-note">Cifras de ejemplo construidas sobre el perfil operativo de DMS, no medidas en su operación. Las preguntas para convertirlas en números reales están en el guion de demo.</div></div>'
-      +'<div class="card"><div class="card-head"><h3>Por qué el riesgo baja a cero</h3></div><div class="rules">'
-      +'<div class="rule"><span class="rule-n">01</span><div><b>Ningún despacho sale sin verificación</b><span>El motor no puede asignar a un transportista cuya documentación obligatoria no esté aprobada y vigente. No es una advertencia que alguien puede saltarse: es la condición para aparecer en la lista.</span></div></div>'
-      +'<div class="rule"><span class="rule-n">02</span><div><b>El seguro se valida contra la fecha de entrega</b><span>Un seguro que vence en pleno viaje excluye al transportista, aunque hoy figure vigente.</span></div></div>'
-      +'<div class="rule"><span class="rule-n">03</span><div><b>La responsabilidad ante la Aduana queda cubierta</b><span>Como agente consolidador registrado, un siniestro con transportista no habilitado recae sobre DMS. El registro de por qué se eligió a cada transportista queda guardado con el despacho.</span></div></div>'
-      +'</div></div>';
-  }
-  if(S.role.id==="cli"){
-    return pageHead("Cliente importador","Sus cargas, sin llamar a nadie",
-      "Ve el estado de cada envío y el expediente documental de sus trámites en el mismo lugar donde DMS los trabaja. Cuando la ETA cambia, le llega el aviso.")
-      +tiles([{k:"Trámites abiertos",v:String(exps.length),n:"Importaciones vía Arica"},
-        {k:"Cargas en tránsito",v:String(ships.length),n:"Con seguimiento en vivo"},
-        {k:"Documentos disponibles",v:String(exps.reduce(function(a,e){return a+expCount(e);},0)),n:"Descargables desde su expediente"},
-        {k:"Avisos este mes",v:"3",n:"Cambios de ETA notificados solos"}])
-      +(ships[0]&&ships[0].alerta?alertBox(ships[0].alerta):"")
-      +shipTable(ships,"Sus cargas en tránsito")+expTable(exps,"Sus expedientes");
-  }
-  if(S.role.id==="tra"){
-    var c=carrierBy(S.role.carrierId),st=perfilEstado(c);
-    var elegibleEn=LOADS.filter(function(l){return !evaluar(c,l);}).length;
-    var bloqueo=null;
-    for(var i=0;i<LOADS.length;i++){var no=evaluar(c,LOADS[i]); if(no){bloqueo=no;break;}}
-    return pageHead("Transportista","Su perfil decide cuánta carga recibe",
-      "El sistema le asigna despachos solo si sus papeles están aprobados y vigentes para esa carga concreta. No hay que llamar a DMS ni esperar que se acuerden de usted.")
-      +tiles([{k:"Estado del perfil",v:st.txt.split(" (")[0],n:c.n+" · "+c.base},
-        {k:"Cargas para las que califica",v:elegibleEn+"/"+LOADS.length,n:"De las abiertas ahora mismo"},
-        {k:"Unidad",v:c.placa,n:c.unidad},
-        {k:"Viajes con DMS",v:String(c.viajes),n:"Calificación "+r1(c.rating)+" / 5"}])
-      +(bloqueo?alertBox({t:"Está quedando fuera de los despachos abiertos",
-          d:bloqueo.motivo+". Actualice el documento en «Mi perfil y papeles» y quedará habilitado apenas Operaciones lo apruebe."}):
-        alertBox({t:"Perfil habilitado",d:"Su documentación está aprobada y vigente. El sistema puede asignarle carga automáticamente."},"good"))
-      +viewPerfilCard(c);
-  }
-  /* Operaciones */
-  return pageHead("Operaciones y agenciamiento","Una operación, dos frentes",
-    "El expediente documental de cada trámite y el despacho del tramo terrestre viven en el mismo lugar, atados al mismo número de trámite.")
-    +tiles([{k:"Expedientes activos",v:"142",n:"6 con movimiento esta semana"},
-      {k:"Adjuntos almacenados",v:"11,4",u:" GB",n:"Sin límite por trámite ni por archivo"},
-      {k:"Despachos sin asignar",v:String(sinAsignar),n:"Listos para que corra el motor"},
-      {k:"Transportistas habilitados",v:hab+"/"+CARRIERS.length,n:"Documentación aprobada y vigente"},
-      {k:"Papeles por revisar",v:String(pend),n:"Que subieron los transportistas"}])
-    +(pend>0?alertBox({t:pend+" documentos esperando su aprobación",
-       d:"Los transportistas los cargaron ellos mismos. Hasta que no se aprueben, esas unidades no entran al pool de asignación."},"info"):"")
-    +(ships[0]&&ships[0].alerta?alertBox(ships[0].alerta):"")
-    +'<div class="card"><div class="card-head"><h3>Despachos esperando asignación</h3><span class="spacer"></span><button class="btn" data-go="asignacion">Ir a asignación</button></div>'
-    +'<div class="tw"><table><thead><tr><th>Despacho</th><th>Trámite</th><th>Corredor</th><th class="r">Peso</th><th>Requisitos</th><th>Estado</th></tr></thead><tbody>'
-    +LOADS.map(function(l){
-      var r=evaluarTodos(l);
-      return '<tr class="clickable" data-load="'+l.id+'"><td class="mono t-strong">'+l.id+'</td>'
-        +'<td class="mono t-sub">'+l.exp+'</td><td class="t-sub">'+l.corredor+'</td>'
-        +'<td class="r mono">'+nf(l.peso)+' kg</td>'
-        +'<td>'+(l.peligrosa?badge("b-warn","Carga peligrosa"):badge("b-neutral","Carga general"))+'</td>'
-        +'<td>'+(l.asignado?badge("b-ok","Asignado a "+carrierBy(l.asignado).n):badge("b-accent",r.elegibles.length+" elegibles"))+'</td></tr>';}).join("")
-    +'</tbody></table></div></div>'
-    +'<div class="card"><div class="card-head"><h3>Expedientes con documentación incompleta</h3><span class="spacer"></span><button class="btn" data-go="expedientes">Ver expedientes</button></div>'
-    +'<div class="tw"><table><thead><tr><th>Trámite</th><th>Cliente</th><th>Documentos</th><th class="r">Adjuntos</th></tr></thead><tbody>'
-    +exps.filter(function(e){return expCount(e)<expReq(e);}).map(function(e){
-      return '<tr class="clickable" data-exp="'+e.code+'"><td class="mono t-strong">'+e.code+'</td><td>'+e.cliente+'</td>'
-        +'<td>'+meter(expCount(e),expReq(e))+'</td><td class="r mono">'+mb(expTotal(e))+'</td></tr>';}).join("")
-    +'</tbody></table></div></div>';
-}
+  /* Oportunidades por etapa */
+  var porEtapa=ETAPAS.map(function(e){
+    var o=OPORTUNIDADES.filter(function(x){return x.etapa===e.id;});
+    return {n:e.n,c:o.length,v:o.reduce(function(a,x){return a+x.valor;},0)};});
 
-/* ===================== ASIGNACIÓN ===================== */
-function viewAsignacion(){
-  if(S.loadOpen) return viewLoadDetail(S.loadOpen);
-  return pageHead("Puertas afuera","Asignación automática de carga",
-    "El sistema elige al transportista. No hay llamadas ni negociación: hay reglas, y la primera es que la documentación esté aprobada y vigente para esa carga concreta.")
-    +'<div class="card"><div class="card-head"><h3>Reglas que aplica el motor, en orden</h3></div><div class="rules">'
-    +'<div class="rule"><span class="rule-n">01</span><div><b>Documentación obligatoria aprobada y vigente</b><span>Licencia categoría C, seguro de carga, habilitación del Viceministerio y antecedentes del conductor. Un perfil en revisión no entra.</span></div></div>'
-    +'<div class="rule"><span class="rule-n">02</span><div><b>El seguro cubre hasta la fecha de entrega</b><span>No alcanza con estar vigente hoy: tiene que seguir vigente cuando la carga se entrega.</span></div></div>'
-    +'<div class="rule"><span class="rule-n">03</span><div><b>Certificación específica según la carga</b><span>Mercadería peligrosa exige certificación de transporte de carga peligrosa.</span></div></div>'
-    +'<div class="rule"><span class="rule-n">04</span><div><b>Cubre el corredor</b><span>El transportista declara en qué corredores opera.</span></div></div>'
-    +'<div class="rule"><span class="rule-n">05</span><div><b>Capacidad suficiente</b><span>Tonelaje de la unidad contra peso de la carga.</span></div></div>'
-    +'<div class="rule"><span class="rule-n">06</span><div><b>Entre los que pasan, gana el puntaje</b><span>Calificación histórica (40), rotación equitativa para que no se concentre siempre en los mismos (35), unidad ya en el origen (25) y certificación de manejo defensivo (5).</span></div></div>'
-    +'</div></div>'
-    +'<div class="card"><div class="card-head"><h3>Despachos abiertos</h3></div>'
-    +'<div class="tw"><table><thead><tr><th>Despacho</th><th>Cliente</th><th>Corredor</th><th class="r">Peso</th><th>Requisitos</th><th>Elegibles</th><th>Estado</th></tr></thead><tbody>'
-    +LOADS.map(function(l){var r=evaluarTodos(l);
-      return '<tr class="clickable" data-load="'+l.id+'"><td class="mono t-strong">'+l.id+'<div class="t-sub">'+l.retiro+'</div></td>'
-        +'<td>'+l.cliente+'</td><td class="t-sub">'+l.corredor+'</td><td class="r mono">'+nf(l.peso)+' kg</td>'
-        +'<td>'+(l.peligrosa?badge("b-warn","Carga peligrosa"):badge("b-neutral","Carga general"))+'</td>'
-        +'<td class="mono">'+r.elegibles.length+' de '+CARRIERS.length+'</td>'
-        +'<td>'+(l.asignado?badge("b-ok","Asignado"):badge("b-accent","Sin asignar"))+'</td></tr>';}).join("")
-    +'</tbody></table></div></div>';
-}
-function viewLoadDetail(id){
-  var l=loadBy(id); if(!l) return "";
-  var r=evaluarTodos(l);
-  var ganador=r.elegibles[0];
-  var puedeAsignar=!l.asignado&&r.elegibles.length>0;
-  var readonly=S.role.id!=="ops";
-
-  return '<button class="back" data-back="asignacion">← Asignación de carga</button>'
-    +'<div class="page-head"><div class="eyebrow">Despacho · trámite '+l.exp+'</div>'
-    +'<h2 class="mono" style="font-size:20px">'+l.id+'</h2><p>'+l.carga+'</p></div>'
-    +'<div class="card"><div class="card-body"><div class="grid-kv">'
-    +'<div class="kv"><span class="eyebrow">Cliente</span><b>'+l.cliente+'</b></div>'
-    +'<div class="kv"><span class="eyebrow">Corredor</span><b>'+l.corredor+'</b></div>'
-    +'<div class="kv"><span class="eyebrow">Peso</span><b class="mono">'+nf(l.peso)+' kg</b></div>'
-    +'<div class="kv"><span class="eyebrow">Retiro</span><b>'+l.retiro+'</b></div>'
-    +'<div class="kv"><span class="eyebrow">Entrega comprometida</span><b>'+l.entrega+'</b></div>'
-    +'<div class="kv"><span class="eyebrow">Requisito especial</span><b>'+(l.peligrosa?"Certificación de carga peligrosa":"Ninguno")+'</b></div>'
-    +'</div></div></div>'
-    +(l.asignado?alertBox({t:"Asignado a "+carrierBy(l.asignado).n,
-        d:"Unidad "+carrierBy(l.asignado).placa+" · "+carrierBy(l.asignado).unidad+". El cliente ya ve el despacho en seguimiento y el expediente "+l.exp+" quedó vinculado al transportista."},"good"):"")
-    +'<div class="card"><div class="card-head"><h3>Transportistas elegibles</h3>'
-    +'<span class="spacer"></span>'
-    +(readonly?'<span class="t-sub">Solo Operaciones puede ejecutar la asignación</span>'
-      :(puedeAsignar?'<button class="btn btn-primary" id="btn-asignar" data-load="'+l.id+'">Asignar automáticamente</button>'
-        :(l.asignado?badge("b-ok","Asignado"):badge("b-crit","Ningún transportista elegible"))))
-    +'</div>'
-    +(r.elegibles.length
-      ?'<div class="tw"><table><thead><tr><th>Transportista</th><th>Unidad</th><th class="r">Calif.</th><th class="r">Rotación</th><th>Unidad en origen</th><th class="r">Puntaje</th></tr></thead><tbody>'
-        +r.elegibles.map(function(x){
-          var esGanador=l.asignado?(l.asignado===x.c.id):(ganador&&ganador.c.id===x.c.id);
-          return '<tr'+(esGanador&&l.asignado?' class="pick"':'')+'>'
-            +'<td class="t-strong">'+x.c.n+'<div class="t-sub">'+x.c.base+' · '+x.c.viajes+' viajes</div></td>'
-            +'<td class="t-sub">'+x.c.unidad+'<div class="mono">'+x.c.placa+'</div></td>'
-            +'<td class="r mono">'+r1(x.c.rating)+'</td>'
-            +'<td class="r mono">'+x.c.asignadas30d+' en 30 d</td>'
-            +'<td>'+(x.c.unidadEn===l.origen?badge("b-ok","En "+l.origen):'<span class="t-sub">'+x.c.unidadEn+'</span>')+'</td>'
-            +'<td class="r"><span class="score-bar"><i style="width:'+x.p.total+'%"></i></span> <span class="mono t-strong">'+x.p.total+'</span></td></tr>';}).join("")
-        +'</tbody></table></div>'
-        +(ganador?'<div class="card-note">'+(l.asignado?'Elegido':'Elegiría')+' <b>'+ganador.c.n+'</b> con puntaje '+ganador.p.total+': calificación '+ganador.p.calif+' + rotación '+ganador.p.rot+' + unidad en origen '+ganador.p.prox+(ganador.p.bonus?' + manejo defensivo '+ganador.p.bonus:'')+'. La rotación evita que todos los despachos caigan siempre en el mismo transportista.</div>':'')
-      :'<div class="card-body"><p class="t-sub">Ningún transportista pasa las reglas para esta carga. Revisá los motivos abajo: si el bloqueo es documental, el transportista puede subir el documento y Operaciones aprobarlo.</p></div>')
-    +'</div>'
-    +'<div class="card"><div class="card-head"><h3>Excluidos y por qué</h3><span class="spacer"></span><span class="t-sub">'+r.excluidos.length+' de '+CARRIERS.length+'</span></div>'
-    +'<div class="tw"><table><thead><tr><th>Transportista</th><th>Regla</th><th>Motivo del rechazo</th></tr></thead><tbody>'
-    +r.excluidos.map(function(x){
-      return '<tr class="excl"><td class="t-strong">'+x.c.n+'<div class="t-sub">'+x.c.base+'</div></td>'
-        +'<td class="mono t-sub">R'+("0"+x.regla).slice(-2)+'</td>'
-        +'<td>'+x.motivo+'</td></tr>';}).join("")
-    +'</tbody></table></div>'
-    +'<div class="card-note">Este registro queda guardado con el despacho: ante un reclamo o una revisión de la Aduana, DMS puede mostrar por qué eligió a ese transportista y por qué descartó a los demás.</div></div>';
-}
-
-/* ===================== APROBACIONES ===================== */
-function viewAprobaciones(){
-  var filas=[];
-  CARRIERS.forEach(function(c){
-    pendientesDe(c).forEach(function(k){filas.push({c:c,k:k});});
-  });
-  return pageHead("Puertas afuera","Aprobación de papeles",
-    "Los transportistas suben su propia documentación. Acá se aprueba o se rechaza, y esa decisión es lo único que los mete o los saca del pool de asignación.")
-    +(filas.length===0
-      ?'<div class="card"><div class="card-body"><p class="t-sub">No hay documentos esperando aprobación. Cuando un transportista suba uno nuevo, aparece acá.</p></div></div>'
-      :'<div class="card"><div class="card-head"><h3>Esperando revisión</h3><span class="spacer"></span><span class="t-sub">'+filas.length+' documentos</span></div>'
-       +'<div class="tw"><table><thead><tr><th>Transportista</th><th>Documento</th><th>Vigencia declarada</th><th class="r">Acción</th></tr></thead><tbody>'
-       +filas.map(function(f){
-         return '<tr><td class="t-strong">'+f.c.n+'<div class="t-sub">'+f.c.base+(f.c.nuevo?' · alta nueva':'')+'</div></td>'
-           +'<td>'+CERTS[f.k].n+'<div class="t-sub">'+CERTS[f.k].sub+'</div></td>'
-           +'<td class="mono">'+f.c.docs[f.k].vence+'</td>'
-           +'<td class="r"><button class="btn btn-primary" data-aprobar="'+f.c.id+'|'+f.k+'">Aprobar</button> '
-           +'<button class="btn" data-rechazar="'+f.c.id+'|'+f.k+'">Rechazar</button></td></tr>';}).join("")
-       +'</tbody></table></div>'
-       +'<div class="card-note">Al aprobar el último documento obligatorio de un transportista, su perfil pasa a habilitado y entra automáticamente al pool de asignación.</div></div>')
-    +'<div class="card"><div class="card-head"><h3>Estado de la red</h3></div>'
-    +'<div class="tw"><table><thead><tr><th>Transportista</th><th>Corredores</th><th class="r">Capacidad</th><th>Certificaciones extra</th><th>Perfil</th></tr></thead><tbody>'
-    +CARRIERS.map(function(c){var st=perfilEstado(c);
-      var extras=[];
-      if(c.docs.defensivo.st==="aprobado") extras.push("Manejo defensivo");
-      if(c.docs.peligrosa.st==="aprobado") extras.push("Carga peligrosa");
-      return '<tr class="clickable" data-carrier="'+c.id+'"><td class="t-strong">'+c.n+'<div class="t-sub">'+c.base+(c.nuevo?" · alta nueva":" · "+c.viajes+" viajes")+'</div></td>'
-        +'<td class="t-sub">'+c.corr.join("<br>")+'</td><td class="r mono">'+c.cap+' t</td>'
-        +'<td class="t-sub">'+(extras.length?extras.join(", "):"—")+'</td>'
-        +'<td>'+badge(st.cls,st.txt)+'</td></tr>';}).join("")
-    +'</tbody></table></div></div>';
-}
-function viewCarrierDetail(id){
-  var c=carrierBy(id); if(!c) return "";
-  var st=perfilEstado(c);
-  return '<button class="back" data-back="aprobaciones">← Aprobaciones</button>'
-    +'<div class="page-head"><div class="eyebrow">'+c.base+(c.nuevo?" · alta nueva":" · "+c.viajes+" viajes con DMS")+'</div>'
-    +'<h2>'+c.n+'</h2><p>'+c.unidad+' · placa '+c.placa+' · conductor '+c.conductor+'</p></div>'
-    +'<div class="card"><div class="card-head"><h3>Documentación</h3><span class="spacer"></span>'+badge(st.cls,st.txt)+'</div>'
-    +'<div class="tw"><table><thead><tr><th>Documento</th><th>Tipo</th><th>Vigencia</th><th>Estado</th><th class="r">Acción</th></tr></thead><tbody>'
-    +CERT_KEYS.map(function(k){var d=c.docs[k];
-      return '<tr><td class="t-strong">'+CERTS[k].n+'<div class="t-sub">'+CERTS[k].sub+'</div></td>'
-        +'<td>'+(CERTS[k].oblig?badge("b-neutral","Obligatorio"):badge("b-neutral","Suma puntaje"))+'</td>'
-        +'<td class="mono">'+d.vence+'</td><td>'+certBadge(d.st)+'</td>'
-        +'<td class="r">'+(d.st==="pendiente"
-          ?'<button class="btn btn-primary" data-aprobar="'+c.id+'|'+k+'">Aprobar</button> <button class="btn" data-rechazar="'+c.id+'|'+k+'">Rechazar</button>'
-          :'<span class="t-sub">—</span>')+'</td></tr>';}).join("")
-    +'</tbody></table></div></div>'
-    +'<div class="card"><div class="card-head"><h3>Elegibilidad por despacho abierto</h3></div>'
-    +'<div class="tw"><table><thead><tr><th>Despacho</th><th>Corredor</th><th>Resultado</th></tr></thead><tbody>'
-    +LOADS.map(function(l){var no=evaluar(c,l);
-      return '<tr><td class="mono t-strong">'+l.id+'</td><td class="t-sub">'+l.corredor+'</td>'
-        +'<td>'+(no?badge("b-crit","Excluido")+' <span class="t-sub">'+no.motivo+'</span>':badge("b-ok","Elegible · puntaje "+puntaje(c,l).total))+'</td></tr>';}).join("")
-    +'</tbody></table></div></div>';
-}
-
-/* ===================== PERFIL (transportista) ===================== */
-function viewPerfilCard(c){
-  var st=perfilEstado(c);
-  /* Una certificación solo se sugiere si es EL bloqueo: se simula aprobada y se
-     cuentan los despachos que pasan de excluido a elegible. */
-  var faltantes=CERT_KEYS.filter(function(k){return !CERTS[k].oblig && c.docs[k].st!=="aprobado";});
-  var desbloqueo=faltantes.map(function(k){
-    var orig=c.docs[k];
-    var sin=LOADS.map(function(l){return !!evaluar(c,l);});
-    c.docs[k]={st:"aprobado",vence:"—",hasta:"2099-12-31"};
-    var con=LOADS.map(function(l){return !!evaluar(c,l);});
-    c.docs[k]=orig;
-    var n=0;
-    for(var i=0;i<LOADS.length;i++){ if(sin[i]&&!con[i]) n++; }
-    return {k:k,n:n};}).filter(function(x){return x.n>0;});
-
-  return '<div class="card"><div class="card-head"><h3>Mis papeles</h3><span class="spacer"></span>'+badge(st.cls,st.txt)+'</div>'
-    +'<div class="tw"><table><thead><tr><th>Documento</th><th>Tipo</th><th>Vigencia</th><th>Estado</th><th class="r">Acción</th></tr></thead><tbody>'
-    +CERT_KEYS.map(function(k){var d=c.docs[k];
-      var necesita=(d.st!=="aprobado")||(k==="seguro"&&d.hasta&&d.hasta<"2026-09-21");
-      return '<tr><td class="t-strong">'+CERTS[k].n+'<div class="t-sub">'+CERTS[k].sub+'</div></td>'
-        +'<td>'+(CERTS[k].oblig?badge("b-neutral","Obligatorio"):badge("b-neutral","Suma puntaje"))+'</td>'
-        +'<td class="mono">'+d.vence+'</td>'
-        +'<td>'+(k==="seguro"&&d.st==="aprobado"&&d.hasta&&d.hasta<"2026-09-21"?badge("b-warn","Vence durante el próximo viaje"):certBadge(d.st))+'</td>'
-        +'<td class="r">'+(d.st==="pendiente"?'<span class="t-sub">En revisión</span>'
-          :(necesita?'<button class="btn btn-primary" data-subir="'+c.id+'|'+k+'">Subir documento</button>'
-            :'<button class="btn" data-subir="'+c.id+'|'+k+'">Renovar</button>'))+'</td></tr>';}).join("")
-    +'</tbody></table></div>'
-    +'<div class="card-note">Usted sube el documento y queda en revisión. Operaciones de DMS lo aprueba, y recién ahí el sistema puede asignarle carga. Nadie le va a pedir los papeles por WhatsApp.</div></div>'
-    +(desbloqueo.length
-      ?'<div class="card"><div class="card-head"><h3>Certificaciones que le darían más carga</h3></div><div class="rules">'
-       +desbloqueo.map(function(x){
-         return '<div class="rule"><span class="rule-n">+'+x.n+'</span><div><b>'+CERTS[x.k].n+'</b><span>Hay '+x.n+' despacho'+(x.n>1?'s abiertos ahora mismo que exigen':' abierto ahora mismo que exige')+' esta certificación y para el'+(x.n>1?'los':'')+' que hoy no califica.</span></div></div>';}).join("")
-       +'</div><div class="card-note">El sistema le muestra qué certificación le abre trabajo que hoy no puede tomar. Eso genera pedidos nuevos para usted, no solo reparte los que ya existen.</div></div>'
-      :'');
-}
-function viewPerfil(){
-  var c=carrierBy(S.role.carrierId);
-  return pageHead("Transportista","Mi perfil y papeles",
-    "Su documentación es lo único que decide si el sistema puede asignarle un despacho. La sube usted, la aprueba Operaciones, y el motor la lee cada vez que hay carga.")
-    +'<div class="card"><div class="card-body"><div class="grid-kv">'
-    +'<div class="kv"><span class="eyebrow">Empresa</span><b>'+c.n+'</b></div>'
-    +'<div class="kv"><span class="eyebrow">Base</span><b>'+c.base+'</b></div>'
-    +'<div class="kv"><span class="eyebrow">Unidad</span><b>'+c.unidad+'</b></div>'
-    +'<div class="kv"><span class="eyebrow">Placa</span><b class="mono">'+c.placa+'</b></div>'
-    +'<div class="kv"><span class="eyebrow">Capacidad</span><b class="mono">'+c.cap+' t</b></div>'
-    +'<div class="kv"><span class="eyebrow">Corredores declarados</span><b>'+c.corr.join(" · ")+'</b></div>'
-    +'</div></div></div>'
-    +viewPerfilCard(c);
-}
-function viewCargasTransportista(){
-  var c=carrierBy(S.role.carrierId);
-  return pageHead("Transportista","Cargas disponibles",
-    "Todas las cargas del corredor se evalúan contra su perfil. Si no califica, el sistema le dice exactamente por qué.")
-    +LOADS.map(function(l){
-      var no=evaluar(c,l);
-      var p=no?null:puntaje(c,l);
-      return '<div class="card"><div class="card-head"><h3 class="mono">'+l.id+'</h3>'
-        +'<span class="spacer"></span>'+(l.asignado===c.id?badge("b-ok","Asignado a usted")
-          :(no?badge("b-crit","No califica"):badge("b-ok","Califica · puntaje "+p.total)))+'</div>'
-        +'<div class="card-body"><div class="grid-kv">'
-        +'<div class="kv"><span class="eyebrow">Corredor</span><b>'+l.corredor+'</b></div>'
-        +'<div class="kv"><span class="eyebrow">Carga</span><b>'+l.carga+'</b></div>'
-        +'<div class="kv"><span class="eyebrow">Peso</span><b class="mono">'+nf(l.peso)+' kg</b></div>'
-        +'<div class="kv"><span class="eyebrow">Retiro</span><b>'+l.retiro+'</b></div>'
-        +'</div></div>'
-        +(no?'<div class="card-note" style="color:var(--crit);background:var(--crit-soft)"><b>Por qué no califica:</b> '+no.motivo+'</div>'
-            :'<div class="card-note" style="color:var(--ok);background:var(--ok-soft)">Cumple las cinco reglas. El sistema puede asignarle este despacho.</div>')
-        +'</div>';}).join("");
-}
-
-/* ===================== EXPEDIENTES ===================== */
-function expTable(exps,title){
-  return '<div class="card"><div class="card-head"><h3>'+title+'</h3><span class="spacer"></span>'
-    +'<span class="t-sub">'+exps.length+' de 142 · vista de esta semana</span></div>'
-    +'<div class="tw"><table><thead><tr><th>Trámite</th><th>Cliente</th><th>Ruta</th><th>Estado</th><th>Documentos</th><th class="r">Adjuntos</th></tr></thead><tbody>'
-    +exps.map(function(e){var b=estBadge(e.est);
-      return '<tr class="clickable" data-exp="'+e.code+'"><td class="mono t-strong">'+e.code+'<div class="t-sub">'+e.modal+'</div></td>'
-        +'<td>'+e.cliente+'</td><td class="t-sub">'+e.ruta+'</td><td>'+badge(b[0],b[1])+'</td>'
-        +'<td>'+meter(expCount(e),expReq(e))+'</td><td class="r mono">'+mb(expTotal(e))+'</td></tr>';}).join("")
-    +'</tbody></table></div></div>';
-}
-function viewExpedientes(){
-  var exps=visibleExps();
-  if(S.expOpen) return viewExpDetail(S.expOpen);
-  var totalMB=exps.reduce(function(a,e){return a+expTotal(e);},0);
-  var matches=[];
-  if(S.q.length>=2){var q=S.q.toLowerCase();
-    matches=OCR.filter(function(o){var e=expBy(o.code); if(!e) return false;
-      if(S.role.cliente&&e.cliente!==S.role.cliente) return false;
-      return (o.snip+" "+docMeta(e.tipo,o.doc).n+" "+o.code+" "+e.cliente).toLowerCase().indexOf(q)>=0;});}
-  return pageHead("Puertas adentro","Expediente documental por trámite",
-    "Cada trámite es una carpeta con hasta 12 documentos y lotes de fotos de inspección. El adjunto pesado es el caso normal, no la excepción: el buscador entra dentro del texto de los escaneos.")
-    +tiles([{k:"Expedientes en el sistema",v:"142",n:"Importación y exportación, 2026"},
-      {k:"Adjuntos almacenados",v:"11,4",u:" GB",n:"Promedio 82 MB por trámite"},
-      {k:"Documentos indexados con OCR",v:"1.487",n:"Escaneos buscables por su contenido"},
-      {k:"Vista de esta semana",v:mb(totalMB),n:exps.length+" expedientes con movimiento"}])
-    +'<div class="card"><div class="card-head"><h3>Buscar dentro de los adjuntos</h3></div><div class="card-body">'
-    +'<input id="q" type="search" value="'+S.q.replace(/"/g,"&quot;")+'" placeholder="Probá: precinto · quinua · 8544 · MEDU · CEDEIM" style="max-width:440px">'
-    +(S.q.length>=2
-      ?(matches.length
-        ?'<div style="margin-top:14px;display:flex;flex-direction:column;gap:10px">'
-         +matches.map(function(o){var e=expBy(o.code);var dm=docMeta(e.tipo,o.doc);
-           return '<div style="border-left:2px solid var(--accent);padding:2px 0 2px 12px">'
-             +'<div class="t-sub"><span class="mono">'+o.code+'</span> · '+dm.n+' · '+dm.f+'</div>'
-             +'<div style="font-size:13px;color:var(--ink-2)">'+o.snip+'</div></div>';}).join("")+'</div>'
-        :'<p class="t-sub" style="margin-top:12px">Sin coincidencias en el texto de los adjuntos.</p>')
-      :'<p class="t-sub" style="margin-top:12px">La búsqueda recorre el texto reconocido de los escaneos, no solo el nombre del archivo.</p>')
-    +'</div></div>'+expTable(exps,"Expedientes");
-}
-function viewExpDetail(code){
-  var e=expBy(code); if(!e) return "";
-  var b=estBadge(e.est),falta=expFalta(e),cat=CATALOG[e.tipo],readonly=!!S.role.cliente;
-  return '<button class="back" data-back="expedientes">← Expedientes</button>'
-    +'<div class="page-head"><div class="eyebrow">'+(e.tipo==="imp"?"Importación":"Exportación")+' · abierto el '+e.abierto+'</div>'
-    +'<h2 class="mono" style="font-size:20px">'+e.code+'</h2><p>'+e.carga+'</p></div>'
-    +'<div class="card"><div class="card-body"><div class="grid-kv">'
-    +'<div class="kv"><span class="eyebrow">Cliente</span><b>'+e.cliente+'</b></div>'
-    +'<div class="kv"><span class="eyebrow">Ruta</span><b>'+e.ruta+'</b></div>'
-    +'<div class="kv"><span class="eyebrow">Modalidad</span><b>'+e.modal+'</b></div>'
-    +'<div class="kv"><span class="eyebrow">Peso bruto</span><b class="mono">'+nf(e.peso)+' kg</b></div>'
-    +'<div class="kv"><span class="eyebrow">Precinto</span><b class="mono">'+e.precinto+'</b></div>'
-    +'<div class="kv"><span class="eyebrow">Estado</span><b>'+badge(b[0],b[1])+'</b></div>'
-    +'</div></div></div>'
-    +'<div class="card"><div class="card-head"><h3>Expediente documental</h3><span class="spacer"></span>'
-    +'<span class="t-sub mono">'+mb(expTotal(e))+' en '+expCount(e)+' documentos</span>'
-    +(readonly?'':(falta.length?'<button class="btn btn-primary" id="btn-upload">Subir los '+falta.length+' faltantes</button>':badge("b-ok","Expediente completo")))
-    +'</div><div class="card-body" style="padding-bottom:14px">'+meter(expCount(e),expReq(e))
-    +'<p class="t-sub" style="margin-top:8px">'+(falta.length?'Faltan '+falta.length+' documentos requeridos para cerrar el trámite.':'Los '+expReq(e)+' documentos requeridos están cargados y versionados.')+'</p></div>'
-    +'<div class="docs" id="doclist">'+cat.map(function(d){var has=d.id in e.docs;
-      return '<div class="doc'+(has?"":" missing")+'" data-doc="'+d.id+'"><span class="doc-i">'+d.f.split(" ")[0]+'</span>'
-        +'<span class="doc-n"><b>'+d.n+'</b><span class="t-sub">'+(has?d.f+' · v2 · subido por Ana Quispe':'Requerido · no cargado')+'</span></span>'
-        +(has?'<span class="doc-sz">'+mb(e.docs[d.id])+'</span>':badge("b-warn","Falta"))+'</div>';}).join("")+'</div>'
-    +'<div class="card-note">Cada documento guarda historial de versiones y queda indexado con OCR. Los lotes de fotos de inspección se suben completos, sin dividirlos ni comprimirlos: es el volumen que hizo fallar a las plataformas probadas antes.</div></div>';
-}
-
-/* ===================== TRÁNSITO ===================== */
-function shipTable(ships,title){
-  return '<div class="card"><div class="card-head"><h3>'+title+'</h3></div>'
-    +'<div class="tw"><table><thead><tr><th>Trámite</th><th>Ruta</th><th>Transportista</th><th>Avance</th><th>ETA de entrega</th></tr></thead><tbody>'
-    +ships.map(function(s){var c=carrierBy(s.carrierId);
-      return '<tr class="clickable" data-ship="'+s.code+'"><td class="mono t-strong">'+s.code+'<div class="t-sub">'+s.cliente+'</div></td>'
-        +'<td class="t-sub">'+s.ruta+'</td><td>'+(c?c.n:"—")+'<div class="t-sub mono">'+s.placa+'</div></td>'
-        +'<td><div class="meter-row"><div class="meter"><i style="width:'+s.pct+'%"></i></div><span class="mono">'+pctf(s.pct)+'</span></div></td>'
-        +'<td class="mono t-sub">'+s.eta+(s.alerta?' <span class="badge b-warn"><span class="dot"></span>+4 h</span>':'')+'</td></tr>';}).join("")
-    +'</tbody></table></div></div>';
-}
-function estadoEnvio(e){
-  var m={curso:["b-accent","En curso"],entregado:["b-ok","Entregado"],incidencia:["b-warn","Con incidencia"]};
-  return m[e]||["b-neutral","—"];
-}
-function viewTransito(){
-  var todos=visibleShips();
-  if(S.shipOpen) return viewShipDetail(S.shipOpen);
-
-  var cnt={todos:todos.length,
-    curso:todos.filter(function(s){return s.estado==="curso";}).length,
-    incidencia:todos.filter(function(s){return s.estado==="incidencia";}).length,
-    entregado:todos.filter(function(s){return s.estado==="entregado";}).length};
-
-  var lista=todos.filter(function(s){return S.filtro==="todos"||s.estado===S.filtro;});
-  if(S.track.length>=2){
-    var q=S.track.toLowerCase();
-    lista=lista.filter(function(s){
-      var c=carrierBy(s.carrierId);
-      return (s.code+" "+s.cliente+" "+s.placa+" "+s.ruta+" "+(c?c.n:"")).toLowerCase().indexOf(q)>=0;});
-  }
-
-  var chips=[["todos","Todos"],["curso","En curso"],["incidencia","Con incidencia"],["entregado","Entregados"]]
-    .map(function(f){
-      return '<button class="chip'+(S.filtro===f[0]?" is-on":"")+'" data-filtro="'+f[0]+'">'+
-        f[1]+'<span class="chip-n">'+cnt[f[0]]+'</span></button>';}).join("");
-
-  return '<div class="page-head-row">'
-    + pageHead("Operación","Envíos","Estado de cada envío en un solo lugar: lo que está en ruta, lo que ya se entregó y lo que necesita atención ahora.")
-    + (S.role.cliente?'':'<button class="btn btn-primary btn-lg" data-go="nuevo">+ Nuevo envío</button>')
-    + '</div>'
+  return ph({eyebrow:"DMS Bolivia S.R.L.",t:"Dashboard",
+      meta:pill("Hoy",HOY)+pill("Ejecutivo","Ana Quispe")})
     + tiles([
-      {k:"En curso",v:String(cnt.curso),n:"En ruta o en aduana ahora"},
-      {k:"Con incidencia",v:String(cnt.incidencia),n:"Demoras que requieren atención"},
-      {k:"Entregados",v:String(cnt.entregado),n:"Cerrados este mes"},
-      {k:"Entregas a tiempo",v:String(Math.round(PERF.aTiempo/PERF.total*100)),u:"%",n:PERF.total+" envíos en "+PERF.periodo}])
-    + (cnt.incidencia?alertBox({t:"1 envío con demora activa",
-        d:"IMP-2026-0847 está detenido en la frontera Tambo Quemado. La ETA ya se recalculó y el cliente fue notificado automáticamente."}):"")
-    + '<div class="card"><div class="card-head"><h3>Seguimiento</h3></div>'
-    + '<div class="card-body" style="padding-bottom:12px">'
-    + '<input id="track" type="search" value="'+S.track.replace(/"/g,"&quot;")+'" '
-    + 'placeholder="Rastrear por N° de trámite, cliente, placa o ruta…" style="max-width:420px">'
-    + '<div class="chips" style="margin-top:13px">'+chips+'</div></div>'
-    + (lista.length
-      ? '<div class="tw"><table><thead><tr><th>Trámite</th><th>Ruta</th><th>Transportista</th><th>Estado</th><th>Avance</th><th>Entrega</th></tr></thead><tbody>'
-        + lista.map(function(s){
-            var c=carrierBy(s.carrierId),b=estadoEnvio(s.estado);
-            return '<tr class="clickable" data-ship="'+s.code+'">'
-              +'<td class="mono t-strong">'+s.code+'<div class="t-sub">'+s.cliente+'</div></td>'
-              +'<td class="t-sub">'+s.ruta+'</td>'
-              +'<td>'+(c?c.n:"—")+'<div class="t-sub mono">'+s.placa+'</div></td>'
-              +'<td>'+badge(b[0],b[1])+'</td>'
-              +'<td><div class="meter-row"><div class="meter'+(s.pct>=100?" is-full":"")+'"><i style="width:'+s.pct+'%"></i></div><span class="mono">'+pctf(s.pct)+'</span></div></td>'
-              +'<td class="mono t-sub">'+(s.estado==="entregado"
-                  ? s.entregado+(s.puntual?' <span class="badge b-ok"><span class="dot"></span>a tiempo</span>':' <span class="badge b-warn"><span class="dot"></span>tarde</span>')
-                  : s.eta+(s.alerta?' <span class="badge b-warn"><span class="dot"></span>+4 h</span>':''))+'</td></tr>';
-          }).join("")
-        + '</tbody></table></div>'
-      : '<div class="card-body"><p class="t-sub">Ningún envío coincide con el filtro o la búsqueda.</p></div>')
+      {k:"Clientes",v:String(CLIENTES.length),n:act.length+" activos"},
+      {k:"Prospectos",v:String(pros.length),n:"En captación"},
+      {k:"Oportunidades",v:String(opAb.length),n:"USD "+nf(valor)},
+      {k:"Sin actividad 7 d",v:String(sinAct.length),n:"Requieren contacto"},
+      {k:"Actividades",v:String(actPend.length),n:"Pendientes"},
+      {k:"Docs por revisar",v:String(docPend.length),n:"De "+nf(DOCS.length)+" totales"}])
+    + tiles([
+      {k:"Viajes en ruta",v:String(enRuta.length),n:"Confirmados o en tránsito"},
+      {k:"Incidencias",v:String(inci.length),n:"Requieren atención"},
+      {k:"Demandas abiertas",v:String(demAb.length),n:"Sin transportista"},
+      {k:"Transportistas libres",v:String(dispo.length)+"/"+TRANSPORTISTAS.length,n:"Certificados y disponibles"},
+      {k:"Entrega a tiempo",v:String(Math.round(PERF.aTiempo/PERF.total*100)),u:"%",n:PERF.periodo},
+      {k:"Tránsito medio",v:String(PERF.horas),u:" h",n:"Puerta a puerta"}])
+    + (inci.length?alerta(inci.length+" viaje con incidencia activa",
+        inci.map(function(v){return v.id+" · "+v.inc;}).join(" "),""):"")
+    + '<div class="grid2">'
+    + card("Oportunidades por etapa",
+        tbl([{t:"Etapa"},{t:"Oportunidades",r:true},{t:"Valor USD",r:true}],
+          porEtapa.map(function(e){
+            return '<tr><td class="t-strong">'+e.n+'</td><td class="r mono">'+e.c+'</td>'
+              +'<td class="r mono">'+nf(e.v)+'</td></tr>';}).join("")))
+    + card("Servicios contratados",
+        tbl([{t:"Servicio"},{t:"Clientes",r:true},{t:"Potencial",r:true}],
+          SERVICIOS.map(function(sv){
+            var con=CLIENTES.filter(function(c){return c.serv.indexOf(sv.id)>=0;}).length;
+            var pot=CLIENTES.filter(function(c){return c.serv.length&&c.serv.indexOf(sv.id)<0;}).length;
+            return '<tr><td class="t-strong">'+sv.n+'</td><td class="r mono">'+con+'</td>'
+              +'<td class="r mono" style="color:var(--action)">'+pot+'</td></tr>';}).join("")))
+    + '</div>'
+    + card("Actividades pendientes",
+        tbl([{t:"Fecha"},{t:"Cliente"},{t:"Tipo"},{t:"Asunto"},{t:"Responsable"}],
+          actPend.slice(0,6).map(function(a){
+            var c=cliBy(a.cli);
+            return '<tr class="clickable" data-cli="'+a.cli+'"><td class="mono t-sub">'+a.fecha+'</td>'
+              +'<td class="t-strong">'+(c?c.n:"—")+'</td><td>'+badge("b-neutral",ACT_TIPOS[a.tipo])+'</td>'
+              +'<td>'+a.asunto+'</td><td class="t-sub">'+a.resp+'</td></tr>';}).join("")),
+        '<button class="btn" data-go="actividades">Ver todas</button>');
+}
+function vDashCliente(){
+  var ops=visibleOps(),docs=visibleDocs(),via=visibleViajes();
+  var c=cliBy(S.role.cliente);
+  return ph({eyebrow:c.n,t:"Dashboard",meta:pill("NIT",c.nit)+pill("Ejecutivo",c.ejecutivo)})
+    + tiles([
+      {k:"Operaciones",v:String(ops.length),n:ops.filter(function(o){return o.estado!=="cerrada";}).length+" abiertas"},
+      {k:"Documentos",v:String(docs.length),n:docs.filter(function(d){return d.estado==="pendiente";}).length+" pendientes"},
+      {k:"Viajes",v:String(via.length),n:"Asociados a sus cargas"},
+      {k:"Servicios",v:String(c.serv.length),n:"Contratados"}])
+    + card("Operaciones",
+        tbl([{t:"Operación"},{t:"Ruta"},{t:"Mercancía"},{t:"Estado"},{t:"Docs",r:true}],
+          ops.map(function(o){
+            return '<tr class="clickable" data-op="'+o.id+'"><td class="mono t-strong">'+o.id+'</td>'
+              +'<td class="t-sub">'+o.ruta+'</td><td>'+o.merc+'</td><td>'+bd(opEstado(o.estado))+'</td>'
+              +'<td class="r mono">'+DOCS.filter(function(d){return d.op===o.id;}).length+'</td></tr>';}).join("")));
+}
+function vDashTransportista(){
+  var t=traBy(S.role.traId),st=certEstado(t);
+  var mias=visibleViajes();
+  var abiertas=DEMANDAS.filter(function(d){return d.estado==="publicada";});
+  var elegibles=abiertas.filter(function(d){return !evaluar(t,d);});
+  return ph({eyebrow:t.n,t:"Dashboard",meta:bd([st.cls,st.txt])+pill("Placa",t.placa)})
+    + tiles([
+      {k:"Certificación",v:st.code==="ok"?"Vigente":"Bloqueada",n:st.txt},
+      {k:"Demandas abiertas",v:String(abiertas.length),n:elegibles.length+" compatibles"},
+      {k:"Mis viajes",v:String(mias.length),n:"Historial y activos"},
+      {k:"Cumplimiento",v:String(t.cumpl),u:"%",n:t.viajes+" viajes"}])
+    + (st.code!=="ok"?alerta("Certificación no vigente",
+        "Sin documentación aprobada no puede recibir asignaciones."):"")
+    + card("Demandas compatibles",
+        tbl([{t:"Demanda"},{t:"Ruta"},{t:"Carga"},{t:"Peso",r:true},{t:"Resultado"}],
+          abiertas.map(function(d){
+            var no=evaluar(t,d);
+            return '<tr class="clickable" data-dem="'+d.id+'"><td class="mono t-strong">'+d.id+'</td>'
+              +'<td class="t-sub">'+d.origen+' → '+d.destino+'</td><td>'+d.merc+'</td>'
+              +'<td class="r mono">'+nf(d.peso)+' kg</td>'
+              +'<td>'+(no?badge("b-crit",no.motivo):badge("b-ok","Compatible"))+'</td></tr>';}).join("")
+          ||emptyRow(5,"Sin demandas publicadas")));
+}
+
+/* ===================== CLIENTES ===================== */
+function vClientes(){
+  if(S.cliOpen) return vCliente(S.cliOpen);
+  var q=S.q.toLowerCase();
+  var lista=CLIENTES.filter(function(c){
+    if(S.filtro!=="todos"&&c.etapa!==S.filtro) return false;
+    if(q.length<2) return true;
+    return (c.n+" "+c.nit+" "+c.ciudad+" "+c.tipo+" "+c.ejecutivo).toLowerCase().indexOf(q)>=0;});
+  var chips=[["todos","Todos",CLIENTES.length]].concat(ETAPAS.map(function(e){
+    return [e.id,e.n,CLIENTES.filter(function(c){return c.etapa===e.id;}).length];}))
+    .map(function(f){return '<button class="chip'+(S.filtro===f[0]?" is-on":"")+'" data-filtro="'+f[0]+'">'
+      +f[1]+'<span class="chip-n">'+f[2]+'</span></button>';}).join("");
+  return ph({eyebrow:"CRM",t:"Clientes",
+      meta:pill("Total",CLIENTES.length)+pill("Activos",CLIENTES.filter(function(c){return c.etapa==="activo"||c.etapa==="fidelizacion";}).length),
+      act:'<button class="btn btn-primary" id="btn-nuevo-cli">+ Nuevo prospecto</button>'})
+    + '<div class="card"><div class="card-body" style="padding-bottom:12px">'
+    + '<input id="q" type="search" value="'+esc(S.q)+'" placeholder="Buscar por nombre, NIT, ciudad…" style="max-width:380px">'
+    + '<div class="chips" style="margin-top:12px">'+chips+'</div></div>'
+    + tbl([{t:"Cliente"},{t:"Tipo"},{t:"Ciudad"},{t:"Etapa"},{t:"Servicios",r:true},{t:"Docs",r:true},{t:"Próximo seg."}],
+        lista.map(function(c){
+          return '<tr class="clickable" data-cli="'+c.id+'">'
+            +'<td class="t-strong">'+c.n+'<div class="t-sub mono">'+c.nit+'</div></td>'
+            +'<td class="t-sub">'+c.tipo+'</td><td class="t-sub">'+c.ciudad+'</td>'
+            +'<td>'+bd(etapaBadge(c.etapa))+'</td>'
+            +'<td class="r mono">'+c.serv.length+'</td>'
+            +'<td class="r mono">'+docsDe(c.id).length+'</td>'
+            +'<td class="mono t-sub">'+c.proximo+'</td></tr>';}).join("")
+        ||emptyRow(7,"Sin resultados"))
     + '</div>';
 }
 
-function viewNuevo(){
-  return '<button class="back" data-back="transito">← Envíos</button>'
-    + pageHead("Operación","Nuevo envío",
-      "Cargá los datos del despacho. Al crearlo, el sistema evalúa la red de transportistas y te muestra quién puede tomarlo.")
-    + '<div class="card"><div class="card-head"><h3>Datos del despacho</h3></div><div class="card-body">'
-    + '<div class="form-grid">'
-    + '<label class="fld"><span class="eyebrow">Cliente</span>'
-      + '<select id="f-cliente">'+["Ferretería Illimani S.R.L.","Químicos del Altiplano S.R.L.","AgroSur Bolivia S.A.","Repuestos Tunari S.A.","Andina Textil S.A."]
-        .map(function(c){return '<option>'+c+'</option>';}).join("")+'</select></label>'
-    + '<label class="fld"><span class="eyebrow">Corredor</span>'
-      + '<select id="f-corredor">'+["Arica – La Paz","Ilo – La Paz","Iquique – Oruro","Arica – Cochabamba","Santa Cruz – Santos"]
-        .map(function(c){return '<option>'+c+'</option>';}).join("")+'</select></label>'
-    + '<label class="fld"><span class="eyebrow">Descripción de la carga</span>'
-      + '<input id="f-carga" type="text" value="Carga general paletizada"></label>'
-    + '<label class="fld"><span class="eyebrow">Peso bruto (kg)</span>'
-      + '<input id="f-peso" type="text" value="18500"></label>'
-    + '<label class="fld"><span class="eyebrow">Retiro</span>'
-      + '<input id="f-retiro" type="text" value="24 sep 2026 · 07:00"></label>'
-    + '<label class="fld"><span class="eyebrow">Entrega comprometida</span>'
-      + '<input id="f-entrega" type="text" value="26 sep 2026"></label>'
-    + '</div>'
-    + '<label class="chk"><input type="checkbox" id="f-peligrosa"> '
-      + '<span>Mercadería peligrosa — exige transportista con certificación específica</span></label>'
-    + '<div style="margin-top:18px;display:flex;gap:10px;flex-wrap:wrap">'
-    + '<button class="btn btn-primary btn-lg" id="btn-crear">Crear envío y buscar transportista</button>'
-    + '<button class="btn" data-back="transito">Cancelar</button></div>'
-    + '</div><div class="card-note">El envío se crea como despacho abierto. El motor de asignación solo puede adjudicarlo a transportistas con documentación vigente para esa carga.</div></div>';
+var CLI_TABS=[["resumen","Resumen"],["operaciones","Operaciones"],["documentos","Documentos"],
+  ["servicios","Servicios"],["actividades","Actividades"],["contactos","Contactos"],["historial","Historial"]];
+function vCliente(id){
+  var c=cliBy(id); if(!c) return "";
+  var ops=OPERACIONES.filter(function(o){return o.cli===id;});
+  var docs=docsDe(id);
+  var acts=ACTIVIDADES.filter(function(a){return a.cli===id;});
+  var oport=OPORTUNIDADES.filter(function(o){return o.cli===id;});
+  var tabs='<div class="tabs">'+CLI_TABS.map(function(t){
+    return '<button class="tab'+(S.cliTab===t[0]?" is-on":"")+'" data-clitab="'+t[0]+'">'+t[1]+'</button>';}).join("")+'</div>';
+  var body="";
+
+  if(S.cliTab==="resumen"){
+    var noTiene=SERVICIOS.filter(function(sv){return c.serv.indexOf(sv.id)<0;});
+    body=tiles([
+      {k:"Etapa",v:etapaN(c.etapa),n:"Desde "+c.desde},
+      {k:"Operaciones",v:String(ops.length),n:ops.filter(function(o){return o.estado!=="cerrada";}).length+" abiertas"},
+      {k:"Documentos",v:String(docs.length),n:docs.filter(function(d){return d.estado==="pendiente";}).length+" pendientes"},
+      {k:"Servicios",v:String(c.serv.length)+"/"+SERVICIOS.length,n:noTiene.length+" sin contratar"},
+      {k:"Oportunidades",v:String(oport.length),n:"USD "+nf(oport.reduce(function(a,o){return a+o.valor;},0))},
+      {k:"Última interacción",v:c.ultima.split(" ")[0]+" "+c.ultima.split(" ")[1],n:"Próxima: "+c.proximo}])
+    + '<div class="grid2">'
+    + card("Datos generales",'<div class="card-body"><div class="kvlist">'
+        +'<div class="kvrow"><span>NIT</span><span class="mono">'+c.nit+'</span></div>'
+        +'<div class="kvrow"><span>Tipo</span><span>'+c.tipo+'</span></div>'
+        +'<div class="kvrow"><span>Ciudad</span><span>'+c.ciudad+'</span></div>'
+        +'<div class="kvrow"><span>Ejecutivo</span><span>'+c.ejecutivo+'</span></div>'
+        +'<div class="kvrow"><span>Cliente desde</span><span>'+c.desde+'</span></div>'
+        +'</div></div>')
+    + card("Servicios contratados",'<div class="card-body"><div class="chips">'
+        +(c.serv.length?c.serv.map(function(s){return badge("b-ok",servN(s));}).join("")
+          :'<span class="t-sub">Ninguno</span>')+'</div>'
+        +(noTiene.length?'<div class="eyebrow" style="margin:14px 0 8px">Sin contratar</div><div class="chips">'
+          +noTiene.map(function(s){return badge("b-neutral",s.n);}).join("")+'</div>':'')
+        +'</div>')
+    + '</div>';
+  }
+  else if(S.cliTab==="operaciones"){
+    body=tbl([{t:"Operación"},{t:"Tipo"},{t:"Ruta"},{t:"Mercancía"},{t:"Peso",r:true},{t:"Estado"},{t:"Docs",r:true}],
+      ops.map(function(o){
+        return '<tr class="clickable" data-op="'+o.id+'"><td class="mono t-strong">'+o.id+'</td>'
+          +'<td>'+badge("b-neutral",o.tipo==="imp"?"Importación":"Exportación")+'</td>'
+          +'<td class="t-sub">'+o.ruta+'</td><td>'+o.merc+'</td>'
+          +'<td class="r mono">'+nf(o.peso)+' kg</td><td>'+bd(opEstado(o.estado))+'</td>'
+          +'<td class="r mono">'+DOCS.filter(function(d){return d.op===o.id;}).length+'</td></tr>';}).join("")
+      ||emptyRow(7,"Sin operaciones"));
+    body='<div class="card">'+body+'</div>';
+  }
+  else if(S.cliTab==="documentos"){
+    body=docPanel(id);
+  }
+  else if(S.cliTab==="servicios"){
+    var noTiene2=SERVICIOS.filter(function(sv){return c.serv.indexOf(sv.id)<0;});
+    body=card("Contratados",tbl([{t:"Servicio"},{t:"Estado"}],
+        (c.serv.length?c.serv.map(function(s){
+          return '<tr><td class="t-strong">'+servN(s)+'</td><td>'+badge("b-ok","Activo")+'</td></tr>';}).join("")
+          :emptyRow(2,"Ninguno"))))
+      + card("Oportunidades de ampliación",tbl(
+          [{t:"Servicio"},{t:"Oportunidad"},{t:"Valor USD",r:true},{t:"Prob.",r:true},{t:"Estado"}],
+          (oport.length?oport.map(function(o){
+            return '<tr><td class="t-strong">'+servN(o.serv)+'</td><td>'+o.t+'</td>'
+              +'<td class="r mono">'+nf(o.valor)+'</td><td class="r mono">'+o.prob+'%</td>'
+              +'<td>'+bd(etapaBadge(o.etapa))+'</td></tr>';}).join("")
+            :emptyRow(5,"Sin oportunidades registradas"))))
+      + card("Sin contratar",tbl([{t:"Servicio"},{t:"Oportunidad"}],
+          (noTiene2.length?noTiene2.map(function(sv){
+            var tiene=oport.filter(function(o){return o.serv===sv.id;}).length>0;
+            return '<tr><td class="t-strong">'+sv.n+'</td>'
+              +'<td>'+(tiene?badge("b-warn","Oportunidad abierta"):badge("b-neutral","Sin registrar"))+'</td></tr>';}).join("")
+            :emptyRow(2,"Contrata todos los servicios"))));
+  }
+  else if(S.cliTab==="actividades"){
+    body='<div class="card">'+tbl([{t:"Fecha"},{t:"Tipo"},{t:"Asunto"},{t:"Responsable"},{t:"Estado"}],
+      acts.map(function(a){
+        return '<tr><td class="mono t-sub">'+a.fecha+'</td><td>'+badge("b-neutral",ACT_TIPOS[a.tipo])+'</td>'
+          +'<td>'+a.asunto+'</td><td class="t-sub">'+a.resp+'</td>'
+          +'<td>'+(a.estado==="hecha"?badge("b-ok","Hecha"):badge("b-warn","Pendiente"))+'</td></tr>';}).join("")
+      ||emptyRow(5,"Sin actividades"))+'</div>';
+  }
+  else if(S.cliTab==="contactos"){
+    body='<div class="card">'+tbl([{t:"Nombre"},{t:"Cargo"},{t:"Teléfono"},{t:"Correo"}],
+      c.contactos.map(function(k){
+        return '<tr><td class="t-strong">'+k.n+'</td><td class="t-sub">'+k.c+'</td>'
+          +'<td class="mono t-sub">'+k.t+'</td><td class="mono t-sub">'+k.m+'</td></tr>';}).join(""))+'</div>';
+  }
+  else {
+    var hist=acts.slice().reverse();
+    body=card("Historial",'<div class="card-body"><ol class="hitos">'
+      +(hist.length?hist.map(function(a,i){
+        return '<li class="hito '+(a.estado==="hecha"?"done":"now")+'">'
+          +'<span class="hito-rail"><span class="hito-dot"></span><span class="hito-line"></span></span>'
+          +'<span class="hito-b"><b>'+a.asunto+'</b><span>'+a.fecha+' · '+ACT_TIPOS[a.tipo]+' · '+a.resp+'</span></span></li>';
+        }).join(""):'<li class="t-sub">Sin historial</li>')+'</ol></div>');
+  }
+
+  return '<button class="back" data-back="clientes">← Clientes</button>'
+    + ph({eyebrow:c.tipo+" · "+c.ciudad,t:c.n,
+        meta:bd(etapaBadge(c.etapa))+pill("NIT",c.nit)+pill("Docs",docs.length),
+        act:'<button class="btn btn-primary" data-crear-dem="'+c.id+'">+ Demanda de carga</button>'})
+    + tabs + body;
 }
 
-function viewRendimiento(){
-  var pct=Math.round(PERF.aTiempo/PERF.total*100);
-  return pageHead("Operación","Rendimiento de entregas",
-    "Cómo viene la operación en "+PERF.periodo+": puntualidad, tiempos por corredor y dónde se concentran las incidencias.")
+/* ===================== PIPELINE ===================== */
+function vPipeline(){
+  var cols=ETAPAS.map(function(e){
+    var cl=CLIENTES.filter(function(c){return c.etapa===e.id;});
+    var op=OPORTUNIDADES.filter(function(o){return o.etapa===e.id;});
+    var val=op.reduce(function(a,o){return a+o.valor;},0);
+    return '<div class="pipe-col"><div class="pipe-h"><b>'+e.n+'</b>'
+      +'<span>'+cl.length+' · USD '+nf(val)+'</span></div><div class="pipe-b">'
+      +(cl.length?cl.map(function(c){
+        var o=OPORTUNIDADES.filter(function(x){return x.cli===c.id;});
+        var v=o.reduce(function(a,x){return a+x.valor;},0);
+        return '<button class="pcard" data-cli="'+c.id+'"><b>'+c.n+'</b>'
+          +'<span>'+c.ciudad+' · '+c.ejecutivo+'</span>'
+          +(v?'<span class="val">USD '+nf(v)+'</span>':'')+'</button>';}).join("")
+        :'<span class="t-sub" style="padding:6px">—</span>')
+      +'</div></div>';}).join("");
+  var val=OPORTUNIDADES.reduce(function(a,o){return a+o.valor;},0);
+  return ph({eyebrow:"CRM",t:"Pipeline",
+      meta:pill("Oportunidades",OPORTUNIDADES.length)+pill("Valor","USD "+nf(val))})
+    + '<div class="pipe">'+cols+'</div>'
+    + '<div style="height:18px"></div>'
+    + card("Oportunidades",
+        tbl([{t:"ID"},{t:"Cliente"},{t:"Oportunidad"},{t:"Servicio"},{t:"Valor USD",r:true},{t:"Prob.",r:true},{t:"Cierre"},{t:"Etapa"}],
+          OPORTUNIDADES.map(function(o){
+            var c=cliBy(o.cli);
+            return '<tr class="clickable" data-cli="'+o.cli+'"><td class="mono t-strong">'+o.id+'</td>'
+              +'<td>'+(c?c.n:"—")+'</td><td>'+o.t+'</td><td class="t-sub">'+servN(o.serv)+'</td>'
+              +'<td class="r mono">'+nf(o.valor)+'</td><td class="r mono">'+o.prob+'%</td>'
+              +'<td class="mono t-sub">'+o.cierre+'</td><td>'+bd(etapaBadge(o.etapa))+'</td></tr>';}).join("")));
+}
+
+/* ===================== ACTIVIDADES ===================== */
+function vActividades(){
+  var lista=ACTIVIDADES.filter(function(a){
+    return S.filtro==="todos"||(S.filtro==="pendiente"?a.estado==="pendiente":a.estado==="hecha");});
+  var chips=[["todos","Todas",ACTIVIDADES.length],
+    ["pendiente","Pendientes",ACTIVIDADES.filter(function(a){return a.estado==="pendiente";}).length],
+    ["hecha","Hechas",ACTIVIDADES.filter(function(a){return a.estado==="hecha";}).length]]
+    .map(function(f){return '<button class="chip'+(S.filtro===f[0]?" is-on":"")+'" data-filtro="'+f[0]+'">'
+      +f[1]+'<span class="chip-n">'+f[2]+'</span></button>';}).join("");
+  return ph({eyebrow:"CRM",t:"Actividades",
+      meta:pill("Pendientes",ACTIVIDADES.filter(function(a){return a.estado==="pendiente";}).length),
+      act:'<button class="btn btn-primary" id="btn-nueva-act">+ Nueva actividad</button>'})
+    + '<div class="card"><div class="card-body" style="padding-bottom:12px"><div class="chips">'+chips+'</div></div>'
+    + tbl([{t:"Fecha"},{t:"Cliente"},{t:"Tipo"},{t:"Asunto"},{t:"Responsable"},{t:"Estado"},{t:""}],
+        lista.map(function(a){
+          var c=cliBy(a.cli);
+          return '<tr><td class="mono t-sub">'+a.fecha+'</td>'
+            +'<td class="t-strong clickable" data-cli="'+a.cli+'">'+(c?c.n:"—")+'</td>'
+            +'<td>'+badge("b-neutral",ACT_TIPOS[a.tipo])+'</td><td>'+a.asunto+'</td>'
+            +'<td class="t-sub">'+a.resp+'</td>'
+            +'<td>'+(a.estado==="hecha"?badge("b-ok","Hecha"):badge("b-warn","Pendiente"))+'</td>'
+            +'<td class="r">'+(a.estado==="pendiente"
+              ?'<button class="btn" data-act-ok="'+a.id+'">Marcar hecha</button>':'')+'</td></tr>';}).join("")
+        ||emptyRow(7,"Sin actividades"))
+    + '</div>';
+}
+
+/* ===================== GESTIÓN DOCUMENTAL ===================== */
+var PAGE=20;
+
+function docFiltrados(cli){
+  var base=cli?docsDe(cli):visibleDocs();
+  var q=S.docQ.toLowerCase();
+  return base.filter(function(d){
+    if(S.docCat!=="todas"&&d.cat!==S.docCat) return false;
+    if(S.docEstado!=="todos"&&d.estado!==S.docEstado) return false;
+    if(S.docOp!=="todas"&&d.op!==S.docOp) return false;
+    if(q.length>=2&&(d.n+" "+d.op+" "+catN(d.cat).n).toLowerCase().indexOf(q)<0) return false;
+    return true;});
+}
+
+function docPanel(cli){
+  var base=cli?docsDe(cli):visibleDocs();
+  var lista=docFiltrados(cli);
+  var totalMB=base.reduce(function(a,d){return a+d.size;},0);
+  var dups=base.filter(function(d){return d.dup;}).length;
+  var pend=base.filter(function(d){return d.estado==="pendiente";}).length;
+  var pages=Math.max(1,Math.ceil(lista.length/PAGE));
+  if(S.docPage>pages) S.docPage=pages;
+  var slice=lista.slice((S.docPage-1)*PAGE,S.docPage*PAGE);
+
+  /* Carpetas por categoría */
+  var folders='<button class="tnode'+(S.docCat==="todas"?" is-on":"")+'" data-doccat="todas">'
+    +'<span class="tnode-n">Todas las categorías</span><span class="tnode-c">'+base.length+'</span></button>'
+    +DOC_CATS.map(function(c){
+      var n=base.filter(function(d){return d.cat===c.id;}).length;
+      if(!n) return "";
+      return '<button class="tnode'+(S.docCat===c.id?" is-on":"")+'" data-doccat="'+c.id+'">'
+        +'<span class="tnode-n">'+c.n+'</span><span class="tnode-c">'+n+'</span></button>';}).join("");
+
+  /* Filtros */
+  var opsCli=(cli?OPERACIONES.filter(function(o){return o.cli===cli;}):visibleOps());
+  var selOp='<select id="f-docop"><option value="todas">Todas las operaciones</option>'
+    +opsCli.map(function(o){return '<option value="'+o.id+'"'+(S.docOp===o.id?" selected":"")+'>'+o.id+'</option>';}).join("")
+    +'</select>';
+  var selEst='<select id="f-docest"><option value="todos">Todos los estados</option>'
+    +Object.keys(DOC_ESTADOS).map(function(k){
+      return '<option value="'+k+'"'+(S.docEstado===k?" selected":"")+'>'+DOC_ESTADOS[k][1]+'</option>';}).join("")
+    +'</select>';
+
+  var rows=slice.map(function(d){
+    var e=DOC_ESTADOS[d.estado];
+    return '<tr class="clickable" data-doc="'+d.id+'">'
+      +'<td><span class="doc-i">'+d.fmt+'</span></td>'
+      +'<td class="t-strong fname" title="'+esc(d.n)+'">'+d.n
+        +(d.dup?' '+badge("b-warn","Duplicado"):'')+'</td>'
+      +'<td class="t-sub">'+catN(d.cat).n+'</td>'
+      +'<td class="mono t-sub">'+d.op+'</td>'
+      +'<td class="r mono">'+mb(d.size)+'</td>'
+      +'<td>'+bd(e)+'</td>'
+      +'<td class="mono t-sub">'+d.fecha+'</td></tr>';}).join("");
+
+  var pg='<div class="pg"><span>'+(lista.length?((S.docPage-1)*PAGE+1)+'–'+Math.min(S.docPage*PAGE,lista.length):0)
+    +' de '+lista.length+'</span><div class="pg-b">'
+    +'<button class="pg-btn" data-pg="'+(S.docPage-1)+'"'+(S.docPage<=1?" disabled":"")+'>‹</button>'
+    +Array.apply(null,{length:Math.min(pages,7)}).map(function(_,i){
+        var n=i+1;
+        return '<button class="pg-btn'+(n===S.docPage?" is-on":"")+'" data-pg="'+n+'">'+n+'</button>';}).join("")
+    +(pages>7?'<span style="padding:0 4px">…</span>':'')
+    +'<button class="pg-btn" data-pg="'+(S.docPage+1)+'"'+(S.docPage>=pages?" disabled":"")+'>›</button>'
+    +'</div></div>';
+
+  return tiles([
+      {k:"Archivos",v:nf(base.length),n:mb(totalMB)},
+      {k:"Pendientes",v:String(pend),n:"Por revisar"},
+      {k:"Duplicados",v:String(dups),n:"Detectados"},
+      {k:"Operaciones",v:String(opsCli.length),n:"Con documentos"}])
+    + '<div class="doc-layout">'
+    + '<div class="card" style="margin:0"><div class="card-head"><h3>Categorías</h3></div>'
+      + '<div class="tree">'+folders+'</div></div>'
+    + '<div style="min-width:0">'
+      + '<div class="card"><div class="card-body" style="padding-bottom:12px">'
+      + '<div class="filter-row">'
+      + '<input id="f-docq" type="search" value="'+esc(S.docQ)+'" placeholder="Buscar archivo…">'
+      + selOp + selEst
+      + '<button class="btn btn-primary" data-subir="'+(cli||"")+'">+ Subir archivos</button>'
+      + '</div></div>'
+      + tbl([{t:""},{t:"Archivo"},{t:"Categoría"},{t:"Operación"},{t:"Tamaño",r:true},{t:"Estado"},{t:"Fecha"}],
+          rows||emptyRow(7,"Sin resultados"))
+      + pg + '</div>'
+    + '</div></div>';
+}
+
+function vDocumentos(){
+  var base=visibleDocs();
+  return ph({eyebrow:S.role.cliente?cliBy(S.role.cliente).n:"CRM",t:"Documentos",
+      meta:pill("Archivos",nf(base.length))
+        +pill("Pendientes",base.filter(function(d){return d.estado==="pendiente";}).length)
+        +pill("Volumen",mb(base.reduce(function(a,d){return a+d.size;},0)))})
+    + docPanel(S.role.cliente||null);
+}
+
+/* Subida simulada con arrastrar y soltar */
+function modalSubir(cli){
+  var ops=(cli?OPERACIONES.filter(function(o){return o.cli===cli;}):visibleOps());
+  openModal("Subir archivos",
+    '<div class="drop" id="drop"><div class="drop-i">'
+    +'<svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.7" '
+    +'stroke-linecap="round" stroke-linejoin="round"><path d="M12 16V4"/><path d="m7 9 5-5 5 5"/>'
+    +'<path d="M4 16v3a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1v-3"/></svg></div>'
+    +'<b>Arrastrá archivos acá</b><span>o seleccionalos desde tu equipo</span>'
+    +'<div style="margin-top:12px"><input type="file" id="f-files" multiple></div></div>'
+    +'<div class="form-grid" style="margin-top:16px">'
+    +'<label class="fld"><span class="eyebrow">Operación</span><select id="f-upop">'
+      +ops.map(function(o){return '<option value="'+o.id+'">'+o.id+' · '+o.merc+'</option>';}).join("")
+      +'</select></label>'
+    +'<label class="fld"><span class="eyebrow">Categoría</span><select id="f-upcat">'
+      +DOC_CATS.map(function(c){return '<option value="'+c.id+'">'+c.n+'</option>';}).join("")
+      +'</select></label></div>'
+    +'<div id="up-list" style="margin-top:14px"></div>',
+    '<button class="btn" id="m-cancel">Cancelar</button>'
+    +'<button class="btn btn-primary" id="m-up" data-cli="'+(cli||"C001")+'">Subir</button>');
+}
+
+function wireModal(){
+  var drop=$("drop");
+  if(drop){
+    ["dragenter","dragover"].forEach(function(ev){
+      drop.addEventListener(ev,function(e){e.preventDefault();drop.classList.add("is-over");});});
+    ["dragleave","drop"].forEach(function(ev){
+      drop.addEventListener(ev,function(e){e.preventDefault();drop.classList.remove("is-over");});});
+    drop.addEventListener("drop",function(e){
+      e.preventDefault();
+      var f=e.dataTransfer&&e.dataTransfer.files;
+      if(f&&f.length) listarArchivos(Array.prototype.slice.call(f));});
+  }
+  var inp=$("f-files");
+  if(inp) inp.addEventListener("change",function(){
+    listarArchivos(Array.prototype.slice.call(inp.files));});
+  var c=$("m-cancel"); if(c) c.addEventListener("click",closeModal);
+  var u=$("m-up"); if(u) u.addEventListener("click",function(){subirArchivos(u.getAttribute("data-cli"));});
+}
+var pendientesSubida=[];
+function listarArchivos(files){
+  pendientesSubida=files.map(function(f){
+    return {n:f.name,size:Math.round((f.size/1048576)*10)/10||0.4};});
+  $("up-list").innerHTML='<div class="eyebrow" style="margin-bottom:8px">'+files.length+' archivo(s)</div>'
+    +'<div class="docs" style="border:1px solid var(--line);border-radius:8px">'
+    +pendientesSubida.map(function(f){
+      return '<div class="doc"><span class="doc-n"><b>'+esc(f.n)+'</b></span>'
+        +'<span class="doc-sz">'+mb(f.size)+'</span></div>';}).join("")+'</div>';
+}
+function subirArchivos(cli){
+  var op=$("f-upop")?$("f-upop").value:"";
+  var cat=$("f-upcat")?$("f-upcat").value:"factura";
+  var lote=pendientesSubida.length?pendientesSubida
+    :[{n:"documento_"+Date.now()+".pdf",size:2.4},{n:"anexo_"+Date.now()+".pdf",size:5.1}];
+  var nuevos=0,dups=0;
+  lote.forEach(function(f){
+    var existe=DOCS.some(function(d){return d.op===op&&d.n===f.n;});
+    DOCS.push({id:"D"+(9000+DOCS.length),cli:cli,op:op,cat:cat,fmt:catN(cat).fmt,
+      n:f.n,size:f.size,estado:"pendiente",fecha:"22 sep 2026",por:S.role.name,dup:existe});
+    if(existe) dups++; else nuevos++;});
+  pendientesSubida=[];
+  closeModal();
+  S.docPage=1;
+  renderNav();render();
+  toast(nuevos+" archivo(s) cargado(s) en "+op+(dups?" · "+dups+" duplicado(s) marcado(s)":""));
+}
+function modalDoc(id){
+  var d=null;for(var i=0;i<DOCS.length;i++){if(DOCS[i].id===id)d=DOCS[i];}
+  if(!d)return;
+  var c=cliBy(d.cli);
+  openModal(d.n,
+    '<div class="fprev">'+d.fmt+' · '+mb(d.size)+'</div>'
+    +'<div class="kvlist">'
+    +'<div class="kvrow"><span>Cliente</span><span>'+(c?c.n:"—")+'</span></div>'
+    +'<div class="kvrow"><span>Operación</span><span class="mono">'+d.op+'</span></div>'
+    +'<div class="kvrow"><span>Categoría</span><span>'+catN(d.cat).n+'</span></div>'
+    +'<div class="kvrow"><span>Formato</span><span>'+d.fmt+'</span></div>'
+    +'<div class="kvrow"><span>Tamaño</span><span class="mono">'+mb(d.size)+'</span></div>'
+    +'<div class="kvrow"><span>Subido</span><span>'+d.fecha+' · '+d.por+'</span></div>'
+    +'<div class="kvrow"><span>Estado</span><span>'+bd(DOC_ESTADOS[d.estado])+'</span></div>'
+    +(d.dup?'<div class="kvrow"><span>Duplicado</span><span>'+badge("b-warn","Mismo nombre en la operación")+'</span></div>':'')
+    +'</div>',
+    (d.estado==="pendiente"
+      ?'<button class="btn" data-doc-rech="'+d.id+'">Rechazar</button>'
+       +'<button class="btn btn-primary" data-doc-ok="'+d.id+'">Aprobar</button>'
+      :'<button class="btn" id="m-cancel">Cerrar</button>'));
+}
+
+/* ===================== OPERACIONES ===================== */
+function vOperaciones(){
+  var ops=visibleOps();
+  var lista=ops.filter(function(o){return S.filtro==="todos"||o.estado===S.filtro;});
+  var chips=[["todos","Todas",ops.length],
+    ["transito","En tránsito",ops.filter(function(o){return o.estado==="transito";}).length],
+    ["aduana","En aduana",ops.filter(function(o){return o.estado==="aduana";}).length],
+    ["puerto","En puerto",ops.filter(function(o){return o.estado==="puerto";}).length],
+    ["docs","Documentación",ops.filter(function(o){return o.estado==="docs";}).length],
+    ["cerrada","Cerradas",ops.filter(function(o){return o.estado==="cerrada";}).length]]
+    .map(function(f){return '<button class="chip'+(S.filtro===f[0]?" is-on":"")+'" data-filtro="'+f[0]+'">'
+      +f[1]+'<span class="chip-n">'+f[2]+'</span></button>';}).join("");
+  return ph({eyebrow:"Operaciones",t:"Operaciones",
+      meta:pill("Total",ops.length)+pill("Abiertas",ops.filter(function(o){return o.estado!=="cerrada";}).length)})
+    + '<div class="card"><div class="card-body" style="padding-bottom:12px"><div class="chips">'+chips+'</div></div>'
+    + tbl([{t:"Operación"},{t:"Cliente"},{t:"Tipo"},{t:"Ruta"},{t:"Peso",r:true},{t:"Estado"},{t:"Docs",r:true}],
+        lista.map(function(o){
+          var c=cliBy(o.cli);
+          return '<tr class="clickable" data-op="'+o.id+'"><td class="mono t-strong">'+o.id+'</td>'
+            +'<td>'+(c?c.n:"—")+'</td>'
+            +'<td>'+badge("b-neutral",o.tipo==="imp"?"Importación":"Exportación")+'</td>'
+            +'<td class="t-sub">'+o.ruta+'</td><td class="r mono">'+nf(o.peso)+' kg</td>'
+            +'<td>'+bd(opEstado(o.estado))+'</td>'
+            +'<td class="r mono">'+DOCS.filter(function(d){return d.op===o.id;}).length+'</td></tr>';}).join("")
+        ||emptyRow(7,"Sin operaciones"))
+    + '</div>';
+}
+
+/* ===================== DEMANDAS DE CARGA ===================== */
+function vDemandas(){
+  if(S.demOpen) return vDemanda(S.demOpen);
+  var lista=DEMANDAS.filter(function(d){return S.filtro==="todos"||d.estado===S.filtro;});
+  var chips=[["todos","Todas",DEMANDAS.length]].concat(Object.keys(DEM_EST).map(function(k){
+      return [k,DEM_EST[k][1],DEMANDAS.filter(function(d){return d.estado===k;}).length];}))
+    .filter(function(f){return f[0]==="todos"||f[2]>0;})
+    .map(function(f){return '<button class="chip'+(S.filtro===f[0]?" is-on":"")+'" data-filtro="'+f[0]+'">'
+      +f[1]+'<span class="chip-n">'+f[2]+'</span></button>';}).join("");
+  return ph({eyebrow:"Operaciones",t:"Demandas de carga",
+      meta:pill("Total",DEMANDAS.length)
+        +pill("Sin asignar",DEMANDAS.filter(function(d){return !d.tra;}).length),
+      act:S.role.traId?'':'<button class="btn btn-primary" id="btn-nueva-dem">+ Publicar demanda</button>'})
+    + '<div class="card"><div class="card-body" style="padding-bottom:12px"><div class="chips">'+chips+'</div></div>'
+    + tbl([{t:"Demanda"},{t:"Cliente"},{t:"Origen → Destino"},{t:"Carga"},{t:"Peso",r:true},
+           {t:"Vehículo"},{t:"Prioridad"},{t:"Estado"},{t:"Transportista"}],
+        lista.map(function(d){
+          var c=cliBy(d.cli),t=d.tra?traBy(d.tra):null;
+          return '<tr class="clickable" data-dem="'+d.id+'"><td class="mono t-strong">'+d.id+'</td>'
+            +'<td>'+(c?c.n:"—")+'</td><td class="t-sub">'+d.origen+' → '+d.destino+'</td>'
+            +'<td class="mono t-sub">'+d.carga+'</td><td class="r mono">'+nf(d.peso)+' kg</td>'
+            +'<td class="t-sub">'+d.vehiculo+'</td><td>'+bd(PRIOR[d.prior])+'</td>'
+            +'<td>'+bd(DEM_EST[d.estado])+'</td>'
+            +'<td class="t-sub">'+(t?t.n:"—")+'</td></tr>';}).join("")
+        ||emptyRow(9,"Sin demandas"))
+    + '</div>';
+}
+function vDemanda(id){
+  var d=demBy(id); if(!d) return "";
+  var c=cliBy(d.cli),cand=candidatos(d),asig=d.tra?traBy(d.tra):null;
+  var puedeAsignar=!d.tra&&d.estado==="publicada"&&cand.ok.length&&!S.role.traId;
+  var viaje=VIAJES.filter(function(v){return v.dem===d.id;})[0];
+
+  return '<button class="back" data-back="demandas">← Demandas</button>'
+    + ph({eyebrow:(c?c.n:"")+" · "+d.op,t:d.id,
+        meta:bd(DEM_EST[d.estado])+bd(PRIOR[d.prior])+(d.peligrosa?badge("b-crit","Carga peligrosa"):""),
+        act:(d.estado==="borrador"&&!S.role.traId?'<button class="btn btn-primary" data-pub="'+d.id+'">Publicar</button>':'')
+          +(puedeAsignar?'<button class="btn btn-primary" data-asig="'+d.id+'">Asignar automáticamente</button>':'')
+          +(viaje?'<button class="btn" data-via="'+viaje.id+'">Ver viaje</button>':'')})
+    + card("Datos","<div class='card-body'><div class='grid-kv'>"
+        +"<div class='kv'><span class='eyebrow'>Origen</span><b>"+d.origen+"</b></div>"
+        +"<div class='kv'><span class='eyebrow'>Destino</span><b>"+d.destino+"</b></div>"
+        +"<div class='kv'><span class='eyebrow'>Fecha de carga</span><b>"+d.carga+"</b></div>"
+        +"<div class='kv'><span class='eyebrow'>Entrega estimada</span><b>"+d.entrega+"</b></div>"
+        +"<div class='kv'><span class='eyebrow'>Mercancía</span><b>"+d.merc+"</b></div>"
+        +"<div class='kv'><span class='eyebrow'>Peso</span><b class='mono'>"+nf(d.peso)+" kg</b></div>"
+        +"<div class='kv'><span class='eyebrow'>Volumen</span><b class='mono'>"+d.vol+" m³</b></div>"
+        +"<div class='kv'><span class='eyebrow'>Vehículo</span><b>"+d.vehiculo+"</b></div>"
+        +"</div></div>")
+    + (asig?alerta("Asignada a "+asig.n,asig.unidad+" · "+asig.placa,"good"):"")
+    + card("Candidatos compatibles",
+        tbl([{t:"Transportista"},{t:"Vehículo"},{t:"Cobertura"},{t:"Cumpl.",r:true},
+             {t:"Rotación",r:true},{t:"Disponibilidad"},{t:"Puntaje",r:true}],
+          (cand.ok.length?cand.ok.map(function(x){
+            var win=asig?asig.id===x.t.id:false;
+            return '<tr'+(win?' class="pick"':'')+' data-tra="'+x.t.id+'">'
+              +'<td class="t-strong clickable">'+x.t.n+'<div class="t-sub">'+x.t.base+' · '+x.t.viajes+' viajes</div></td>'
+              +'<td class="t-sub">'+x.t.unidad+'<div class="mono">'+x.t.placa+'</div></td>'
+              +'<td class="t-sub">'+x.t.cobertura.join("<br>")+'</td>'
+              +'<td class="r mono">'+x.t.cumpl+'%</td>'
+              +'<td class="r mono">'+x.t.asignadas30d+'/30 d</td>'
+              +'<td>'+bd(DISP[x.t.disp])+'</td>'
+              +'<td class="r"><span class="score-bar"><i style="width:'+x.p.total+'%"></i></span> '
+              +'<span class="mono t-strong">'+x.p.total+'</span></td></tr>';}).join("")
+            :emptyRow(7,"Ningún transportista cumple los requisitos"))),
+        cand.ok.length?"Puntaje: cumplimiento "+cand.ok[0].p.cumpl+" + rotación "+cand.ok[0].p.rot
+          +" + origen "+cand.ok[0].p.prox+" + disponibilidad "+cand.ok[0].p.disp:null)
+    + card("Descartados",
+        tbl([{t:"Transportista"},{t:"Regla"},{t:"Motivo"}],
+          cand.no.map(function(x){
+            return '<tr class="excl"><td class="t-strong">'+x.t.n+'</td>'
+              +'<td class="mono t-sub">R0'+x.regla+'</td><td>'+x.motivo+'</td></tr>';}).join("")
+          ||emptyRow(3,"Ninguno")));
+}
+
+/* ===================== VIAJES ===================== */
+function vViajes(){
+  if(S.viaOpen) return vViaje(S.viaOpen);
+  var todos=visibleViajes();
+  var lista=todos.filter(function(v){return S.filtro==="todos"||v.estado===S.filtro;});
+  var estados=["todos"].concat(Object.keys(VIAJE_EST));
+  var chips=estados.map(function(k){
+      var n=k==="todos"?todos.length:todos.filter(function(v){return v.estado===k;}).length;
+      if(k!=="todos"&&!n) return "";
+      return '<button class="chip'+(S.filtro===k?" is-on":"")+'" data-filtro="'+k+'">'
+        +(k==="todos"?"Todos":VIAJE_EST[k][1])+'<span class="chip-n">'+n+'</span></button>';}).join("");
+  var q=S.q.toLowerCase();
+  if(q.length>=2) lista=lista.filter(function(v){
+    var t=traBy(v.tra),c=cliBy(v.cli);
+    return (v.id+" "+v.dem+" "+(t?t.n+" "+t.placa:"")+" "+(c?c.n:"")+" "+v.origen+" "+v.destino)
+      .toLowerCase().indexOf(q)>=0;});
+  return ph({eyebrow:"Operaciones",t:"Viajes",
+      meta:pill("Total",todos.length)
+        +pill("En ruta",todos.filter(function(v){return ["confirmado","carga","transito","reparto"].indexOf(v.estado)>=0;}).length)
+        +pill("Incidencias",todos.filter(function(v){return v.estado==="incidencia";}).length)})
+    + '<div class="card"><div class="card-body" style="padding-bottom:12px">'
+    + '<input id="q" type="search" value="'+esc(S.q)+'" placeholder="Rastrear por código, demanda, cliente o placa…" style="max-width:400px">'
+    + '<div class="chips" style="margin-top:12px">'+chips+'</div></div>'
+    + tbl([{t:"Viaje"},{t:"Demanda"},{t:"Cliente"},{t:"Transportista"},{t:"Ruta"},{t:"Estado"},{t:"Avance"},{t:"ETA"}],
+        lista.map(function(v){
+          var t=traBy(v.tra),c=cliBy(v.cli);
+          return '<tr class="clickable" data-via="'+v.id+'"><td class="mono t-strong">'+v.id+'</td>'
+            +'<td class="mono t-sub">'+v.dem+'</td><td>'+(c?c.n:"—")+'</td>'
+            +'<td>'+(t?t.n:"—")+'<div class="t-sub mono">'+(t?t.placa:"")+'</div></td>'
+            +'<td class="t-sub">'+v.origen+' → '+v.destino+'</td>'
+            +'<td>'+bd(VIAJE_EST[v.estado])+'</td>'
+            +'<td>'+meter(v.pct,v.pct>=100?" is-full":"")+'</td>'
+            +'<td class="mono t-sub">'+(v.estado==="entregado"?v.entregado:v.eta)+'</td></tr>';}).join("")
+        ||emptyRow(8,"Sin viajes"))
+    + '</div>';
+}
+function vViaje(id){
+  var v=viaBy(id); if(!v) return "";
+  var t=traBy(v.tra),c=cliBy(v.cli),d=demBy(v.dem);
+  var sig={pendiente:"asignado",asignado:"confirmado",confirmado:"carga",carga:"transito",
+    transito:"reparto",reparto:"entregado",incidencia:"transito"};
+  return '<button class="back" data-back="viajes">← Viajes</button>'
+    + ph({eyebrow:(c?c.n:"")+" · "+v.dem,t:v.id,
+        meta:bd(VIAJE_EST[v.estado])+pill("ETA",v.estado==="entregado"?v.entregado:v.eta),
+        act:(v.estado!=="entregado"&&v.estado!=="cancelado"&&!S.role.cliente
+          ?'<button class="btn btn-primary" data-avanzar="'+v.id+'">Avanzar a '+VIAJE_EST[sig[v.estado]][1]+'</button>':'')})
+    + (v.inc?alerta("Incidencia",v.inc):"")
+    + card("Datos","<div class='card-body'><div class='grid-kv'>"
+        +"<div class='kv'><span class='eyebrow'>Cliente</span><b>"+(c?c.n:"—")+"</b></div>"
+        +"<div class='kv'><span class='eyebrow'>Transportista</span><b>"+(t?t.n:"—")+"</b></div>"
+        +"<div class='kv'><span class='eyebrow'>Unidad</span><b class='mono'>"+(t?t.placa:"—")+"</b></div>"
+        +"<div class='kv'><span class='eyebrow'>Origen</span><b>"+v.origen+"</b></div>"
+        +"<div class='kv'><span class='eyebrow'>Destino</span><b>"+v.destino+"</b></div>"
+        +"<div class='kv'><span class='eyebrow'>Mercancía</span><b>"+(d?d.merc:"—")+"</b></div>"
+        +"</div><div style='margin-top:16px'>"+meter(v.pct,v.pct>=100?" is-full":"")+"</div></div>")
+    + card("Posición",'<div class="card-body"><div class="mapbox">'
+        +'<div class="mapbox-pts"><span>'+v.origen+'</span><span>'+v.destino+'</span></div>'
+        +'<div class="mapbox-rail"><i style="width:'+v.pct+'%"></i>'
+        +'<span class="mapbox-dot" style="left:'+v.pct+'%"></span></div>'
+        +'<div class="mapbox-pos mono">'+v.pos+'</div></div></div>')
+    + card("Línea de tiempo",'<div class="card-body"><ol class="hitos">'
+        +v.hitos.map(function(h){
+          return '<li class="hito '+h.s+'"><span class="hito-rail"><span class="hito-dot"></span>'
+            +'<span class="hito-line"></span></span><span class="hito-b"><b>'+h.n+'</b>'
+            +'<span>'+h.t+'</span></span></li>';}).join("")+'</ol></div>')
+    + card("Historial de actualizaciones",
+        tbl([{t:"Momento"},{t:"Actualización"}],
+          (v.log&&v.log.length?v.log.map(function(l){
+            return '<tr><td class="mono t-sub">'+l.t+'</td><td>'+l.m+'</td></tr>';}).join("")
+            :emptyRow(2,"Sin actualizaciones"))));
+}
+
+/* ===================== TRANSPORTISTAS ===================== */
+function vDirectorio(){
+  if(S.traOpen) return vTransportista(S.traOpen);
+  var lista=TRANSPORTISTAS.filter(function(t){
+    if(S.filtro==="todos") return true;
+    if(S.filtro==="certificados") return certEstado(t).code==="ok";
+    if(S.filtro==="pendientes") return certEstado(t).code==="pend";
+    if(S.filtro==="bloqueados") return certEstado(t).code==="no";
+    return t.disp===S.filtro;});
+  var chips=[["todos","Todos",TRANSPORTISTAS.length],
+    ["certificados","Certificados",TRANSPORTISTAS.filter(function(t){return certEstado(t).code==="ok";}).length],
+    ["pendientes","Validación pendiente",TRANSPORTISTAS.filter(function(t){return certEstado(t).code==="pend";}).length],
+    ["bloqueados","No certificados",TRANSPORTISTAS.filter(function(t){return certEstado(t).code==="no";}).length],
+    ["disponible","Disponibles",TRANSPORTISTAS.filter(function(t){return t.disp==="disponible";}).length]]
+    .map(function(f){return '<button class="chip'+(S.filtro===f[0]?" is-on":"")+'" data-filtro="'+f[0]+'">'
+      +f[1]+'<span class="chip-n">'+f[2]+'</span></button>';}).join("");
+  return ph({eyebrow:"Transportistas",t:"Directorio",
+      meta:pill("Registrados",TRANSPORTISTAS.length)
+        +pill("Certificados",TRANSPORTISTAS.filter(function(t){return certEstado(t).code==="ok";}).length),
+      act:'<button class="btn btn-primary" id="btn-nuevo-tra">+ Registrar transportista</button>'})
+    + '<div class="card"><div class="card-body" style="padding-bottom:12px"><div class="chips">'+chips+'</div></div>'
+    + tbl([{t:"Transportista"},{t:"Contacto"},{t:"Tipo"},{t:"Cobertura"},{t:"Capacidad",r:true},
+           {t:"Disponibilidad"},{t:"Cumpl.",r:true},{t:"Certificación"}],
+        lista.map(function(t){
+          var st=certEstado(t);
+          return '<tr class="clickable" data-tra="'+t.id+'">'
+            +'<td class="t-strong">'+t.n+'<div class="t-sub">'+t.base+'</div></td>'
+            +'<td class="t-sub">'+t.contacto+'<div class="mono">'+t.tel+'</div></td>'
+            +'<td class="t-sub">'+t.tipo+'</td>'
+            +'<td class="t-sub">'+t.cobertura.join("<br>")+'</td>'
+            +'<td class="r mono">'+t.cap+' t</td>'
+            +'<td>'+bd(DISP[t.disp])+'</td>'
+            +'<td class="r mono">'+(t.viajes?t.cumpl+"%":"—")+'</td>'
+            +'<td>'+bd([st.cls,st.txt])+'</td></tr>';}).join("")
+        ||emptyRow(8,"Sin resultados"))
+    + '</div>';
+}
+function vTransportista(id){
+  var t=traBy(id); if(!t) return "";
+  var st=certEstado(t);
+  var mis=VIAJES.filter(function(v){return v.tra===t.id;});
+  return '<button class="back" data-back="directorio">← Directorio</button>'
+    + ph({eyebrow:t.tipo+" · "+t.base,t:t.n,
+        meta:bd([st.cls,st.txt])+bd(DISP[t.disp])+pill("Placa",t.placa)})
     + tiles([
-      {k:"Entregas a tiempo",v:String(pct),u:"%",n:PERF.aTiempo+" de "+PERF.total+" envíos"},
-      {k:"Entregas tardías",v:String(PERF.tarde),n:"Fuera de la fecha comprometida"},
-      {k:"Incidencias",v:String(PERF.incidencias),n:"Demoras en frontera o aduana"},
-      {k:"Tránsito medio",v:String(PERF.horasMedias),u:" h",n:"Puerta a puerta, todos los corredores"}])
-    + '<div class="card"><div class="card-head"><h3>Puntualidad por corredor</h3>'
-      + '<span class="spacer"></span><span class="t-sub">'+PERF.periodo+'</span></div>'
-      + '<div class="tw"><table><thead><tr><th>Corredor</th><th class="r">Envíos</th><th>Puntualidad</th><th class="r">Tránsito medio</th><th class="r">Incidencias</th></tr></thead><tbody>'
-      + PERF.corredores.map(function(c){
-          return '<tr><td class="t-strong">'+c.n+'</td>'
-            +'<td class="r mono">'+c.envios+'</td>'
-            +'<td><div class="meter-row"><div class="meter'+(c.puntual>=94?" is-full":(c.puntual<90?" is-low":""))+'">'
-              +'<i style="width:'+c.puntual+'%"></i></div><span class="mono">'+c.puntual+'%</span></div></td>'
-            +'<td class="r mono">'+c.horas+' h</td>'
-            +'<td class="r mono">'+c.incid+'</td></tr>';}).join("")
-      + '</tbody></table></div>'
-      + '<div class="card-note">El corredor más confiable es <b>'+PERF.mejorCorredor+'</b>. Los tránsitos largos concentran las incidencias: a más horas en ruta, más exposición a cola de frontera.</div></div>'
-    + '<div class="card"><div class="card-head"><h3>Últimas entregas</h3></div>'
-      + '<div class="tw"><table><thead><tr><th>Trámite</th><th>Cliente</th><th>Transportista</th><th>Entregado</th><th>Resultado</th></tr></thead><tbody>'
-      + SHIPMENTS.filter(function(s){return s.estado==="entregado";}).map(function(s){
-          var c=carrierBy(s.carrierId);
-          return '<tr class="clickable" data-ship="'+s.code+'"><td class="mono t-strong">'+s.code+'</td>'
-            +'<td>'+s.cliente+'</td><td class="t-sub">'+(c?c.n:"—")+'</td>'
-            +'<td class="mono t-sub">'+s.entregado+'</td>'
-            +'<td>'+(s.puntual?badge("b-ok","A tiempo"):badge("b-warn","Fuera de fecha"))+'</td></tr>';}).join("")
-      + '</tbody></table></div></div>';
+      {k:"Capacidad",v:String(t.cap),u:" t",n:t.unidad},
+      {k:"Viajes",v:String(t.viajes),n:"Con DMS"},
+      {k:"Cumplimiento",v:t.viajes?String(t.cumpl):"—",u:t.viajes?"%":"",n:"Entregas a tiempo"},
+      {k:"Asignaciones",v:String(t.asignadas30d),n:"Últimos 30 días"}])
+    + card("Perfil","<div class='card-body'><div class='grid-kv'>"
+        +"<div class='kv'><span class='eyebrow'>Contacto</span><b>"+t.contacto+"</b></div>"
+        +"<div class='kv'><span class='eyebrow'>Teléfono</span><b class='mono'>"+t.tel+"</b></div>"
+        +"<div class='kv'><span class='eyebrow'>Cobertura</span><b>"+t.cobertura.join(" · ")+"</b></div>"
+        +"<div class='kv'><span class='eyebrow'>Vehículos</span><b>"+t.vehiculos.join(" · ")+"</b></div>"
+        +"</div></div>")
+    + card("Certificaciones",
+        tbl([{t:"Certificación"},{t:"Tipo"},{t:"Emisión"},{t:"Vencimiento"},{t:"Estado"},{t:"",r:true}],
+          CERT_TIPOS.map(function(ct){
+            var d=t.certs[ct.id];
+            return '<tr><td class="t-strong">'+ct.n+'</td>'
+              +'<td>'+badge("b-neutral",ct.oblig?"Obligatoria":"Opcional")+'</td>'
+              +'<td class="mono t-sub">'+d.em+'</td><td class="mono">'+d.ven+'</td>'
+              +'<td>'+bd(CERT_EST[d.est])+'</td>'
+              +'<td class="r">'+(d.est==="pendiente"
+                ?'<button class="btn btn-primary" data-cert-ok="'+t.id+'|'+ct.id+'">Aprobar</button>'
+                :(d.est!=="aprobado"&&S.role.traId===t.id
+                  ?'<button class="btn btn-primary" data-cert-up="'+t.id+'|'+ct.id+'">Subir</button>':'—'))
+              +'</td></tr>';}).join("")))
+    + card("Historial de viajes",
+        tbl([{t:"Viaje"},{t:"Ruta"},{t:"Estado"},{t:"Entrega"}],
+          (mis.length?mis.map(function(v){
+            return '<tr class="clickable" data-via="'+v.id+'"><td class="mono t-strong">'+v.id+'</td>'
+              +'<td class="t-sub">'+v.origen+' → '+v.destino+'</td>'
+              +'<td>'+bd(VIAJE_EST[v.estado])+'</td>'
+              +'<td class="mono t-sub">'+(v.estado==="entregado"?v.entregado:v.eta)+'</td></tr>';}).join("")
+            :emptyRow(4,"Sin viajes registrados"))));
 }
-function viewShipDetail(code){
-  var s=shipmentBy(code); if(!s) return "";
-  var c=carrierBy(s.carrierId),st=c?perfilEstado(c):null;
-  return '<button class="back" data-back="transito">← Carga en tránsito</button>'
-    +'<div class="page-head"><div class="eyebrow">'+s.cliente+'</div>'
-    +'<h2 class="mono" style="font-size:20px">'+s.code+'</h2><p>'+s.ruta+'</p></div>'
-    +(s.alerta?alertBox(s.alerta):"")
-    +'<div class="card"><div class="card-body"><div class="grid-kv">'
-    +'<div class="kv"><span class="eyebrow">Transportista</span><b>'+(c?c.n:"—")+'</b>'+(st?'<span>'+badge(st.cls,st.txt)+'</span>':'')+'</div>'
-    +'<div class="kv"><span class="eyebrow">Unidad</span><b class="mono">'+s.placa+'</b></div>'
-    +'<div class="kv"><span class="eyebrow">Posición</span><b style="font-size:12.5px">'+s.gps+'</b></div>'
-    +'<div class="kv"><span class="eyebrow">ETA de entrega</span><b class="mono">'+s.eta+'</b></div></div>'
-    +'<div style="margin-top:16px"><div class="meter-row"><div class="meter"><i style="width:'+s.pct+'%"></i></div><span class="mono">'+pctf(s.pct)+' del corredor</span></div></div>'
-    +'</div></div>'
-    +'<div class="card"><div class="card-head"><h3>Hitos del corredor</h3><span class="spacer"></span><span class="t-sub">Actualizado hoy, '+HOY+'</span></div>'
-    +'<div class="card-body"><ol class="hitos">'+s.hitos.map(function(h){
-      return '<li class="hito '+h.s+'"><span class="hito-rail"><span class="hito-dot"></span><span class="hito-line"></span></span>'
-        +'<span class="hito-b"><b>'+h.n+'</b><span>'+h.t+'</span></span></li>';}).join("")+'</ol></div>'
-    +'<div class="card-note">Los hitos de aduana y frontera quedan atados al mismo número de trámite que el expediente documental.</div></div>'
-    +'<div class="card"><div class="card-head"><h3>Expediente del trámite</h3><span class="spacer"></span>'
-    +'<button class="btn" data-exp-jump="'+s.code+'">Abrir expediente</button></div>'
-    +'<div class="card-note" style="border-top:0">El mismo trámite, visto puertas adentro: documentos, versiones y adjuntos.</div></div>';
-}
-
-/* ===================== GUION ===================== */
-var CRITERIOS=[
- {t:"Confiabilidad y seguridad de la carga",
-  p:"DMS maneja carga de terceros de alto valor bajo su responsabilidad legal como agente aduanero registrado. Un siniestro compromete su reputación y su habilitación.",
-  q:"¿Cómo se aseguran de que la carga no salga con un transportista con papeles vencidos?",
-  ver:"Asignación de carga → abrir CG-2026-0412 → tabla «Excluidos y por qué»."},
- {t:"Que el transportista se mantenga solo",
-  p:"Perseguir documentación de transportistas es trabajo administrativo puro. El transportista tiene que tener incentivo para mantenerse al día sin que nadie lo llame.",
-  q:"¿Quién carga y actualiza los papeles del transportista?",
-  ver:"Entrar como Marco Vargas → Mi perfil y papeles → subir el seguro. Luego como Ana Quispe → Aprobaciones."},
- {t:"Cobertura de los corredores relevantes",
-  p:"Su negocio depende de corredores concretos: Arica–La Paz, Ilo–La Paz, y los pasos de Tambo Quemado, Desaguadero y Pisiga.",
-  q:"¿Cuántos transportistas activos tienen en los corredores hacia los puertos que usamos?",
-  ver:"Aprobaciones → tabla «Estado de la red», columna Corredores."},
- {t:"Trazabilidad y visibilidad en tiempo real",
-  p:"Necesitan informar al importador sin depender de una llamada al chofer.",
-  q:"¿Qué ve el cliente final: ubicación, ETA, alertas de demora?",
-  ver:"Entrar como Marcela Ortiz y abrir IMP-2026-0847."},
- {t:"Integración con el expediente documental",
-  p:"Si el despacho no conecta con el trámite aduanero, son dos sistemas separados otra vez.",
-  q:"¿El despacho queda atado al número de trámite?",
-  ver:"Detalle de un envío → «Abrir expediente»; y en el despacho, el trámite vinculado."}];
-var PREGUNTAS=[
- "¿Cuántos transportistas distintos usan hoy y cómo los contactan?",
- "¿Cuánto tiempo toma en promedio conseguir un camión disponible?",
- "¿Quién revisa hoy que el seguro y la licencia de un transportista estén vigentes, y cada cuánto?",
- "¿Alguna vez despacharon con un transportista cuya documentación resultó no estar vigente? ¿Qué pasó?",
- "¿Con qué criterio eligen entre dos transportistas disponibles: precio, confianza, turno?",
- "¿Cuál es el trámite con más adjuntos que intentaron cargar, y en qué punto falló la plataforma anterior?"];
-function renderGuion(){
-  $("sheet-body").innerHTML=
-   '<p style="font-size:13px;color:var(--ink-2);margin-bottom:18px">Orden sugerido de la demo. Cada criterio indica en qué pantalla mostrarlo. El recorrido más fuerte es el circuito completo: Vargas sube su seguro → Ana lo aprueba → el motor ya puede asignarle.</p>'
-   +'<div class="eyebrow" style="margin-bottom:12px">En qué se fija DMS, por orden</div>'
-   +CRITERIOS.map(function(c,i){
-     return '<div class="crit"><div class="crit-n">'+String(i+1).padStart(2,"0")+'</div><h4>'+c.t+'</h4>'
-       +'<p>'+c.p+'</p><q>'+c.q+'</q><p class="t-sub" style="margin-top:6px">Mostrar en: '+c.ver+'</p></div>';}).join("")
-   +'<div class="eyebrow" style="margin:24px 0 12px">Preguntas para cerrar el discovery</div>'
-   +'<ol class="qs">'+PREGUNTAS.map(function(q){return '<li>'+q+'</li>';}).join("")+'</ol>'
-   +'<p class="t-sub" style="margin-top:20px">Las respuestas reemplazan las cifras de «antes / ahora» del tablero de Gerencia por números medidos.</p>';
-}
-function openGuion(){renderGuion();$("sheet").hidden=false;$("sheet-bg").hidden=false;}
-function closeGuion(){$("sheet").hidden=true;$("sheet-bg").hidden=true;}
-
-var toastT=null;
-function toast(msg){
-  var old=document.querySelector(".toast"); if(old) old.remove();
-  var d=document.createElement("div"); d.className="toast"; d.textContent=msg;
-  document.body.appendChild(d);
-  if(toastT) clearTimeout(toastT);
-  toastT=setTimeout(function(){if(d.parentNode)d.remove();},4600);
+function vCertificaciones(){
+  var filas=[];
+  var pool=S.role.traId?[traBy(S.role.traId)]:TRANSPORTISTAS;
+  pool.forEach(function(t){CERT_TIPOS.forEach(function(ct){
+    filas.push({t:t,ct:ct,d:t.certs[ct.id]});});});
+  var lista=filas.filter(function(f){return S.filtro==="todos"||f.d.est===S.filtro;});
+  var chips=[["todos","Todas",filas.length]].concat(Object.keys(CERT_EST).map(function(k){
+      return [k,CERT_EST[k][1],filas.filter(function(f){return f.d.est===k;}).length];}))
+    .map(function(f){return '<button class="chip'+(S.filtro===f[0]?" is-on":"")+'" data-filtro="'+f[0]+'">'
+      +f[1]+'<span class="chip-n">'+f[2]+'</span></button>';}).join("");
+  return ph({eyebrow:"Transportistas",t:"Certificaciones",
+      meta:pill("Pendientes",filas.filter(function(f){return f.d.est==="pendiente";}).length)
+        +pill("Vencidas",filas.filter(function(f){return f.d.est==="vencido";}).length)})
+    + '<div class="card"><div class="card-body" style="padding-bottom:12px"><div class="chips">'+chips+'</div></div>'
+    + tbl([{t:"Transportista"},{t:"Certificación"},{t:"Emisión"},{t:"Vencimiento"},{t:"Estado"},{t:"",r:true}],
+        lista.map(function(f){
+          return '<tr><td class="t-strong clickable" data-tra="'+f.t.id+'">'+f.t.n+'</td>'
+            +'<td>'+f.ct.n+(f.ct.oblig?' '+badge("b-neutral","Obligatoria"):'')+'</td>'
+            +'<td class="mono t-sub">'+f.d.em+'</td><td class="mono">'+f.d.ven+'</td>'
+            +'<td>'+bd(CERT_EST[f.d.est])+'</td>'
+            +'<td class="r">'+(f.d.est==="pendiente"&&!S.role.traId
+              ?'<button class="btn btn-primary" data-cert-ok="'+f.t.id+'|'+f.ct.id+'">Aprobar</button>'
+              :(f.d.est!=="aprobado"&&S.role.traId===f.t.id
+                ?'<button class="btn btn-primary" data-cert-up="'+f.t.id+'|'+f.ct.id+'">Subir</button>':'—'))
+            +'</td></tr>';}).join("")
+        ||emptyRow(6,"Sin certificaciones"))
+    + '</div>';
 }
 
-/* ===================== RENDER ===================== */
+/* ===================== REPORTES ===================== */
+function vReportes(){
+  var pct=Math.round(PERF.aTiempo/PERF.total*100);
+  var valor=OPORTUNIDADES.reduce(function(a,o){return a+o.valor;},0);
+  var porEtapa=ETAPAS.map(function(e){
+    return {n:e.n,c:CLIENTES.filter(function(c){return c.etapa===e.id;}).length};});
+  var maxC=Math.max.apply(null,porEtapa.map(function(e){return e.c;}))||1;
+  return ph({eyebrow:"Análisis",t:"Reportes",meta:pill("Periodo",PERF.periodo)})
+    + tiles([
+      {k:"Entregas a tiempo",v:String(pct),u:"%",n:PERF.aTiempo+" de "+PERF.total},
+      {k:"Tardías",v:String(PERF.tarde),n:"Fuera de fecha"},
+      {k:"Incidencias",v:String(PERF.incidencias),n:"Frontera o aduana"},
+      {k:"Tránsito medio",v:String(PERF.horas),u:" h",n:"Puerta a puerta"},
+      {k:"Pipeline",v:"USD "+nf(Math.round(valor/1000))+"k",n:OPORTUNIDADES.length+" oportunidades"},
+      {k:"Documentos",v:nf(DOCS.length),n:mb(DOCS.reduce(function(a,d){return a+d.size;},0))}])
+    + '<div class="grid2">'
+    + card("Puntualidad por corredor",
+        tbl([{t:"Corredor"},{t:"Envíos",r:true},{t:"Puntualidad"},{t:"Tránsito",r:true},{t:"Incid.",r:true}],
+          PERF.corredores.map(function(c){
+            return '<tr><td class="t-strong">'+c.n+'</td><td class="r mono">'+c.envios+'</td>'
+              +'<td>'+meter(c.puntual,c.puntual>=94?" is-full":(c.puntual<90?" is-low":""))+'</td>'
+              +'<td class="r mono">'+c.horas+' h</td><td class="r mono">'+c.incid+'</td></tr>';}).join("")))
+    + card("Clientes por etapa",
+        tbl([{t:"Etapa"},{t:"Clientes"},{t:"",r:true}],
+          porEtapa.map(function(e){
+            return '<tr><td class="t-strong">'+e.n+'</td>'
+              +'<td>'+meter(Math.round(e.c/maxC*100))+'</td>'
+              +'<td class="r mono">'+e.c+'</td></tr>';}).join("")))
+    + '</div>'
+    + card("Volumen documental por cliente",
+        tbl([{t:"Cliente"},{t:"Archivos",r:true},{t:"Volumen",r:true},{t:"Pendientes",r:true},{t:"Operaciones",r:true}],
+          CLIENTES.filter(function(c){return docsDe(c.id).length;})
+            .sort(function(a,b){return docsDe(b.id).length-docsDe(a.id).length;})
+            .map(function(c){
+              var d=docsDe(c.id);
+              return '<tr class="clickable" data-cli="'+c.id+'"><td class="t-strong">'+c.n+'</td>'
+                +'<td class="r mono">'+nf(d.length)+'</td>'
+                +'<td class="r mono">'+mb(d.reduce(function(a,x){return a+x.size;},0))+'</td>'
+                +'<td class="r mono">'+d.filter(function(x){return x.estado==="pendiente";}).length+'</td>'
+                +'<td class="r mono">'+OPERACIONES.filter(function(o){return o.cli===c.id;}).length+'</td></tr>';}).join("")));
+}
+
+/* ===================== ROUTER ===================== */
 function render(){
   var h="";
-  if(S.sec==="tablero") h=viewTablero();
-  else if(S.sec==="expedientes") h=viewExpedientes();
-  else if(S.sec==="asignacion") h=viewAsignacion();
-  else if(S.sec==="aprobaciones") h=S.carrierOpen?viewCarrierDetail(S.carrierOpen):viewAprobaciones();
-  else if(S.sec==="transito") h=viewTransito();
-  else if(S.sec==="nuevo") h=viewNuevo();
-  else if(S.sec==="rendimiento") h=viewRendimiento();
-  else if(S.sec==="perfil") h=viewPerfil();
-  else if(S.sec==="cargas") h=viewCargasTransportista();
+  switch(S.mod){
+    case "dashboard": h=vDashboard(); break;
+    case "clientes": h=vClientes(); break;
+    case "pipeline": h=vPipeline(); break;
+    case "actividades": h=vActividades(); break;
+    case "documentos": h=vDocumentos(); break;
+    case "operaciones": h=vOperaciones(); break;
+    case "demandas": h=vDemandas(); break;
+    case "viajes": h=vViajes(); break;
+    case "directorio": h=vDirectorio(); break;
+    case "certificaciones": h=vCertificaciones(); break;
+    case "reportes": h=vReportes(); break;
+  }
   $("content").innerHTML=h;
   wire();
 }
-function nav(sec){S.sec=sec;S.expOpen=null;S.shipOpen=null;S.loadOpen=null;S.carrierOpen=null;
-  renderNav();render();window.scrollTo(0,0);}
 function wire(){
   var root=$("content");
-  var on=function(sel,fn){Array.prototype.forEach.call(root.querySelectorAll(sel),function(el){
-    el.addEventListener("click",function(ev){ev.stopPropagation();fn(el);});});};
-  on("[data-exp]",function(el){S.expOpen=el.getAttribute("data-exp");S.sec="expedientes";renderNav();render();window.scrollTo(0,0);});
-  on("[data-exp-jump]",function(el){S.expOpen=el.getAttribute("data-exp-jump");S.shipOpen=null;S.sec="expedientes";renderNav();render();window.scrollTo(0,0);});
-  on("[data-ship]",function(el){S.shipOpen=el.getAttribute("data-ship");S.sec="transito";renderNav();render();window.scrollTo(0,0);});
-  on("[data-load]",function(el){S.loadOpen=el.getAttribute("data-load");S.sec="asignacion";renderNav();render();window.scrollTo(0,0);});
-  on("[data-carrier]",function(el){S.carrierOpen=el.getAttribute("data-carrier");S.sec="aprobaciones";renderNav();render();window.scrollTo(0,0);});
-  on("[data-back]",function(el){nav(el.getAttribute("data-back"));});
-  on("[data-go]",function(el){nav(el.getAttribute("data-go"));});
-  on("[data-aprobar]",function(el){var p=el.getAttribute("data-aprobar").split("|");aprobar(p[0],p[1],true);});
-  on("[data-rechazar]",function(el){var p=el.getAttribute("data-rechazar").split("|");aprobar(p[0],p[1],false);});
-  on("[data-subir]",function(el){var p=el.getAttribute("data-subir").split("|");subir(p[0],p[1]);});
-  var btnA=$("btn-asignar");
-  if(btnA) btnA.addEventListener("click",function(){asignar(btnA.getAttribute("data-load"));});
-  on("[data-filtro]",function(el){S.filtro=el.getAttribute("data-filtro");render();});
-  var tr=$("track");
-  if(tr) tr.addEventListener("input",function(){S.track=tr.value;render();
-    var nt=$("track"); if(nt){nt.focus();nt.setSelectionRange(nt.value.length,nt.value.length);}});
-  var cr=$("btn-crear");
-  if(cr) cr.addEventListener("click",crearEnvio);
+  function on(sel,fn){Array.prototype.forEach.call(root.querySelectorAll(sel),function(el){
+    el.addEventListener("click",function(e){e.stopPropagation();fn(el);});});}
+
+  on("[data-mod]",function(el){go(el.getAttribute("data-mod"));});
+  on("[data-go]",function(el){go(el.getAttribute("data-go"));});
+  on("[data-back]",function(el){go(el.getAttribute("data-back"));});
+  on("[data-cli]",function(el){
+    S.cliOpen=el.getAttribute("data-cli");S.cliTab="resumen";S.mod="clientes";
+    S.docCat="todas";S.docEstado="todos";S.docOp="todas";S.docQ="";S.docPage=1;
+    renderNav();render();window.scrollTo(0,0);});
+  on("[data-clitab]",function(el){S.cliTab=el.getAttribute("data-clitab");
+    S.docPage=1;render();window.scrollTo(0,0);});
+  on("[data-op]",function(el){
+    var o=opBy(el.getAttribute("data-op"));
+    if(!o)return;
+    S.cliOpen=o.cli;S.cliTab="documentos";S.mod="clientes";
+    S.docOp=o.id;S.docCat="todas";S.docEstado="todos";S.docQ="";S.docPage=1;
+    renderNav();render();window.scrollTo(0,0);});
+  on("[data-dem]",function(el){S.demOpen=el.getAttribute("data-dem");S.mod="demandas";
+    renderNav();render();window.scrollTo(0,0);});
+  on("[data-via]",function(el){S.viaOpen=el.getAttribute("data-via");S.mod="viajes";
+    renderNav();render();window.scrollTo(0,0);});
+  on("[data-tra]",function(el){S.traOpen=el.getAttribute("data-tra");S.mod="directorio";
+    renderNav();render();window.scrollTo(0,0);});
+  on("[data-filtro]",function(el){S.filtro=el.getAttribute("data-filtro");S.docPage=1;render();});
+  on("[data-doccat]",function(el){S.docCat=el.getAttribute("data-doccat");S.docPage=1;render();});
+  on("[data-pg]",function(el){
+    var n=parseInt(el.getAttribute("data-pg"),10);
+    if(n>=1){S.docPage=n;render();}});
+  on("[data-doc]",function(el){modalDoc(el.getAttribute("data-doc"));});
+  on("[data-subir]",function(el){modalSubir(el.getAttribute("data-subir")||null);});
+  on("[data-pub]",function(el){publicar(el.getAttribute("data-pub"));});
+  on("[data-asig]",function(el){asignar(el.getAttribute("data-asig"));});
+  on("[data-avanzar]",function(el){avanzar(el.getAttribute("data-avanzar"));});
+  on("[data-act-ok]",function(el){
+    var id=el.getAttribute("data-act-ok");
+    ACTIVIDADES.forEach(function(a){if(a.id===id)a.estado="hecha";});
+    renderNav();render();toast("Actividad marcada como hecha");});
+  on("[data-cert-ok]",function(el){
+    var p=el.getAttribute("data-cert-ok").split("|");aprobarCert(p[0],p[1]);});
+  on("[data-cert-up]",function(el){
+    var p=el.getAttribute("data-cert-up").split("|");subirCert(p[0],p[1]);});
+  on("[data-crear-dem]",function(el){modalDemanda(el.getAttribute("data-crear-dem"));});
+
   var q=$("q");
   if(q) q.addEventListener("input",function(){S.q=q.value;render();
-    var nq=$("q"); if(nq){nq.focus();nq.setSelectionRange(nq.value.length,nq.value.length);}});
-  var up=$("btn-upload");
-  if(up) up.addEventListener("click",uploadMissing);
+    var n=$("q");if(n){n.focus();n.setSelectionRange(n.value.length,n.value.length);}});
+  var dq=$("f-docq");
+  if(dq) dq.addEventListener("input",function(){S.docQ=dq.value;S.docPage=1;render();
+    var n=$("f-docq");if(n){n.focus();n.setSelectionRange(n.value.length,n.value.length);}});
+  var fo=$("f-docop");
+  if(fo) fo.addEventListener("change",function(){S.docOp=fo.value;S.docPage=1;render();});
+  var fe=$("f-docest");
+  if(fe) fe.addEventListener("change",function(){S.docEstado=fe.value;S.docPage=1;render();});
+  var bn=$("btn-nuevo-cli"); if(bn) bn.addEventListener("click",modalProspecto);
+  var ba=$("btn-nueva-act"); if(ba) ba.addEventListener("click",modalActividad);
+  var bd2=$("btn-nueva-dem"); if(bd2) bd2.addEventListener("click",function(){modalDemanda(null);});
+  var bt=$("btn-nuevo-tra"); if(bt) bt.addEventListener("click",modalTransportista);
 }
 
 /* ===================== ACCIONES ===================== */
-var reduce=window.matchMedia&&window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-
-var NUEVA_VIGENCIA={seguro:{vence:"20 sep 2027",hasta:"2027-09-20"},
- licencia:{vence:"11 may 2028",hasta:"2028-05-11"},
- habilitacion:{vence:"24 feb 2028",hasta:"2028-02-24"},
- antecedentes:{vence:"vigente",hasta:"2027-12-01"},
- defensivo:{vence:"17 sep 2028",hasta:"2028-09-17"},
- peligrosa:{vence:"17 sep 2028",hasta:"2028-09-17"}};
-
-function subir(cid,k){
-  var c=carrierBy(cid); if(!c) return;
-  var v=NUEVA_VIGENCIA[k];
-  c.docs[k]={st:"pendiente",vence:v.vence,hasta:v.hasta};
+function publicar(id){
+  var d=demBy(id); if(!d)return;
+  d.estado="publicada";
   renderNav();render();
-  toast(CERTS[k].n+" enviado. Queda en revisión hasta que Operaciones de DMS lo apruebe.");
-}
-function aprobar(cid,k,ok){
-  var c=carrierBy(cid); if(!c) return;
-  if(ok){
-    c.docs[k].st="aprobado";
-    var st=perfilEstado(c);
-    renderNav();render();
-    if(st.code==="habilitado") toast(c.n+" quedó habilitado. Ya entra al pool de asignación automática.");
-    else toast(CERTS[k].n+" aprobado. Faltan documentos para habilitar a "+c.n+".");
-  }else{
-    c.docs[k].st="rechazado";
-    renderNav();render();
-    toast(CERTS[k].n+" rechazado. "+c.n+" queda fuera del pool hasta que suba uno válido.");
-  }
+  toast("Demanda "+id+" publicada · "+candidatos(d).ok.length+" candidatos compatibles");
 }
 function asignar(id){
-  var l=loadBy(id); if(!l) return;
-  var r=evaluarTodos(l);
-  if(!r.elegibles.length){toast("Ningún transportista pasa las reglas para este despacho.");return;}
-  var g=r.elegibles[0];
-  l.asignado=g.c.id;
-  g.c.asignadas30d++;
+  var d=demBy(id); if(!d)return;
+  var c=candidatos(d);
+  if(!c.ok.length){toast("Ningún transportista cumple los requisitos");return;}
+  var g=c.ok[0];
+  d.tra=g.t.id; d.estado="asignada"; g.t.asignadas30d++;
+  var nv={id:"VJ-"+(1182+VIAJES.length),dem:d.id,cli:d.cli,tra:g.t.id,
+    origen:d.origen,destino:d.destino,estado:"asignado",pct:8,eta:d.entrega+" · 12:00",
+    pos:"Pendiente de confirmación del transportista",inc:null,
+    hitos:[{n:"Asignado",t:HOY,s:"done"},{n:"Confirmado por transportista",t:"pendiente",s:"now"},
+      {n:"En carga",t:"ETA "+d.carga,s:"next"},{n:"En tránsito",t:"—",s:"next"},
+      {n:"En reparto",t:"—",s:"next"},{n:"Entregado",t:"ETA "+d.entrega,s:"next"}],
+    log:[{t:HOY,m:"Transportista asignado: "+g.t.n+" (puntaje "+g.p.total+")"}]};
+  VIAJES.push(nv);
+  S.mod="viajes"; S.viaOpen=nv.id; S.demOpen=null;
   renderNav();render();window.scrollTo(0,0);
-  toast("Asignado a "+g.c.n+" · unidad "+g.c.placa+" · puntaje "+g.p.total+".");
+  toast("Asignado a "+g.t.n+" · viaje "+nv.id+" creado");
 }
-var seqEnvio=860;
-function crearEnvio(){
-  var cli=$("f-cliente").value, corr=$("f-corredor").value;
-  var peso=parseInt(String($("f-peso").value).replace(/\D/g,""),10)||0;
-  if(peso<=0){ toast("Poné un peso válido en kilos."); return; }
-  seqEnvio++;
-  var partes=corr.split(" – ");
-  var l={id:"CG-2026-0"+(414+LOADS.length),exp:"IMP-2026-0"+seqEnvio,cliente:cli,
-    origen:partes[0],destino:partes[1],corredor:partes[0]+"–"+partes[1],peso:peso,
-    carga:$("f-carga").value||"Carga general",peligrosa:$("f-peligrosa").checked,
-    retiro:$("f-retiro").value,entregaISO:"2026-09-26",entrega:$("f-entrega").value,asignado:null};
-  LOADS.push(l);
-  var r=evaluarTodos(l);
-  S.sec="asignacion"; S.loadOpen=l.id;
-  renderNav(); render(); window.scrollTo(0,0);
-  toast("Envío "+l.exp+" creado. "+r.elegibles.length+" transportista"+(r.elegibles.length===1?"":"s")+" puede"+(r.elegibles.length===1?"":"n")+" tomarlo.");
+var ORDEN=["pendiente","asignado","confirmado","carga","transito","reparto","entregado"];
+function avanzar(id){
+  var v=viaBy(id); if(!v)return;
+  var cur=v.estado==="incidencia"?"transito":v.estado;
+  var i=ORDEN.indexOf(cur);
+  if(i<0||i>=ORDEN.length-1)return;
+  var next=ORDEN[i+1];
+  v.estado=next; v.inc=null;
+  v.pct=Math.min(100,Math.round((i+2)/ORDEN.length*100));
+  if(next==="entregado"){v.pct=100;v.entregado=HOY+" · 11:30";v.puntual=true;
+    v.pos="Entregado en destino";
+    var d=demBy(v.dem); if(d) d.estado="cerrada";}
+  v.hitos.forEach(function(h,k){
+    if(k<i+1) h.s="done"; else if(k===i+1) h.s="now"; else h.s="next";});
+  if(next==="entregado") v.hitos.forEach(function(h){h.s="done";});
+  v.log.unshift({t:HOY,m:"Estado actualizado a "+VIAJE_EST[next][1]});
+  renderNav();render();
+  toast("Viaje "+id+" → "+VIAJE_EST[next][1]);
 }
-function uploadMissing(){
-  var e=expBy(S.expOpen); if(!e) return;
-  var falta=expFalta(e); if(!falta.length) return;
-  var list=$("doclist");
-  falta.forEach(function(d){
-    var row=list.querySelector('[data-doc="'+d.id+'"]');
-    if(row){row.classList.remove("missing");
-      row.innerHTML='<span class="doc-i">'+d.f.split(" ")[0]+'</span>'
-        +'<span class="doc-n"><b>'+d.n+'</b><span class="t-sub">Subiendo '+mb(d.sz)+' · indexando con OCR…</span></span>'
-        +'<span class="doc-prog"><span class="meter"><i style="width:'+(reduce?100:6)+'%"></i></span></span>';
-      if(!reduce){var bar=row.querySelector(".meter i");
-        setTimeout(function(){if(bar)bar.style.width="100%";},60);}}});
-  var finish=function(){falta.forEach(function(d){e.docs[d.id]=d.sz;});render();
-    toast("Expediente "+e.code+" completo: "+expReq(e)+" documentos, "+mb(expTotal(e))+" de adjuntos.");};
-  if(reduce) finish(); else setTimeout(finish,1100);
+function aprobarCert(tid,cid){
+  var t=traBy(tid); if(!t)return;
+  t.certs[cid].est="aprobado";
+  var st=certEstado(t);
+  renderNav();render();
+  toast(st.code==="ok"?t.n+" quedó certificado":certN(cid)+" aprobada");
+}
+function subirCert(tid,cid){
+  var t=traBy(tid); if(!t)return;
+  t.certs[cid]={est:"pendiente",em:HOY,ven:"22 sep 2029"};
+  renderNav();render();
+  toast(certN(cid)+" enviada · pendiente de validación");
 }
 
+/* ===================== MODALES DE ALTA ===================== */
+function modalProspecto(){
+  openModal("Nuevo prospecto",
+    '<div class="form-grid">'
+    +'<label class="fld"><span class="eyebrow">Razón social</span><input id="p-n" type="text" placeholder="Empresa S.R.L."></label>'
+    +'<label class="fld"><span class="eyebrow">NIT</span><input id="p-nit" type="text" placeholder="1012345670"></label>'
+    +'<label class="fld"><span class="eyebrow">Ciudad</span><select id="p-ciudad">'
+      +["La Paz","El Alto","Santa Cruz","Cochabamba","Oruro","Trinidad"].map(function(c){
+        return '<option>'+c+'</option>';}).join("")+'</select></label>'
+    +'<label class="fld"><span class="eyebrow">Tipo</span><select id="p-tipo">'
+      +'<option>Importador</option><option>Exportador</option><option>Importador y exportador</option></select></label>'
+    +'<label class="fld"><span class="eyebrow">Contacto</span><input id="p-c" type="text" placeholder="Nombre"></label>'
+    +'<label class="fld"><span class="eyebrow">Correo</span><input id="p-m" type="text" placeholder="contacto@empresa.demo"></label>'
+    +'</div><div id="p-err" class="t-sub" style="color:var(--crit);margin-top:10px"></div>',
+    '<button class="btn" id="m-cancel">Cancelar</button>'
+    +'<button class="btn btn-primary" id="m-save">Crear prospecto</button>');
+  $("m-cancel").addEventListener("click",closeModal);
+  $("m-save").addEventListener("click",function(){
+    var n=$("p-n").value.trim(),nit=$("p-nit").value.trim();
+    if(n.length<3||nit.length<5){$("p-err").textContent="Razón social y NIT son obligatorios.";return;}
+    var id="C"+(100+CLIENTES.length);
+    CLIENTES.push({id:id,n:n,nit:nit,ciudad:$("p-ciudad").value,tipo:$("p-tipo").value,
+      etapa:"prospecto",ejecutivo:S.role.name,desde:"—",serv:[],ultima:HOY,proximo:"—",
+      contactos:[{n:$("p-c").value||"—",c:"Contacto",t:"—",m:$("p-m").value||"—"}]});
+    closeModal();S.cliOpen=id;S.cliTab="resumen";S.mod="clientes";
+    renderNav();render();toast("Prospecto "+n+" creado");});
+}
+function modalActividad(){
+  openModal("Nueva actividad",
+    '<div class="form-grid">'
+    +'<label class="fld"><span class="eyebrow">Cliente</span><select id="a-cli">'
+      +CLIENTES.map(function(c){return '<option value="'+c.id+'">'+c.n+'</option>';}).join("")+'</select></label>'
+    +'<label class="fld"><span class="eyebrow">Tipo</span><select id="a-tipo">'
+      +Object.keys(ACT_TIPOS).map(function(k){return '<option value="'+k+'">'+ACT_TIPOS[k]+'</option>';}).join("")
+      +'</select></label>'
+    +'<label class="fld"><span class="eyebrow">Fecha</span><input id="a-f" type="text" value="25 sep 2026"></label>'
+    +'<label class="fld"><span class="eyebrow">Responsable</span><input id="a-r" type="text" value="'+S.role.name+'"></label>'
+    +'</div>'
+    +'<label class="fld" style="margin-top:14px"><span class="eyebrow">Asunto</span>'
+    +'<input id="a-as" type="text" placeholder="Asunto de la actividad"></label>'
+    +'<div id="a-err" class="t-sub" style="color:var(--crit);margin-top:10px"></div>',
+    '<button class="btn" id="m-cancel">Cancelar</button>'
+    +'<button class="btn btn-primary" id="m-save">Registrar</button>');
+  $("m-cancel").addEventListener("click",closeModal);
+  $("m-save").addEventListener("click",function(){
+    var as=$("a-as").value.trim();
+    if(as.length<3){$("a-err").textContent="El asunto es obligatorio.";return;}
+    ACTIVIDADES.unshift({id:"A-"+(300+ACTIVIDADES.length),cli:$("a-cli").value,tipo:$("a-tipo").value,
+      fecha:$("a-f").value,asunto:as,estado:"pendiente",resp:$("a-r").value});
+    closeModal();renderNav();render();toast("Actividad registrada");});
+}
+function modalDemanda(cli){
+  var ops=cli?OPERACIONES.filter(function(o){return o.cli===cli;}):OPERACIONES;
+  openModal("Publicar demanda de carga",
+    '<div class="form-grid">'
+    +'<label class="fld"><span class="eyebrow">Cliente</span><select id="d-cli">'
+      +CLIENTES.filter(function(c){return c.serv.length;}).map(function(c){
+        return '<option value="'+c.id+'"'+(cli===c.id?" selected":"")+'>'+c.n+'</option>';}).join("")+'</select></label>'
+    +'<label class="fld"><span class="eyebrow">Operación</span><select id="d-op">'
+      +ops.map(function(o){return '<option value="'+o.id+'">'+o.id+'</option>';}).join("")+'</select></label>'
+    +'<label class="fld"><span class="eyebrow">Corredor</span><select id="d-corr">'
+      +["Arica–La Paz","Ilo–La Paz","Iquique–Oruro","Arica–Cochabamba","Santa Cruz–Santos"].map(function(c){
+        return '<option>'+c+'</option>';}).join("")+'</select></label>'
+    +'<label class="fld"><span class="eyebrow">Vehículo</span><select id="d-veh">'
+      +["Tracto + semirremolque","Portacontenedor 40\'","Furgón 20 t","Camión rígido 10 t","Cisterna 25 m³"].map(function(v){
+        return '<option>'+v+'</option>';}).join("")+'</select></label>'
+    +'<label class="fld"><span class="eyebrow">Mercancía</span><input id="d-merc" type="text" value="Carga general paletizada"></label>'
+    +'<label class="fld"><span class="eyebrow">Peso (kg)</span><input id="d-peso" type="text" value="18500"></label>'
+    +'<label class="fld"><span class="eyebrow">Volumen (m³)</span><input id="d-vol" type="text" value="42"></label>'
+    +'<label class="fld"><span class="eyebrow">Prioridad</span><select id="d-prior">'
+      +'<option value="media">Media</option><option value="alta">Alta</option><option value="baja">Baja</option></select></label>'
+    +'<label class="fld"><span class="eyebrow">Fecha de carga</span><input id="d-carga" type="text" value="26 sep 2026"></label>'
+    +'<label class="fld"><span class="eyebrow">Entrega estimada</span><input id="d-ent" type="text" value="29 sep 2026"></label>'
+    +'</div>'
+    +'<label class="chk"><input type="checkbox" id="d-pel"> <span>Mercancía peligrosa</span></label>'
+    +'<div id="d-err" class="t-sub" style="color:var(--crit);margin-top:10px"></div>',
+    '<button class="btn" id="m-cancel">Cancelar</button>'
+    +'<button class="btn btn-primary" id="m-save">Publicar</button>');
+  $("m-cancel").addEventListener("click",closeModal);
+  $("m-save").addEventListener("click",function(){
+    var peso=parseInt(String($("d-peso").value).replace(/\D/g,""),10)||0;
+    if(peso<=0){$("d-err").textContent="El peso debe ser mayor a cero.";return;}
+    var corr=$("d-corr").value,p=corr.split("–");
+    var d={id:"DC-0"+(417+DEMANDAS.length),cli:$("d-cli").value,op:$("d-op").value,
+      origen:p[0],destino:p[1],corredor:corr,carga:$("d-carga").value,entrega:$("d-ent").value,
+      entregaISO:isoDe($("d-ent").value),merc:$("d-merc").value,peligrosa:$("d-pel").checked,
+      peso:peso,vol:parseInt($("d-vol").value,10)||0,vehiculo:$("d-veh").value,
+      prior:$("d-prior").value,estado:"publicada",tra:null};
+    DEMANDAS.push(d);
+    closeModal();S.mod="demandas";S.demOpen=d.id;
+    renderNav();render();window.scrollTo(0,0);
+    toast("Demanda "+d.id+" publicada · "+candidatos(d).ok.length+" candidatos");});
+}
+function modalTransportista(){
+  openModal("Registrar transportista",
+    '<div class="form-grid">'
+    +'<label class="fld"><span class="eyebrow">Empresa</span><input id="t-n" type="text" placeholder="Transportes S.R.L."></label>'
+    +'<label class="fld"><span class="eyebrow">Contacto</span><input id="t-c" type="text" placeholder="Nombre"></label>'
+    +'<label class="fld"><span class="eyebrow">Teléfono</span><input id="t-t" type="text" placeholder="+591 7 000-0000"></label>'
+    +'<label class="fld"><span class="eyebrow">Base</span><select id="t-b">'
+      +["La Paz","El Alto","Santa Cruz","Cochabamba","Oruro"].map(function(c){return '<option>'+c+'</option>';}).join("")
+      +'</select></label>'
+    +'<label class="fld"><span class="eyebrow">Capacidad (t)</span><input id="t-cap" type="text" value="30"></label>'
+    +'<label class="fld"><span class="eyebrow">Corredor</span><select id="t-cob">'
+      +["Arica–La Paz","Ilo–La Paz","Iquique–Oruro","Arica–Cochabamba","Santa Cruz–Santos"].map(function(c){
+        return '<option>'+c+'</option>';}).join("")+'</select></label>'
+    +'</div><div id="t-err" class="t-sub" style="color:var(--crit);margin-top:10px"></div>',
+    '<button class="btn" id="m-cancel">Cancelar</button>'
+    +'<button class="btn btn-primary" id="m-save">Registrar</button>');
+  $("m-cancel").addEventListener("click",closeModal);
+  $("m-save").addEventListener("click",function(){
+    var n=$("t-n").value.trim();
+    if(n.length<3){$("t-err").textContent="El nombre de la empresa es obligatorio.";return;}
+    var id="T"+(10+TRANSPORTISTAS.length);
+    var vac={est:"ausente",em:"—",ven:"—"};
+    TRANSPORTISTAS.push({id:id,n:n,contacto:$("t-c").value||"—",tel:$("t-t").value||"—",
+      tipo:"Internacional",cobertura:[$("t-cob").value],cap:parseInt($("t-cap").value,10)||20,
+      vehiculos:["Tracto + semirremolque"],disp:"disponible",viajes:0,cumpl:0,nuevo:true,
+      unidad:"—",placa:"—",base:$("t-b").value,asignadas30d:0,en:$("t-b").value,
+      certs:{licencia:vac,seguro:vac,habilitacion:vac,antecedentes:vac,defensivo:vac,peligrosa:vac}});
+    closeModal();S.mod="directorio";S.traOpen=id;
+    renderNav();render();toast(n+" registrado · pendiente de certificación");});
+}
+
+/* ===================== ARRANQUE ===================== */
 renderLogin();
 $("btn-salir").addEventListener("click",leave);
-$("btn-guion").addEventListener("click",openGuion);
-$("btn-cerrar-guion").addEventListener("click",closeGuion);
-$("sheet-bg").addEventListener("click",closeGuion);
-document.addEventListener("keydown",function(ev){if(ev.key==="Escape"&&!$("sheet").hidden)closeGuion();});
 })();
 </script>
