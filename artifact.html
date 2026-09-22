@@ -75,13 +75,32 @@ button{font:inherit; color:inherit; cursor:pointer; border:0; background:none}
 @media (max-width:460px){.roles{grid-template-columns:1fr}}
 .role{text-align:left; background:var(--surface); border:1px solid var(--line); border-radius:5px;
   padding:16px 15px 14px; box-shadow:var(--shadow-1); display:flex; flex-direction:column; gap:3px;
-  min-height:142px; transition:border-color .14s, transform .14s, box-shadow .14s}
-.role:hover{border-color:var(--accent); transform:translateY(-2px); box-shadow:var(--shadow-2)}
-.role-who{font-family:Archivo; font-weight:600; font-size:15px}
-.role-rol{font-size:12.5px; color:var(--ink-2); flex:1}
+  min-height:150px; position:relative; cursor:pointer;
+  transition:border-color .14s, box-shadow .14s, background .14s}
+.role:hover{border-color:var(--line-2); box-shadow:var(--shadow-2)}
+.role-check{position:absolute; top:13px; right:13px; width:17px; height:17px; border-radius:50%;
+  border:1.5px solid var(--line-2); background:var(--surface); transition:border-color .14s, background .14s}
+.role-check::after{content:""; position:absolute; inset:3px; border-radius:50%;
+  background:var(--accent); opacity:0; transform:scale(.4); transition:opacity .14s, transform .14s}
+.role.is-picked{border-color:var(--accent); background:var(--accent-soft); box-shadow:var(--shadow-2)}
+.role.is-picked .role-check{border-color:var(--accent)}
+.role.is-picked .role-check::after{opacity:1; transform:scale(1)}
+.role-who{font-family:Archivo; font-weight:600; font-size:15px; padding-right:24px}
+.role-rol{font-size:12.5px; color:var(--ink-2)}
 .role-mail{font-family:"IBM Plex Mono",monospace; font-size:10.5px; color:var(--muted); word-break:break-all}
-.role-go{font-family:"IBM Plex Mono",monospace; font-size:10px; letter-spacing:.1em;
-  text-transform:uppercase; color:var(--accent-2); margin-top:8px}
+.role-desc{font-size:12px; color:var(--muted); margin-top:7px;
+  padding-top:8px; border-top:1px solid var(--line); flex:1}
+.role.is-picked .role-desc{border-top-color:color-mix(in srgb,var(--accent) 28%, transparent);
+  color:var(--ink-2)}
+
+.login-go{display:flex; align-items:center; gap:16px; flex-wrap:wrap; margin-top:20px;
+  padding:14px 16px; border:1px solid var(--line); border-radius:5px; background:var(--surface)}
+.login-pick{display:flex; flex-direction:column; gap:2px; flex:1; min-width:200px}
+.login-pick b{font-family:Archivo; font-weight:600; font-size:14px}
+.btn-enter{padding:10px 22px; font-size:13.5px; font-weight:600; flex:none}
+@media (max-width:520px){.login-go{flex-direction:column; align-items:stretch}
+  .btn-enter{width:100%}}
+
 .demo-note{margin-top:26px; font-size:12.5px; color:var(--muted); display:flex; gap:9px;
   align-items:flex-start; border-top:1px solid var(--line); padding-top:14px; max-width:80ch}
 .demo-note b{color:var(--ink-2); font-weight:600}
@@ -297,25 +316,26 @@ input[type="search"],input[type="text"]{padding:9px 12px; border:1px solid var(-
   <div class="login-card">
     <div class="brand">
       <span class="brand-mark">DMS</span>
-      <span class="brand-sub">PUERTO A PUERTA · v0.2 demo</span>
+      <span class="brand-sub">PUERTO A PUERTA · v0.3 demo</span>
     </div>
     <div class="login-head">
-      <h1>El transportista se da de alta, el sistema verifica sus papeles y le asigna la carga.</h1>
-      <p>Demo funcional para DMS Bolivia S.R.L. — agenciamiento aduanal y consolidación de carga, La Paz. Nadie llama a nadie para conseguir camión: la asignación la hace el sistema, y solo sobre transportistas con documentación vigente.</p>
+      <h1>Elegí con qué rol entrar.</h1>
+      <p>Demo funcional para DMS Bolivia S.R.L. — agenciamiento aduanal y consolidación de carga, La Paz. Cada rol ve una parte distinta de la misma operación.</p>
     </div>
-    <div class="flow">
-      <div class="flow-step"><div class="flow-n">01</div><h4>El transportista se registra solo</h4>
-        <p>Crea su perfil y sube él mismo su licencia, seguro, habilitación y certificaciones de manejo. Nadie de DMS lo invita ni le pide los papeles.</p></div>
-      <div class="flow-step"><div class="flow-n">02</div><h4>El sistema aprueba y habilita</h4>
-        <p>Operaciones revisa lo que subió. Aprobado y vigente, entra al pool de asignación. Si algo vence, sale solo.</p></div>
-      <div class="flow-step"><div class="flow-n">03</div><h4>El sistema asigna la carga</h4>
-        <p>Llega un despacho y el motor elige al transportista. Solo puede elegir entre quienes tienen todo en regla para esa carga concreta.</p></div>
+
+    <div class="eyebrow" style="margin-bottom:10px">Seleccioná un rol</div>
+    <div class="roles" id="roles" role="radiogroup" aria-label="Rol con el que entrar"></div>
+
+    <div class="login-go">
+      <div class="login-pick" id="login-pick">
+        <span class="t-sub">Ningún rol seleccionado todavía.</span>
+      </div>
+      <button class="btn btn-primary btn-enter" id="btn-enter" disabled>Entrar</button>
     </div>
-    <div class="eyebrow" style="margin-bottom:10px">Entrar como</div>
-    <div class="roles" id="roles"></div>
+
     <div class="demo-note">
       <span class="demo-flag">Demo</span>
-      <span><b>Datos ficticios.</b> Empresas, placas, números de DUI y cifras son de ejemplo, construidos sobre el perfil público de DMS y las hipótesis de discovery — no son datos reales. Las cifras de «antes / ahora» del tablero de Gerencia son proyecciones a validar, no resultados medidos. No hay contraseñas: un clic entra y recargar la página reinicia el demo.</span>
+      <span><b>Datos ficticios.</b> Empresas, placas, números de DUI y cifras son de ejemplo, construidos sobre el perfil público de DMS y las hipótesis de discovery — no son datos reales. Las cifras de «antes / ahora» del tablero de Gerencia son proyecciones a validar, no resultados medidos. No hay contraseñas: recargar la página reinicia el demo.</span>
     </div>
   </div>
 </div>
@@ -646,22 +666,59 @@ var visibleExps=function(){return S.role&&S.role.cliente?EXPEDIENTES.filter(func
 var visibleShips=function(){return S.role&&S.role.cliente?SHIPMENTS.filter(function(s){return s.cliente===S.role.cliente;}):SHIPMENTS;};
 
 /* ===================== LOGIN ===================== */
+var pendingRole=null;
+
 function renderLogin(){
   $("roles").innerHTML=ROLES.map(function(r){
-    return '<button class="role" data-role="'+r.id+'"><span class="role-who">'+r.name+'</span>'+
-      '<span class="role-rol">'+r.rol+'</span><span class="role-mail">'+r.mail+'</span>'+
-      '<span class="role-go">Entrar sin contraseña →</span></button>';}).join("");
+    return '<button class="role" type="button" role="radio" aria-checked="false" data-role="'+r.id+'">'+
+      '<span class="role-check" aria-hidden="true"></span>'+
+      '<span class="role-who">'+r.name+'</span>'+
+      '<span class="role-rol">'+r.rol+'</span>'+
+      '<span class="role-mail">'+r.mail+'</span>'+
+      '<span class="role-desc">'+r.desc+'</span></button>';}).join("");
   Array.prototype.forEach.call($("roles").querySelectorAll(".role"),function(b){
-    b.addEventListener("click",function(){enter(b.getAttribute("data-role"));});});
+    b.addEventListener("click",function(){pick(b.getAttribute("data-role"));});
+    b.addEventListener("dblclick",function(){pick(b.getAttribute("data-role"));enter(pendingRole);});
+  });
+  $("btn-enter").addEventListener("click",function(){ if(pendingRole) enter(pendingRole); });
+  document.addEventListener("keydown",function(ev){
+    if($("login").hidden) return;
+    if(ev.key==="Enter"&&pendingRole){ ev.preventDefault(); enter(pendingRole); }
+  });
+  resetPick();
+}
+function resetPick(){
+  pendingRole=null;
+  Array.prototype.forEach.call($("roles").querySelectorAll(".role"),function(b){
+    b.classList.remove("is-picked"); b.setAttribute("aria-checked","false");});
+  $("login-pick").innerHTML='<span class="t-sub">Ningún rol seleccionado todavía.</span>';
+  $("btn-enter").disabled=true;
+  $("btn-enter").textContent="Entrar";
+}
+function pick(id){
+  var r=null;
+  for(var i=0;i<ROLES.length;i++){if(ROLES[i].id===id)r=ROLES[i];}
+  if(!r) return;
+  pendingRole=id;
+  Array.prototype.forEach.call($("roles").querySelectorAll(".role"),function(b){
+    var on=b.getAttribute("data-role")===id;
+    b.classList.toggle("is-picked",on); b.setAttribute("aria-checked",on?"true":"false");});
+  var secs=r.secs.map(function(x){return SEC_LABEL[x];}).join(" · ");
+  $("login-pick").innerHTML='<span class="eyebrow">Vas a entrar como</span>'+
+    '<b>'+r.name+' — '+r.rol+'</b>'+
+    '<span class="t-sub">Secciones: '+secs+'</span>';
+  $("btn-enter").disabled=false;
+  $("btn-enter").textContent="Entrar como "+r.name.split(" ")[0];
 }
 function enter(id){
   for(var i=0;i<ROLES.length;i++){if(ROLES[i].id===id)S.role=ROLES[i];}
-  S.sec=S.role.secs[0];S.expOpen=null;S.shipOpen=null;S.loadOpen=null;
+  if(!S.role) return;
+  S.sec=S.role.secs[0];S.expOpen=null;S.shipOpen=null;S.loadOpen=null;S.carrierOpen=null;
   $("login").hidden=true;$("app").hidden=false;
   $("who-name").textContent=S.role.name;$("who-rol").textContent=S.role.rol;
   renderNav();render();window.scrollTo(0,0);
 }
-function leave(){S.role=null;$("app").hidden=true;$("login").hidden=false;window.scrollTo(0,0);}
+function leave(){S.role=null;$("app").hidden=true;$("login").hidden=false;resetPick();window.scrollTo(0,0);}
 
 /* ===================== NAV ===================== */
 function renderNav(){
