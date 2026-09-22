@@ -53,57 +53,56 @@ button{font:inherit; color:inherit; cursor:pointer; border:0; background:none}
   letter-spacing:.12em; text-transform:uppercase; color:var(--muted)}
 
 /* Login */
-.login{min-height:100%; display:flex; align-items:center; justify-content:center; padding:16px; padding-block:48px}
-.login-card{width:100%; max-width:880px}
-.brand{display:flex; align-items:baseline; gap:10px; margin-bottom:22px; flex-wrap:wrap}
-.brand-mark{font-family:Archivo; font-weight:700; font-size:15px; letter-spacing:.04em;
-  background:var(--accent); color:#fff; padding:4px 9px; border-radius:4px}
-:root[data-theme="dark"] .brand-mark{color:#07181D}
-@media (prefers-color-scheme:dark){:root:not([data-theme="light"]) .brand-mark{color:#07181D}}
-.brand-sub{font-family:"IBM Plex Mono",monospace; font-size:11px; color:var(--muted); letter-spacing:.06em}
-.login-head{margin-bottom:26px; max-width:64ch}
-.login-head h1{font-size:clamp(25px,4.4vw,36px); font-weight:700; line-height:1.14; margin-bottom:14px}
-.login-head p{color:var(--ink-2); font-size:15px}
-.flow{display:grid; grid-template-columns:repeat(3,1fr); gap:12px; margin:22px 0 30px}
-@media (max-width:700px){.flow{grid-template-columns:1fr}}
-.flow-step{border:1px solid var(--line); background:var(--surface); border-radius:4px; padding:14px 16px}
-.flow-n{font-family:"IBM Plex Mono",monospace; font-size:11px; color:var(--accent-2); margin-bottom:5px}
-.flow-step h4{font-size:13px; font-weight:600; margin-bottom:4px}
-.flow-step p{font-size:12.5px; color:var(--ink-2)}
-.roles{display:grid; grid-template-columns:repeat(4,1fr); gap:12px}
-@media (max-width:880px){.roles{grid-template-columns:repeat(2,1fr)}}
-@media (max-width:460px){.roles{grid-template-columns:1fr}}
-.role{text-align:left; background:var(--surface); border:1px solid var(--line); border-radius:5px;
-  padding:16px 15px 14px; box-shadow:var(--shadow-1); display:flex; flex-direction:column; gap:3px;
-  min-height:150px; position:relative; cursor:pointer;
+.login{min-height:100%; display:flex; align-items:center; justify-content:center;
+  padding:16px; padding-block:56px}
+.login-card{width:100%; max-width:560px}
+.login-brand{display:flex; align-items:center; gap:14px; margin-bottom:22px}
+.login-logo{width:52px; height:52px; border-radius:13px; background:var(--accent); color:#fff;
+  display:flex; align-items:center; justify-content:center; flex:none}
+:root[data-theme="dark"] .login-logo{color:#07181D}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]) .login-logo{color:#07181D}}
+.login-logo svg{width:26px; height:26px}
+.login-brand-t{display:flex; flex-direction:column; gap:3px; min-width:0}
+.login-brand-t h1{font-size:30px; font-weight:700; line-height:1.05; letter-spacing:-.02em}
+.login-sub{color:var(--ink-2); font-size:14.5px; margin-bottom:24px; max-width:48ch}
+.login-sub b{font-weight:600; color:var(--ink)}
+
+.roles{display:flex; flex-direction:column; gap:10px}
+.role{display:flex; align-items:center; gap:14px; text-align:left; width:100%;
+  background:var(--surface); border:1px solid var(--line); border-radius:11px;
+  padding:15px 16px; cursor:pointer;
   transition:border-color .14s, box-shadow .14s, background .14s}
-.role:hover{border-color:var(--line-2); box-shadow:var(--shadow-2)}
-.role-check{position:absolute; top:13px; right:13px; width:17px; height:17px; border-radius:50%;
-  border:1.5px solid var(--line-2); background:var(--surface); transition:border-color .14s, background .14s}
-.role-check::after{content:""; position:absolute; inset:3px; border-radius:50%;
-  background:var(--accent); opacity:0; transform:scale(.4); transition:opacity .14s, transform .14s}
-.role.is-picked{border-color:var(--accent); background:var(--accent-soft); box-shadow:var(--shadow-2)}
-.role.is-picked .role-check{border-color:var(--accent)}
-.role.is-picked .role-check::after{opacity:1; transform:scale(1)}
-.role-who{font-family:Archivo; font-weight:600; font-size:15px; padding-right:24px}
-.role-rol{font-size:12.5px; color:var(--ink-2)}
-.role-mail{font-family:"IBM Plex Mono",monospace; font-size:10.5px; color:var(--muted); word-break:break-all}
-.role-desc{font-size:12px; color:var(--muted); margin-top:7px;
-  padding-top:8px; border-top:1px solid var(--line); flex:1}
-.role.is-picked .role-desc{border-top-color:color-mix(in srgb,var(--accent) 28%, transparent);
-  color:var(--ink-2)}
+.role:hover{border-color:var(--line-2); box-shadow:var(--shadow-1)}
+.role-icon{width:42px; height:42px; border-radius:11px; background:var(--surface-2);
+  color:var(--ink-2); display:flex; align-items:center; justify-content:center; flex:none;
+  transition:background .14s, color .14s}
+.role-icon svg{width:19px; height:19px}
+.role-txt{display:flex; flex-direction:column; gap:2px; flex:1; min-width:0}
+.role-who{font-family:Archivo; font-weight:600; font-size:16.5px; letter-spacing:-.01em}
+.role-rol{font-size:13px; color:var(--ink-2)}
+.role-mail{font-family:"IBM Plex Mono",monospace; font-size:11.5px; color:var(--muted);
+  margin-top:3px; word-break:break-all}
+.role-chev{color:var(--line-2); flex:none; display:flex; transition:color .14s, transform .14s}
+.role-chev svg{width:17px; height:17px}
+.role:hover .role-chev{color:var(--muted); transform:translateX(2px)}
+.role.is-picked{border-color:var(--accent); background:var(--accent-soft); box-shadow:var(--shadow-1)}
+.role.is-picked .role-icon{background:var(--accent); color:#fff}
+:root[data-theme="dark"] .role.is-picked .role-icon{color:#07181D}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]) .role.is-picked .role-icon{color:#07181D}}
+.role.is-picked .role-chev{color:var(--accent); transform:translateX(2px)}
 
-.login-go{display:flex; align-items:center; gap:16px; flex-wrap:wrap; margin-top:20px;
-  padding:14px 16px; border:1px solid var(--line); border-radius:5px; background:var(--surface)}
-.login-pick{display:flex; flex-direction:column; gap:2px; flex:1; min-width:200px}
+.login-go{display:flex; align-items:center; gap:14px; flex-wrap:wrap; margin-top:20px;
+  padding-top:18px; border-top:1px solid var(--line)}
+.login-pick{display:flex; flex-direction:column; gap:1px; flex:1; min-width:180px}
 .login-pick b{font-family:Archivo; font-weight:600; font-size:14px}
-.btn-enter{padding:10px 22px; font-size:13.5px; font-weight:600; flex:none}
-@media (max-width:520px){.login-go{flex-direction:column; align-items:stretch}
-  .btn-enter{width:100%}}
-
-.demo-note{margin-top:26px; font-size:12.5px; color:var(--muted); display:flex; gap:9px;
-  align-items:flex-start; border-top:1px solid var(--line); padding-top:14px; max-width:80ch}
-.demo-note b{color:var(--ink-2); font-weight:600}
+.btn-enter{padding:11px 22px; font-size:13.5px; font-weight:600; flex:none; border-radius:8px}
+@media (max-width:460px){
+  .login-brand-t h1{font-size:25px}
+  .login-go{flex-direction:column; align-items:stretch}
+  .btn-enter{width:100%}
+  .role{padding:13px 14px; gap:12px}
+  .role-icon{width:38px; height:38px}
+}
 
 /* Shell */
 .shell{display:grid; grid-template-columns:var(--rail-w) 1fr; min-height:100%}
@@ -314,28 +313,26 @@ input[type="search"],input[type="text"]{padding:9px 12px; border:1px solid var(-
 
 <div id="login" class="login">
   <div class="login-card">
-    <div class="brand">
-      <span class="brand-mark">DMS</span>
-      <span class="brand-sub">PUERTO A PUERTA · v0.3 demo</span>
-    </div>
-    <div class="login-head">
-      <h1>Elegí con qué rol entrar.</h1>
-      <p>Demo funcional para DMS Bolivia S.R.L. — agenciamiento aduanal y consolidación de carga, La Paz. Cada rol ve una parte distinta de la misma operación.</p>
+    <div class="login-brand">
+      <span class="login-logo" aria-hidden="true">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M3 9h12v7H3z"/><path d="M15 12h3.5L21 14.5V16h-6z"/>
+          <circle cx="7" cy="18" r="2"/><circle cx="17.5" cy="18" r="2"/>
+        </svg>
+      </span>
+      <span class="login-brand-t">
+        <span class="eyebrow">DMS BOLIVIA S.R.L. · DEMO</span>
+        <h1>Puerto a Puerta</h1>
+      </span>
     </div>
 
-    <div class="eyebrow" style="margin-bottom:10px">Seleccioná un rol</div>
+    <p class="login-sub">Elegí un rol para recorrer la operación de <b>DMS Bolivia S.R.L.</b></p>
+
     <div class="roles" id="roles" role="radiogroup" aria-label="Rol con el que entrar"></div>
 
     <div class="login-go">
-      <div class="login-pick" id="login-pick">
-        <span class="t-sub">Ningún rol seleccionado todavía.</span>
-      </div>
+      <div class="login-pick" id="login-pick"><span class="t-sub">Ningún rol seleccionado.</span></div>
       <button class="btn btn-primary btn-enter" id="btn-enter" disabled>Entrar</button>
-    </div>
-
-    <div class="demo-note">
-      <span class="demo-flag">Demo</span>
-      <span><b>Datos ficticios.</b> Empresas, placas, números de DUI y cifras son de ejemplo, construidos sobre el perfil público de DMS y las hipótesis de discovery — no son datos reales. Las cifras de «antes / ahora» del tablero de Gerencia son proyecciones a validar, no resultados medidos. No hay contraseñas: recargar la página reinicia el demo.</span>
     </div>
   </div>
 </div>
@@ -645,17 +642,25 @@ var BA=[
 
 /* ===================== ROLES ===================== */
 var ROLES=[
- {id:"ops",name:"Ana Quispe",rol:"Operaciones y agenciamiento · DMS",mail:"operaciones@dms.demo",
-  desc:"Arma expedientes y despacha carga. Aprueba los papeles que suben los transportistas.",
+ {id:"ops",name:"Operaciones",mail:"operaciones@dms.demo",
+  rol:"Expedientes, asignación de carga y aprobación de papeles",
+  entidad:"DMS Bolivia S.R.L.",
+  icon:'<path d="M3 5.5h10M3 9h10M3 12.5h7"/>',
   secs:["tablero","expedientes","asignacion","aprobaciones","transito"]},
- {id:"ger",name:"Rodrigo Salazar",rol:"Gerencia general · DMS",mail:"gerencia@dms.demo",
-  desc:"Mira el costo del tramo terrestre, las horas del equipo y el riesgo de transportista.",
+ {id:"ger",name:"Gerencia",mail:"gerencia@dms.demo",
+  rol:"Tablero y resultados, sin detalle operativo",
+  entidad:"DMS Bolivia S.R.L.",
+  icon:'<rect x="2.5" y="2.5" width="4.5" height="4.5" rx="1"/><rect x="9" y="2.5" width="4.5" height="4.5" rx="1"/><rect x="2.5" y="9" width="4.5" height="4.5" rx="1"/><rect x="9" y="9" width="4.5" height="4.5" rx="1"/>',
   secs:["tablero","expedientes","asignacion","transito"]},
- {id:"cli",name:"Marcela Ortiz",rol:"Cliente importador · Ferretería Illimani S.R.L.",mail:"cliente@illimani.demo",
-  desc:"Solo ve sus cargas y sus documentos. Es el rol que deja de llamar por teléfono.",
+ {id:"cli",name:"Cliente importador",mail:"cliente@dms.demo",
+  rol:"Solo sus cargas y sus documentos",
+  entidad:"Ferretería Illimani S.R.L.",
+  icon:'<path d="M2.5 5.5 8 2.5l5.5 3v5L8 13.5l-5.5-3z"/><path d="M2.5 5.5 8 8.5l5.5-3M8 8.5v5"/>',
   secs:["tablero","expedientes","transito"],cliente:"Ferretería Illimani S.R.L."},
- {id:"tra",name:"Marco Vargas",rol:"Transportista · Transportes Vargas Hnos.",mail:"vargas@transporte.demo",
-  desc:"Sube sus propios papeles y espera la aprobación. Hoy su seguro lo deja fuera del próximo despacho.",
+ {id:"tra",name:"Transportista",mail:"transportista@dms.demo",
+  rol:"Su perfil, sus papeles y las cargas disponibles",
+  entidad:"Transportes Vargas Hnos.",
+  icon:'<path d="M1.5 4.5h7.5v6H1.5z"/><path d="M9 6.5h2.5L14 9v1.5H9z"/><circle cx="4" cy="11.5" r="1.4"/><circle cx="11" cy="11.5" r="1.4"/>',
   secs:["tablero","perfil","cargas"],carrierId:"vargas"}];
 var SEC_LABEL={tablero:"Tablero",expedientes:"Expedientes",asignacion:"Asignación de carga",
  aprobaciones:"Aprobaciones",transito:"Carga en tránsito",perfil:"Mi perfil y papeles",cargas:"Cargas disponibles"};
@@ -671,11 +676,17 @@ var pendingRole=null;
 function renderLogin(){
   $("roles").innerHTML=ROLES.map(function(r){
     return '<button class="role" type="button" role="radio" aria-checked="false" data-role="'+r.id+'">'+
-      '<span class="role-check" aria-hidden="true"></span>'+
-      '<span class="role-who">'+r.name+'</span>'+
-      '<span class="role-rol">'+r.rol+'</span>'+
-      '<span class="role-mail">'+r.mail+'</span>'+
-      '<span class="role-desc">'+r.desc+'</span></button>';}).join("");
+      '<span class="role-icon" aria-hidden="true"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" '+
+        'stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round">'+r.icon+'</svg></span>'+
+      '<span class="role-txt">'+
+        '<span class="role-who">'+r.name+'</span>'+
+        '<span class="role-rol">'+r.rol+'</span>'+
+        '<span class="role-mail">'+r.mail+'</span>'+
+      '</span>'+
+      '<span class="role-chev" aria-hidden="true">'+
+        '<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" '+
+        'stroke-linecap="round" stroke-linejoin="round"><path d="M6 3.5 10.5 8 6 12.5"/></svg></span>'+
+    '</button>';}).join("");
   Array.prototype.forEach.call($("roles").querySelectorAll(".role"),function(b){
     b.addEventListener("click",function(){pick(b.getAttribute("data-role"));});
     b.addEventListener("dblclick",function(){pick(b.getAttribute("data-role"));enter(pendingRole);});
@@ -691,7 +702,7 @@ function resetPick(){
   pendingRole=null;
   Array.prototype.forEach.call($("roles").querySelectorAll(".role"),function(b){
     b.classList.remove("is-picked"); b.setAttribute("aria-checked","false");});
-  $("login-pick").innerHTML='<span class="t-sub">Ningún rol seleccionado todavía.</span>';
+  $("login-pick").innerHTML='<span class="t-sub">Ningún rol seleccionado.</span>';
   $("btn-enter").disabled=true;
   $("btn-enter").textContent="Entrar";
 }
@@ -704,18 +715,17 @@ function pick(id){
     var on=b.getAttribute("data-role")===id;
     b.classList.toggle("is-picked",on); b.setAttribute("aria-checked",on?"true":"false");});
   var secs=r.secs.map(function(x){return SEC_LABEL[x];}).join(" · ");
-  $("login-pick").innerHTML='<span class="eyebrow">Vas a entrar como</span>'+
-    '<b>'+r.name+' — '+r.rol+'</b>'+
-    '<span class="t-sub">Secciones: '+secs+'</span>';
+  $("login-pick").innerHTML='<b>'+r.name+' — '+r.entidad+'</b>'+
+    '<span class="t-sub">'+secs+'</span>';
   $("btn-enter").disabled=false;
-  $("btn-enter").textContent="Entrar como "+r.name.split(" ")[0];
+  $("btn-enter").textContent="Entrar como "+r.name;
 }
 function enter(id){
   for(var i=0;i<ROLES.length;i++){if(ROLES[i].id===id)S.role=ROLES[i];}
   if(!S.role) return;
   S.sec=S.role.secs[0];S.expOpen=null;S.shipOpen=null;S.loadOpen=null;S.carrierOpen=null;
   $("login").hidden=true;$("app").hidden=false;
-  $("who-name").textContent=S.role.name;$("who-rol").textContent=S.role.rol;
+  $("who-name").textContent=S.role.name;$("who-rol").textContent=S.role.entidad;
   renderNav();render();window.scrollTo(0,0);
 }
 function leave(){S.role=null;$("app").hidden=true;$("login").hidden=false;resetPick();window.scrollTo(0,0);}
