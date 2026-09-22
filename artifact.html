@@ -461,6 +461,63 @@ input[type="search"],input[type="text"]{padding:9px 12px; border:1px solid var(-
   box-shadow:var(--shadow-1)}
 .mapbox-pos{margin-top:12px; font-size:11.5px; color:var(--muted); text-align:center}
 
+
+/* ===== Mapa esquemático ===== */
+.map{position:relative;background:var(--surface-2);border:1px solid var(--line);
+  border-radius:10px;overflow:hidden}
+.map svg{display:block;width:100%;height:auto}
+.mk-g{stroke:var(--line-2);stroke-width:.5;opacity:.45}
+.mk-r{fill:none;stroke:var(--line-2);stroke-width:3;stroke-linecap:round;stroke-linejoin:round}
+.mk-rd{fill:none;stroke:var(--accent);stroke-width:3;stroke-linecap:round;stroke-linejoin:round;
+  transition:stroke-dashoffset .6s ease}
+.mk-h{fill:var(--surface);stroke:var(--line-2);stroke-width:1.5}
+.mk-t{fill:var(--muted);font-size:7px;font-family:"IBM Plex Mono",monospace;text-anchor:middle}
+.mk-v{fill:var(--action);stroke:var(--surface);stroke-width:2;transition:cx .6s ease,cy .6s ease}
+.mk-v-h{fill:var(--action);opacity:.22;transition:cx .6s ease,cy .6s ease}
+.map-note{position:absolute;right:8px;bottom:6px;font-family:"IBM Plex Mono",monospace;
+  font-size:9.5px;color:var(--muted);background:color-mix(in srgb,var(--surface) 80%,transparent);
+  padding:2px 7px;border-radius:4px}
+.trk{display:grid;grid-template-columns:repeat(auto-fit,minmax(105px,1fr));gap:12px;margin-top:16px}
+.trk-i{display:flex;flex-direction:column;gap:2px}
+.trk-i b{font-family:Archivo;font-weight:600;font-size:14.5px}
+.trk-last{display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;
+  margin-top:14px;padding-top:12px;border-top:1px solid var(--line);font-size:12.5px}
+
+/* ===== POD ===== */
+.pod-req{display:flex;gap:14px;flex-wrap:wrap;padding:11px 13px;background:var(--surface-2);
+  border-radius:8px}
+.pod-req .chk{font-size:12.5px}
+.sign-wrap{position:relative;border:1.5px dashed var(--line-2);border-radius:9px;
+  background:var(--surface);overflow:hidden}
+.sign-wrap canvas{display:block;width:100%;height:150px;touch-action:none;cursor:crosshair}
+.sign-clear{position:absolute;right:8px;top:8px;padding:3px 9px;font-size:11.5px}
+.photo-row{display:flex;gap:9px;flex-wrap:wrap}
+.photo-add{border:1.5px dashed var(--line-2);border-radius:8px;padding:14px 16px;
+  font-size:12.5px;color:var(--ink-2);background:var(--surface)}
+.photo-add:hover{border-color:var(--action);color:var(--ink)}
+.photo-thumb{display:inline-flex;flex-direction:column;gap:3px;border:1px solid var(--ok);
+  background:var(--ok-soft);color:var(--ok);border-radius:8px;padding:12px 15px;font-size:12.5px;font-weight:500}
+.photo-thumb em{font-style:normal;font-family:"IBM Plex Mono",monospace;font-size:10px;opacity:.8}
+.empty{display:flex;flex-direction:column;align-items:center;gap:8px;padding:18px 0}
+
+/* ===== Acciones del transportista ===== */
+.tra-actions{display:flex;gap:9px;flex-wrap:wrap;margin-bottom:18px}
+@media (max-width:620px){.tra-actions{flex-direction:column}.tra-actions .btn{width:100%}}
+
+/* ===== Tracking público ===== */
+.pub-wrap{min-height:100%;display:flex;align-items:flex-start;justify-content:center;
+  padding:16px;padding-block:40px;background:var(--ground)}
+.pub-card{width:100%;max-width:560px;background:var(--surface);border:1px solid var(--line);
+  border-radius:14px;box-shadow:var(--shadow-2);padding:24px}
+.pub-brand{display:flex;align-items:baseline;gap:9px;margin-bottom:18px}
+.pub-code{font-size:23px;font-weight:600;letter-spacing:.04em}
+.pub-est{margin:9px 0 14px}
+.pub-route{display:flex;align-items:center;gap:10px;font-family:Archivo;font-size:16px;
+  font-weight:600;margin-bottom:16px}
+.pub-route span{color:var(--muted);font-weight:400}
+.pub-foot{margin-top:20px;padding-top:14px;border-top:1px solid var(--line);
+  font-size:11.5px;color:var(--muted)}
+
 /* ===== Nombre de archivo ===== */
 .fname{max-width:260px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap}
 .doc-layout table{min-width:720px}
@@ -958,18 +1015,18 @@ var ROLES=[
   rol:"Sus operaciones, documentos y viajes",cliente:"C001",
   icon:'<path d="M2.5 5.5 8 2.5l5.5 3v5L8 13.5l-5.5-3z"/><path d="M2.5 5.5 8 8.5l5.5-3M8 8.5v5"/>',
   mods:["dashboard","operaciones","documentos","viajes"]},
- {id:"tra",name:"Transportista",mail:"transportista@dms.demo",entidad:"Transportes Vargas Hnos.",
-  rol:"Demandas, viajes y certificaciones",traId:"T05",
+ {id:"tra",name:"Transportista",mail:"transportista@dms.demo",entidad:"Transportes Illimani S.R.L.",
+  rol:"Demandas, viajes y certificaciones",traId:"T01",
   icon:'<path d="M1.5 4.5h7.5v6H1.5z"/><path d="M9 6.5h2.5L14 9v1.5H9z"/><circle cx="4" cy="11.5" r="1.4"/><circle cx="11" cy="11.5" r="1.4"/>',
-  mods:["dashboard","demandas","viajes","certificaciones"]}];
+  mods:["dashboard","misviajes","demandas","certificaciones"]}];
 
 var MODS={dashboard:"Dashboard",clientes:"Clientes",pipeline:"Pipeline",actividades:"Actividades",
  documentos:"Documentos",operaciones:"Operaciones",demandas:"Demandas de carga",viajes:"Viajes",
- directorio:"Directorio",certificaciones:"Certificaciones",reportes:"Reportes"};
+ directorio:"Directorio",certificaciones:"Certificaciones",reportes:"Reportes",misviajes:"Mis viajes"};
 var GRUPOS=[
  {t:"General",items:["dashboard"]},
  {t:"CRM",items:["clientes","pipeline","actividades","documentos"]},
- {t:"Operaciones",items:["operaciones","demandas","viajes"]},
+ {t:"Operaciones",items:["operaciones","demandas","viajes","misviajes"]},
  {t:"Transportistas",items:["directorio","certificaciones"]},
  {t:"Análisis",items:["reportes"]}];
 
@@ -1088,7 +1145,7 @@ function renderNav(){
     actividades:ACTIVIDADES.filter(function(a){return a.estado==="pendiente";}).length,
     documentos:visibleDocs().length,operaciones:visibleOps().length,
     demandas:DEMANDAS.length,viajes:visibleViajes().length,
-    directorio:TRANSPORTISTAS.length,certificaciones:pendCerts};
+    directorio:TRANSPORTISTAS.length,certificaciones:pendCerts,misviajes:visibleViajes().length};
   var html="";
   GRUPOS.forEach(function(g){
     var items=g.items.filter(function(m){return S.role.mods.indexOf(m)>=0;});
@@ -1753,11 +1810,8 @@ function vViaje(id){
         +"<div class='kv'><span class='eyebrow'>Destino</span><b>"+v.destino+"</b></div>"
         +"<div class='kv'><span class='eyebrow'>Mercancía</span><b>"+(d?d.merc:"—")+"</b></div>"
         +"</div><div style='margin-top:16px'>"+meter(v.pct,v.pct>=100?" is-full":"")+"</div></div>")
-    + card("Posición",'<div class="card-body"><div class="mapbox">'
-        +'<div class="mapbox-pts"><span>'+v.origen+'</span><span>'+v.destino+'</span></div>'
-        +'<div class="mapbox-rail"><i style="width:'+v.pct+'%"></i>'
-        +'<span class="mapbox-dot" style="left:'+v.pct+'%"></span></div>'
-        +'<div class="mapbox-pos mono">'+v.pos+'</div></div></div>')
+    + panelTracking(v)
+    + panelPOD(v)
     + card("Línea de tiempo",'<div class="card-body"><ol class="hitos">'
         +v.hitos.map(function(h){
           return '<li class="hito '+h.s+'"><span class="hito-rail"><span class="hito-dot"></span>'
@@ -1918,8 +1972,412 @@ function vReportes(){
                 +'<td class="r mono">'+OPERACIONES.filter(function(o){return o.cli===c.id;}).length+'</td></tr>';}).join("")));
 }
 
+/* ===================== FASE 1 · RUTAS Y POSICIÓN ===================== */
+/* SUPUESTO: sin integración GPS real. Las coordenadas son puntos de un mapa
+   esquemático propio (viewBox 0 0 400 200), no latitud/longitud. El avance se
+   simula con el botón "Simular avance". */
+var RUTAS={
+ "Arica–La Paz":{km:505,pts:[[28,150],[95,132],[150,108],[210,86],[288,62],[362,44]],
+   hitos:["Arica","Chacalluta","Tambo Quemado","Patacamaya","La Paz"]},
+ "Ilo–La Paz":{km:480,pts:[[24,158],[88,140],[152,116],[224,88],[300,64],[366,48]],
+   hitos:["Ilo","Moquegua","Desaguadero","Guaqui","La Paz"]},
+ "Iquique–Oruro":{km:440,pts:[[26,162],[96,144],[168,120],[244,92],[320,66],[368,52]],
+   hitos:["Iquique","Pozo Almonte","Colchane","Pisiga","Oruro"]},
+ "Arica–Cochabamba":{km:780,pts:[[26,156],[92,138],[158,116],[226,92],[300,70],[368,50]],
+   hitos:["Arica","Tambo Quemado","Oruro","Caracollo","Cochabamba"]},
+ "Santa Cruz–Santos":{km:2180,pts:[[24,150],[94,134],[162,112],[232,88],[302,64],[370,46]],
+   hitos:["Santa Cruz","Puerto Suárez","Corumbá","São Paulo","Santos"]}};
+function rutaDe(v){
+  var d=demBy(v.dem);
+  if(d&&RUTAS[d.corredor]) return RUTAS[d.corredor];
+  var k=Object.keys(RUTAS);
+  for(var i=0;i<k.length;i++){
+    if(k[i].indexOf(v.origen)===0||k[i].indexOf(v.destino)>=0) return RUTAS[k[i]];}
+  return RUTAS["Arica–La Paz"];
+}
+
+/* Código público de seguimiento */
+function trackCode(id){
+  var b="ABCDEFGHJKMNPQRSTUVWXYZ23456789",h=0;
+  for(var i=0;i<id.length;i++) h=(h*31+id.charCodeAt(i))>>>0;
+  var s="";
+  for(var j=0;j<6;j++){s+=b[h%b.length];h=Math.floor(h/7)+13;}
+  return "DMS-"+s;
+}
+VIAJES.forEach(function(v){
+  v.code=trackCode(v.id);
+  var r=rutaDe(v);
+  v.km=Math.round(r.km*v.pct/100);
+  v.kmTotal=r.km;
+  v.vel=(v.estado==="transito"||v.estado==="reparto")?ri(58,82):0;
+  v.ultPos=v.estado==="entregado"?(v.entregado||HOY):HOY+" · 11:"+ri(10,59);
+  v.posHist=[{t:v.ultPos,km:v.km,pos:v.pos,vel:v.vel}];
+});
+
+/* ===================== POD ===================== */
+/* SUPUESTO: la firma se dibuja en canvas y se guarda como dataURL en memoria.
+   Las fotos se simulan con marcadores; no se sube nada a ningún servidor. */
+var POD_REQ={firma:true,receptor:true,fotoCarga:true,fotoLugar:false,obs:false};
+var POD_EST={pendiente:["b-warn","Pendiente"],completado:["b-ok","Completado"],
+  rechazado:["b-crit","Rechazado"],incidencia:["b-crit","Con incidencia"]};
+var PODS=[
+ {id:"POD-1165",viaje:"VJ-1165",cli:"C005",op:"EXP-2026-0209",estado:"completado",
+  receptor:"Jorge Ayala",fecha:"10 sep 2026 · 13:20",gps:"-18.4783, -70.3126 (simulado)",
+  obs:"Recepción conforme, sin observaciones.",fotos:2,firma:true,motivo:null},
+ {id:"POD-1160",viaje:"VJ-1160",cli:"C006",op:"IMP-2026-0851",estado:"completado",
+  receptor:"Pablo Rocha",fecha:"06 sep 2026 · 08:35",gps:"-16.5000, -68.1500 (simulado)",
+  obs:"Dos bultos con embalaje dañado, carga completa.",fotos:3,firma:true,motivo:null},
+ {id:"POD-1152",viaje:"VJ-1152",cli:"C003",op:"IMP-2026-0839",estado:"incidencia",
+  receptor:"Elena Ríos",fecha:"02 sep 2026 · 07:10",gps:"-16.4897, -68.1193 (simulado)",
+  obs:"Entrega fuera de fecha comprometida.",fotos:1,firma:true,motivo:null}];
+var podDe=function(vid){for(var i=0;i<PODS.length;i++){if(PODS[i].viaje===vid)return PODS[i];}return null;};
+
+/* ===================== ESTADOS DEL TRANSPORTISTA ===================== */
+var FLUJO_TRA=[
+ {id:"asignado",n:"Asignado"},{id:"aceptado",n:"Aceptado"},
+ {id:"a_cargar",n:"En camino a cargar"},{id:"carga",n:"En carga"},
+ {id:"cargado",n:"Carga completada"},{id:"transito",n:"En tránsito"},
+ {id:"destino",n:"En destino"},{id:"entregado",n:"Entrega realizada"}];
+VIAJE_EST.aceptado=["b-accent","Aceptado"];
+VIAJE_EST.a_cargar=["b-accent","En camino a cargar"];
+VIAJE_EST.cargado=["b-accent","Carga completada"];
+VIAJE_EST.destino=["b-accent","En destino"];
+var traIdx=function(e){for(var i=0;i<FLUJO_TRA.length;i++){if(FLUJO_TRA[i].id===e)return i;}return 0;};
+
+/* Incidencias */
+var INCIDENCIAS=[];
+var TIPOS_INC=["Demora en frontera","Falla mecánica","Bloqueo de ruta","Carga dañada",
+  "Documentación observada","Condiciones climáticas"];
+
+/* ===================== MAPA ESQUEMÁTICO ===================== */
+function mapaViaje(v){
+  var r=rutaDe(v),p=v.pct/100;
+  var d="M"+r.pts.map(function(q){return q[0]+","+q[1];}).join(" L");
+  var i=Math.min(r.pts.length-2,Math.floor(p*(r.pts.length-1)));
+  var f=p*(r.pts.length-1)-i;
+  var x=r.pts[i][0]+(r.pts[i+1][0]-r.pts[i][0])*f;
+  var y=r.pts[i][1]+(r.pts[i+1][1]-r.pts[i][1])*f;
+  var hitos=r.hitos.map(function(h,k){
+    var q=r.pts[Math.min(k,r.pts.length-1)];
+    return '<circle cx="'+q[0]+'" cy="'+q[1]+'" r="3" class="mk-h"/>'
+      +'<text x="'+q[0]+'" y="'+(q[1]-9)+'" class="mk-t">'+h+'</text>';}).join("");
+  return '<div class="map">'
+    +'<svg viewBox="0 0 400 200" role="img" aria-label="Recorrido '+v.origen+' a '+v.destino+'">'
+    +'<defs><pattern id="g" width="20" height="20" patternUnits="userSpaceOnUse">'
+    +'<path d="M20 0H0V20" fill="none" class="mk-g"/></pattern></defs>'
+    +'<rect width="400" height="200" fill="url(#g)"/>'
+    +'<path d="'+d+'" class="mk-r"/>'
+    +'<path d="'+d+'" class="mk-rd" style="stroke-dasharray:1000;stroke-dashoffset:'+(1000-1000*p)+'"/>'
+    +hitos
+    +'<circle cx="'+x+'" cy="'+y+'" r="9" class="mk-v-h"/>'
+    +'<circle cx="'+x+'" cy="'+y+'" r="5" class="mk-v"/>'
+    +'</svg>'
+    +'<div class="map-note">Mapa esquemático · posición simulada, sin GPS real</div></div>';
+}
+function panelTracking(v){
+  var r=rutaDe(v);
+  var sim=(v.estado!=="entregado"&&v.estado!=="cancelado");
+  return card("Seguimiento",
+    '<div class="card-body">'+mapaViaje(v)
+    +'<div class="trk">'
+      +'<div class="trk-i"><span class="eyebrow">Recorrido</span><b class="mono">'+nf(v.km)+' km</b></div>'
+      +'<div class="trk-i"><span class="eyebrow">Restante</span><b class="mono">'+nf(v.kmTotal-v.km)+' km</b></div>'
+      +'<div class="trk-i"><span class="eyebrow">Avance</span><b class="mono">'+v.pct+'%</b></div>'
+      +'<div class="trk-i"><span class="eyebrow">Velocidad</span><b class="mono">'+(v.vel?v.vel+' km/h':'detenido')+'</b></div>'
+      +'<div class="trk-i"><span class="eyebrow">ETA</span><b class="mono">'+(v.estado==="entregado"?v.entregado:v.eta)+'</b></div>'
+      +'<div class="trk-i"><span class="eyebrow">Estado</span><b>'+bd(VIAJE_EST[v.estado])+'</b></div>'
+    +'</div>'
+    +'<div class="trk-last"><span class="mono">'+v.pos+'</span>'
+      +'<span class="t-sub">Última posición: '+v.ultPos+'</span></div>'
+    +'</div>',
+    sim?'<button class="btn btn-primary" data-sim="'+v.id+'">Simular avance</button>':'')
+  + card("Historial de posiciones",
+      tbl([{t:"Momento"},{t:"Ubicación"},{t:"Km",r:true},{t:"Velocidad",r:true}],
+        v.posHist.map(function(h){
+          return '<tr><td class="mono t-sub">'+h.t+'</td><td>'+h.pos+'</td>'
+            +'<td class="r mono">'+nf(h.km)+'</td>'
+            +'<td class="r mono">'+(h.vel?h.vel+' km/h':'—')+'</td></tr>';}).join("")));
+}
+function simularAvance(id){
+  var v=viaBy(id); if(!v) return;
+  var r=rutaDe(v);
+  if(v.pct>=100){toast("El viaje ya llegó a destino");return;}
+  v.pct=Math.min(100,v.pct+ri(8,16));
+  v.km=Math.round(r.km*v.pct/100);
+  v.vel=v.pct>=100?0:ri(58,82);
+  var idx=Math.min(r.hitos.length-1,Math.floor(v.pct/100*r.hitos.length));
+  v.pos=v.pct>=100?("Entregado en "+v.destino)
+    :("Tramo "+r.hitos[idx]+" · km "+nf(v.km)+" de "+nf(r.km));
+  v.ultPos=HOY+" · "+ri(10,19)+":"+("0"+ri(0,59)).slice(-2);
+  v.posHist.unshift({t:v.ultPos,km:v.km,pos:v.pos,vel:v.vel});
+  if(v.pct>=100&&v.estado!=="entregado"){
+    v.estado="destino";
+    v.log.unshift({t:v.ultPos,m:"Vehículo llegó a destino · pendiente de POD"});
+  }
+  renderNav();render();
+  toast("Posición actualizada · "+nf(v.km)+" km de "+nf(r.km));
+}
+
+/* ===================== POD ===================== */
+var podDraft={firma:null,fotos:[],receptor:"",obs:"",resultado:"completado",motivo:""};
+function modalPOD(vid){
+  var v=viaBy(vid); if(!v) return;
+  var c=cliBy(v.cli),d=demBy(v.dem);
+  podDraft={firma:null,fotos:[],receptor:"",obs:"",resultado:"completado",motivo:""};
+  openModal("Registrar entrega · "+v.id,
+    '<div class="pod-req">'
+      +Object.keys(POD_REQ).map(function(k){
+        var lab={firma:"Firma",receptor:"Receptor",fotoCarga:"Foto de carga",
+          fotoLugar:"Foto del lugar",obs:"Observaciones"}[k];
+        return '<label class="chk" style="margin:0"><input type="checkbox" data-req="'+k+'"'
+          +(POD_REQ[k]?" checked":"")+'> <span>'+lab+'</span></label>';}).join("")
+    +'</div>'
+    +'<div class="form-grid" style="margin-top:14px">'
+    +'<label class="fld"><span class="eyebrow">Nombre del receptor</span>'
+      +'<input id="pod-rec" type="text" placeholder="Nombre y apellido"></label>'
+    +'<label class="fld"><span class="eyebrow">Resultado</span><select id="pod-res">'
+      +'<option value="completado">Entrega conforme</option>'
+      +'<option value="incidencia">Entregado con incidencia</option>'
+      +'<option value="rechazado">Rechazado por el receptor</option></select></label>'
+    +'</div>'
+    +'<div id="pod-motivo" hidden style="margin-top:12px"><label class="fld">'
+      +'<span class="eyebrow">Motivo</span><input id="pod-mot" type="text" placeholder="Motivo del rechazo o incidencia"></label></div>'
+    +'<div class="eyebrow" style="margin:16px 0 7px">Firma del receptor</div>'
+    +'<div class="sign-wrap"><canvas id="pod-sign" width="600" height="170"></canvas>'
+      +'<button class="btn sign-clear" id="pod-clear">Borrar</button></div>'
+    +'<div class="eyebrow" style="margin:16px 0 7px">Fotografías</div>'
+    +'<div class="photo-row" id="pod-fotos">'
+      +'<button class="photo-add" data-foto="carga">+ Carga</button>'
+      +'<button class="photo-add" data-foto="lugar">+ Lugar de entrega</button>'
+    +'</div>'
+    +'<label class="fld" style="margin-top:14px"><span class="eyebrow">Observaciones</span>'
+      +'<input id="pod-obs" type="text" placeholder="Opcional"></label>'
+    +'<div class="kvlist" style="margin-top:14px">'
+      +'<div class="kvrow"><span>Cliente</span><span>'+(c?c.n:"—")+'</span></div>'
+      +'<div class="kvrow"><span>Operación</span><span class="mono">'+(d?d.op:"—")+'</span></div>'
+      +'<div class="kvrow"><span>Fecha y hora</span><span class="mono">'+HOY+' · 11:30</span></div>'
+      +'<div class="kvrow"><span>GPS</span><span class="mono">-16.4897, -68.1193 (simulado)</span></div>'
+    +'</div>'
+    +'<div id="pod-err" class="t-sub" style="color:var(--crit);margin-top:10px"></div>',
+    '<button class="btn" id="m-cancel">Cancelar</button>'
+    +'<button class="btn btn-primary" id="pod-ok" data-via="'+vid+'">Confirmar entrega</button>');
+  initFirma();
+  $("m-cancel").addEventListener("click",closeModal);
+  $("pod-res").addEventListener("change",function(){
+    $("pod-motivo").hidden=$("pod-res").value==="completado";});
+  Array.prototype.forEach.call($("modal-root").querySelectorAll("[data-req]"),function(cb){
+    cb.addEventListener("change",function(){POD_REQ[cb.getAttribute("data-req")]=cb.checked;});});
+  Array.prototype.forEach.call($("modal-root").querySelectorAll("[data-foto]"),function(b){
+    b.addEventListener("click",function(){
+      var t=b.getAttribute("data-foto");
+      if(podDraft.fotos.indexOf(t)>=0) return;
+      podDraft.fotos.push(t);
+      b.outerHTML='<span class="photo-thumb">'+(t==="carga"?"Carga":"Lugar")
+        +'<em>IMG_'+ri(1000,9999)+'.jpg</em></span>';});});
+  $("pod-ok").addEventListener("click",function(){guardarPOD(vid);});
+}
+function initFirma(){
+  var c=$("pod-sign"); if(!c) return;
+  var ctx=c.getContext("2d"),draw=false;
+  function pos(e){
+    var r=c.getBoundingClientRect();
+    var t=e.touches?e.touches[0]:e;
+    return [(t.clientX-r.left)*(c.width/r.width),(t.clientY-r.top)*(c.height/r.height)];}
+  function start(e){e.preventDefault();draw=true;var p=pos(e);ctx.beginPath();ctx.moveTo(p[0],p[1]);}
+  function move(e){if(!draw)return;e.preventDefault();var p=pos(e);
+    ctx.lineTo(p[0],p[1]);ctx.strokeStyle="#0F172A";ctx.lineWidth=2.4;
+    ctx.lineCap="round";ctx.lineJoin="round";ctx.stroke();podDraft.firma=true;}
+  function end(){draw=false;}
+  ["mousedown","touchstart"].forEach(function(e){c.addEventListener(e,start,{passive:false});});
+  ["mousemove","touchmove"].forEach(function(e){c.addEventListener(e,move,{passive:false});});
+  ["mouseup","mouseleave","touchend"].forEach(function(e){c.addEventListener(e,end);});
+  $("pod-clear").addEventListener("click",function(){
+    ctx.clearRect(0,0,c.width,c.height);podDraft.firma=null;});
+}
+function guardarPOD(vid){
+  var v=viaBy(vid); if(!v) return;
+  var rec=$("pod-rec").value.trim(),res=$("pod-res").value;
+  var mot=$("pod-mot")?$("pod-mot").value.trim():"";
+  var falta=[];
+  if(POD_REQ.receptor&&rec.length<3) falta.push("nombre del receptor");
+  if(POD_REQ.firma&&!podDraft.firma) falta.push("firma");
+  if(POD_REQ.fotoCarga&&podDraft.fotos.indexOf("carga")<0) falta.push("foto de carga");
+  if(POD_REQ.fotoLugar&&podDraft.fotos.indexOf("lugar")<0) falta.push("foto del lugar");
+  if(res!=="completado"&&mot.length<3) falta.push("motivo");
+  if(falta.length){$("pod-err").textContent="Falta: "+falta.join(", ")+".";return;}
+  var d=demBy(v.dem);
+  var pod={id:"POD-"+v.id.replace("VJ-",""),viaje:v.id,cli:v.cli,op:d?d.op:"—",
+    estado:res,receptor:rec,fecha:HOY+" · 11:30",gps:"-16.4897, -68.1193 (simulado)",
+    obs:$("pod-obs").value||"—",fotos:podDraft.fotos.length,firma:!!podDraft.firma,
+    motivo:res==="completado"?null:mot};
+  PODS.push(pod);
+  v.log.unshift({t:pod.fecha,m:"POD registrado · "+POD_EST[res][1]+" · receptor "+rec});
+  if(res==="completado"||res==="incidencia"){
+    v.estado="entregado";v.pct=100;v.km=v.kmTotal;v.vel=0;
+    v.entregado=pod.fecha;v.puntual=res==="completado";
+    v.pos="Entregado en "+v.destino;
+    v.hitos.forEach(function(h){h.s="done";});
+    if(d) d.estado="cerrada";
+  } else {
+    v.estado="incidencia";v.inc="Entrega rechazada por el receptor: "+mot;
+  }
+  closeModal();renderNav();render();
+  toast("POD "+pod.id+" registrado · "+POD_EST[res][1]);
+}
+function panelPOD(v){
+  var p=podDe(v.id);
+  if(!p) return card("Prueba de entrega",
+    '<div class="card-body"><div class="empty">'+badge("b-warn","POD pendiente")
+    +'<span class="t-sub">Sin evidencia registrada</span></div></div>',
+    (!S.role.cliente&&v.estado!=="entregado"
+      ?'<button class="btn btn-primary" data-pod="'+v.id+'">Registrar entrega</button>':''));
+  return card("Prueba de entrega · "+p.id,
+    '<div class="card-body"><div class="kvlist">'
+    +'<div class="kvrow"><span>Estado</span><span>'+bd(POD_EST[p.estado])+'</span></div>'
+    +'<div class="kvrow"><span>Receptor</span><span>'+p.receptor+'</span></div>'
+    +'<div class="kvrow"><span>Fecha y hora</span><span class="mono">'+p.fecha+'</span></div>'
+    +'<div class="kvrow"><span>GPS</span><span class="mono">'+p.gps+'</span></div>'
+    +'<div class="kvrow"><span>Firma</span><span>'+(p.firma?badge("b-ok","Registrada"):badge("b-neutral","Sin firma"))+'</span></div>'
+    +'<div class="kvrow"><span>Fotografías</span><span class="mono">'+p.fotos+'</span></div>'
+    +'<div class="kvrow"><span>Operación</span><span class="mono">'+p.op+'</span></div>'
+    +(p.motivo?'<div class="kvrow"><span>Motivo</span><span>'+p.motivo+'</span></div>':'')
+    +'<div class="kvrow"><span>Observaciones</span><span>'+p.obs+'</span></div>'
+    +'</div></div>');
+}
+
+/* ===================== PORTAL DEL TRANSPORTISTA ===================== */
+function vMisViajes(){
+  if(S.viaOpen) return vViajeTra(S.viaOpen);
+  var mis=visibleViajes();
+  var act=mis.filter(function(v){return v.estado!=="entregado"&&v.estado!=="cancelado";});
+  return ph({eyebrow:traBy(S.role.traId).n,t:"Mis viajes",
+      meta:pill("Activos",act.length)+pill("Total",mis.length)})
+    + tbl([{t:"Viaje"},{t:"Ruta"},{t:"Cliente"},{t:"Estado"},{t:"Avance"},{t:"ETA"}],
+        mis.map(function(v){
+          var c=cliBy(v.cli);
+          return '<tr class="clickable" data-viatra="'+v.id+'"><td class="mono t-strong">'+v.id
+            +'<div class="t-sub mono">'+v.code+'</div></td>'
+            +'<td class="t-sub">'+v.origen+' → '+v.destino+'</td>'
+            +'<td>'+(c?c.n:"—")+'</td><td>'+bd(VIAJE_EST[v.estado])+'</td>'
+            +'<td>'+meter(v.pct,v.pct>=100?" is-full":"")+'</td>'
+            +'<td class="mono t-sub">'+(v.estado==="entregado"?v.entregado:v.eta)+'</td></tr>';}).join("")
+        ||emptyRow(6,"Sin viajes asignados"));
+}
+function vViajeTra(id){
+  var v=viaBy(id); if(!v) return "";
+  var c=cliBy(v.cli),d=demBy(v.dem);
+  var i=traIdx(v.estado),sig=FLUJO_TRA[i+1];
+  var puedeEntregar=v.estado==="destino"||v.estado==="transito"||v.estado==="cargado";
+  return '<button class="back" data-back="viajes">← Mis viajes</button>'
+    + ph({eyebrow:(c?c.n:"")+" · "+v.code,t:v.id,
+        meta:bd(VIAJE_EST[v.estado])+pill("ETA",v.estado==="entregado"?v.entregado:v.eta)})
+    + '<div class="tra-actions">'
+      + (sig&&v.estado!=="entregado"
+        ?'<button class="btn btn-primary btn-lg" data-traest="'+v.id+'|'+sig.id+'">'+sig.n+'</button>':'')
+      + (v.estado!=="entregado"?'<button class="btn btn-lg" data-inc="'+v.id+'">Registrar incidencia</button>':'')
+      + (puedeEntregar?'<button class="btn btn-lg" data-pod="'+v.id+'">Registrar entrega</button>':'')
+    + '</div>'
+    + (v.inc?alerta("Incidencia activa",v.inc):"")
+    + card("Carga","<div class='card-body'><div class='grid-kv'>"
+        +"<div class='kv'><span class='eyebrow'>Origen</span><b>"+v.origen+"</b></div>"
+        +"<div class='kv'><span class='eyebrow'>Destino</span><b>"+v.destino+"</b></div>"
+        +"<div class='kv'><span class='eyebrow'>Mercancía</span><b>"+(d?d.merc:"—")+"</b></div>"
+        +"<div class='kv'><span class='eyebrow'>Peso</span><b class='mono'>"+(d?nf(d.peso)+" kg":"—")+"</b></div>"
+        +"<div class='kv'><span class='eyebrow'>Vehículo</span><b>"+(d?d.vehiculo:"—")+"</b></div>"
+        +"<div class='kv'><span class='eyebrow'>Código público</span><b class='mono'>"+v.code+"</b></div>"
+        +"</div></div>")
+    + panelTracking(v)
+    + panelPOD(v)
+    + card("Mis actualizaciones",
+        tbl([{t:"Momento"},{t:"Actualización"}],
+          (v.log&&v.log.length?v.log.map(function(l){
+            return '<tr><td class="mono t-sub">'+l.t+'</td><td>'+l.m+'</td></tr>';}).join("")
+            :emptyRow(2,"Sin actualizaciones"))));
+}
+function avanzarTra(vid,est){
+  var v=viaBy(vid); if(!v) return;
+  v.estado=est;
+  var lbl=FLUJO_TRA[traIdx(est)].n;
+  v.inc=null;
+  if(est==="transito"&&v.pct<20) v.pct=20;
+  if(est==="destino") v.pct=Math.max(v.pct,95);
+  v.km=Math.round(v.kmTotal*v.pct/100);
+  v.log.unshift({t:HOY+" · "+ri(8,18)+":"+("0"+ri(0,59)).slice(-2),
+    m:"Transportista actualizó estado a "+lbl});
+  renderNav();render();
+  toast("Estado: "+lbl);
+}
+function modalIncidencia(vid){
+  openModal("Registrar incidencia",
+    '<label class="fld"><span class="eyebrow">Tipo</span><select id="i-tipo">'
+    +TIPOS_INC.map(function(t){return '<option>'+t+'</option>';}).join("")+'</select></label>'
+    +'<label class="fld" style="margin-top:14px"><span class="eyebrow">Detalle</span>'
+    +'<input id="i-det" type="text" placeholder="Qué ocurrió"></label>'
+    +'<div id="i-err" class="t-sub" style="color:var(--crit);margin-top:10px"></div>',
+    '<button class="btn" id="m-cancel">Cancelar</button>'
+    +'<button class="btn btn-primary" id="i-ok">Registrar</button>');
+  $("m-cancel").addEventListener("click",closeModal);
+  $("i-ok").addEventListener("click",function(){
+    var det=$("i-det").value.trim();
+    if(det.length<4){$("i-err").textContent="Describí qué ocurrió.";return;}
+    var v=viaBy(vid);
+    var txt=$("i-tipo").value+": "+det;
+    v.estado="incidencia";v.inc=txt;v.vel=0;
+    v.log.unshift({t:HOY+" · "+ri(8,18)+":00",m:"Incidencia reportada · "+txt});
+    INCIDENCIAS.push({viaje:vid,t:txt,fecha:HOY});
+    closeModal();renderNav();render();toast("Incidencia registrada");});
+}
+
+/* ===================== TRACKING PÚBLICO ===================== */
+function vPublico(code){
+  var v=null;
+  for(var i=0;i<VIAJES.length;i++){if(VIAJES[i].code===code)v=VIAJES[i];}
+  if(!v) return '<div class="pub-wrap"><div class="pub-card">'
+    +'<div class="pub-brand"><span class="brand-mark">DMS</span>'
+    +'<span class="brand-sub">SEGUIMIENTO</span></div>'
+    +'<div class="empty" style="padding:34px 0">'+badge("b-crit","Código no encontrado")
+    +'<span class="t-sub">'+esc(code)+'</span></div>'
+    +'<button class="btn" data-pubhome="1">Volver</button></div></div>';
+  var p=podDe(v.id);
+  return '<div class="pub-wrap"><div class="pub-card">'
+    +'<div class="pub-brand"><span class="brand-mark">DMS</span>'
+      +'<span class="brand-sub">SEGUIMIENTO</span></div>'
+    +'<div class="pub-code mono">'+v.code+'</div>'
+    +'<div class="pub-est">'+bd(VIAJE_EST[v.estado])+'</div>'
+    +'<div class="pub-route"><b>'+v.origen+'</b><span>→</span><b>'+v.destino+'</b></div>'
+    + mapaViaje(v)
+    +'<div class="trk">'
+      +'<div class="trk-i"><span class="eyebrow">Avance</span><b class="mono">'+v.pct+'%</b></div>'
+      +'<div class="trk-i"><span class="eyebrow">Restante</span><b class="mono">'+nf(v.kmTotal-v.km)+' km</b></div>'
+      +'<div class="trk-i"><span class="eyebrow">ETA</span><b class="mono">'+(v.estado==="entregado"?v.entregado:v.eta)+'</b></div>'
+      +'<div class="trk-i"><span class="eyebrow">Actualizado</span><b class="mono">'+v.ultPos+'</b></div>'
+    +'</div>'
+    +'<div class="eyebrow" style="margin:18px 0 10px">Línea de tiempo</div>'
+    +'<ol class="hitos">'+v.hitos.map(function(h){
+        return '<li class="hito '+h.s+'"><span class="hito-rail"><span class="hito-dot"></span>'
+          +'<span class="hito-line"></span></span><span class="hito-b"><b>'+h.n+'</b>'
+          +'<span>'+h.t+'</span></span></li>';}).join("")+'</ol>'
+    +(p?'<div class="eyebrow" style="margin:18px 0 10px">Entrega</div><div class="kvlist">'
+        +'<div class="kvrow"><span>Estado</span><span>'+bd(POD_EST[p.estado])+'</span></div>'
+        +'<div class="kvrow"><span>Recibido por</span><span>'+p.receptor+'</span></div>'
+        +'<div class="kvrow"><span>Fecha</span><span class="mono">'+p.fecha+'</span></div>'
+        +'</div>':'')
+    +'<div class="pub-foot">Consulta pública · no incluye datos comerciales ni documentos internos</div>'
+    +'<button class="btn" data-pubhome="1" style="margin-top:14px">Volver</button>'
+    +'</div></div>';
+}
+function rutaHash(){
+  var h=(location.hash||"").replace(/^#\/?/,"");
+  if(h.indexOf("tracking/")===0) return h.slice(9).toUpperCase();
+  return null;
+}
+
 /* ===================== ROUTER ===================== */
 function render(){
+  var pub=rutaHash();
+  if(pub){ $("login").hidden=true; $("app").hidden=true;
+    $("modal-root").innerHTML=vPublico(pub); wirePublico(); return; }
+  $("modal-root").innerHTML="";
   var h="";
   switch(S.mod){
     case "dashboard": h=vDashboard(); break;
@@ -1933,6 +2391,7 @@ function render(){
     case "directorio": h=vDirectorio(); break;
     case "certificaciones": h=vCertificaciones(); break;
     case "reportes": h=vReportes(); break;
+    case "misviajes": h=vMisViajes(); break;
   }
   $("content").innerHTML=h;
   wire();
@@ -1973,6 +2432,13 @@ function wire(){
   on("[data-pub]",function(el){publicar(el.getAttribute("data-pub"));});
   on("[data-asig]",function(el){asignar(el.getAttribute("data-asig"));});
   on("[data-avanzar]",function(el){avanzar(el.getAttribute("data-avanzar"));});
+  on("[data-sim]",function(el){simularAvance(el.getAttribute("data-sim"));});
+  on("[data-pod]",function(el){modalPOD(el.getAttribute("data-pod"));});
+  on("[data-inc]",function(el){modalIncidencia(el.getAttribute("data-inc"));});
+  on("[data-viatra]",function(el){S.viaOpen=el.getAttribute("data-viatra");S.mod="misviajes";
+    renderNav();render();window.scrollTo(0,0);});
+  on("[data-traest]",function(el){var p=el.getAttribute("data-traest").split("|");avanzarTra(p[0],p[1]);});
+  on("[data-track]",function(el){location.hash="#/tracking/"+el.getAttribute("data-track");});
   on("[data-act-ok]",function(el){
     var id=el.getAttribute("data-act-ok");
     ACTIVIDADES.forEach(function(a){if(a.id===id)a.estado="hecha";});
@@ -2182,7 +2648,18 @@ function modalTransportista(){
 }
 
 /* ===================== ARRANQUE ===================== */
+function wirePublico(){
+  var b=$("modal-root").querySelector("[data-pubhome]");
+  if(b) b.addEventListener("click",function(){location.hash="";});
+}
+window.addEventListener("hashchange",function(){
+  var pub=rutaHash();
+  if(pub){ render(); }
+  else { $("modal-root").innerHTML="";
+    if(S.role){ $("app").hidden=false; render(); } else { $("login").hidden=false; } }
+});
 renderLogin();
 $("btn-salir").addEventListener("click",leave);
+if(rutaHash()) render();
 })();
 </script>
