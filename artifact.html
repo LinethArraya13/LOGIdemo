@@ -4,40 +4,45 @@
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;600;700&family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&display=swap">
 <style>
 :root{
-  --ground:#F1F4F6; --surface:#FFFFFF; --surface-2:#E8EEF0; --surface-3:#F7F9FA;
-  --ink:#0F1A1E; --ink-2:#394A52; --muted:#6A7C84;
-  --line:#D3DCE0; --line-2:#B6C4CA;
-  --accent:#0E4A5A; --accent-2:#13657A; --accent-soft:#DBE9ED; --accent-ink:#0A3743;
-  --ok:#186B47; --ok-soft:#DBEEE3;
-  --warn:#8F5404; --warn-soft:#F8E9D3;
-  --crit:#9E2318; --crit-soft:#F8E1DE;
-  --shadow-1:0 1px 2px rgba(15,26,30,.07);
-  --shadow-2:0 2px 4px rgba(15,26,30,.05), 0 14px 32px -18px rgba(15,26,30,.28);
+  /* Identidad: azul eléctrico #155EEF (principal) · naranja #FF7A00 (acción)
+     verde #16A34A (éxito) · fondo #F8FAFC · texto #0F172A · bordes #E2E8F0 */
+  --ground:#F8FAFC; --surface:#FFFFFF; --surface-2:#F1F5F9; --surface-3:#F8FAFC;
+  --ink:#0F172A; --ink-2:#334155; --muted:#64748B;
+  --line:#E2E8F0; --line-2:#CBD5E1;
+  --accent:#155EEF; --accent-2:#2563EB; --accent-soft:#E7EEFE; --accent-ink:#0B3FA8;
+  --action:#FF7A00; --action-2:#E86E00; --action-soft:#FFF1E2; --action-ink:#9A4E00;
+  --ok:#16A34A; --ok-soft:#DCFCE7;
+  --warn:#9A4E00; --warn-soft:#FFF1E2;
+  --crit:#DC2626; --crit-soft:#FEE2E2;
+  --shadow-1:0 1px 2px rgba(15,23,42,.06);
+  --shadow-2:0 1px 3px rgba(15,23,42,.07), 0 12px 28px -16px rgba(15,23,42,.24);
   --rail-w:238px;
 }
 @media (prefers-color-scheme:dark){
   :root:not([data-theme="light"]){
-    --ground:#0B1316; --surface:#121D21; --surface-2:#1A272C; --surface-3:#162226;
-    --ink:#E7EFF1; --ink-2:#B4C4CA; --muted:#83959C;
-    --line:#22333A; --line-2:#34494F;
-    --accent:#59B4C9; --accent-2:#7FC9DA; --accent-soft:#11333D; --accent-ink:#A6DCE7;
-    --ok:#5DBF8D; --ok-soft:#0F2E1F;
-    --warn:#DDA44A; --warn-soft:#31230B;
-    --crit:#E68B7F; --crit-soft:#341612;
+    --ground:#0B1220; --surface:#111A2B; --surface-2:#1B2436; --surface-3:#151E2E;
+    --ink:#E8EEF7; --ink-2:#B8C4D4; --muted:#8496AC;
+    --line:#26324A; --line-2:#3A4A66;
+    --accent:#5B8DEF; --accent-2:#84AAF5; --accent-soft:#13254A; --accent-ink:#A9C6FA;
+    --action:#FF9838; --action-2:#FFAC5E; --action-soft:#3A2410; --action-ink:#FFB670;
+    --ok:#4ADE80; --ok-soft:#0F2E1F;
+    --warn:#FFB670; --warn-soft:#3A2410;
+    --crit:#F87171; --crit-soft:#3B1516;
     --shadow-1:0 1px 2px rgba(0,0,0,.4);
-    --shadow-2:0 2px 4px rgba(0,0,0,.3), 0 14px 32px -18px rgba(0,0,0,.7);
+    --shadow-2:0 1px 3px rgba(0,0,0,.3), 0 12px 28px -16px rgba(0,0,0,.7);
   }
 }
 :root[data-theme="dark"]{
-  --ground:#0B1316; --surface:#121D21; --surface-2:#1A272C; --surface-3:#162226;
-  --ink:#E7EFF1; --ink-2:#B4C4CA; --muted:#83959C;
-  --line:#22333A; --line-2:#34494F;
-  --accent:#59B4C9; --accent-2:#7FC9DA; --accent-soft:#11333D; --accent-ink:#A6DCE7;
-  --ok:#5DBF8D; --ok-soft:#0F2E1F;
-  --warn:#DDA44A; --warn-soft:#31230B;
-  --crit:#E68B7F; --crit-soft:#341612;
+  --ground:#0B1220; --surface:#111A2B; --surface-2:#1B2436; --surface-3:#151E2E;
+  --ink:#E8EEF7; --ink-2:#B8C4D4; --muted:#8496AC;
+  --line:#26324A; --line-2:#3A4A66;
+  --accent:#5B8DEF; --accent-2:#84AAF5; --accent-soft:#13254A; --accent-ink:#A9C6FA;
+  --action:#FF9838; --action-2:#FFAC5E; --action-soft:#3A2410; --action-ink:#FFB670;
+  --ok:#4ADE80; --ok-soft:#0F2E1F;
+  --warn:#FFB670; --warn-soft:#3A2410;
+  --crit:#F87171; --crit-soft:#3B1516;
   --shadow-1:0 1px 2px rgba(0,0,0,.4);
-  --shadow-2:0 2px 4px rgba(0,0,0,.3), 0 14px 32px -18px rgba(0,0,0,.7);
+  --shadow-2:0 1px 3px rgba(0,0,0,.3), 0 12px 28px -16px rgba(0,0,0,.7);
 }
 *{box-sizing:border-box}
 html,body{min-height:100%}
@@ -59,8 +64,8 @@ button{font:inherit; color:inherit; cursor:pointer; border:0; background:none}
 .login-brand{display:flex; align-items:center; gap:14px; margin-bottom:22px}
 .login-logo{width:52px; height:52px; border-radius:13px; background:var(--accent); color:#fff;
   display:flex; align-items:center; justify-content:center; flex:none}
-:root[data-theme="dark"] .login-logo{color:#07181D}
-@media (prefers-color-scheme:dark){:root:not([data-theme="light"]) .login-logo{color:#07181D}}
+:root[data-theme="dark"] .login-logo{color:#0B1220}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]) .login-logo{color:#0B1220}}
 .login-logo svg{width:26px; height:26px}
 .login-brand-t{display:flex; flex-direction:column; gap:3px; min-width:0}
 .login-brand-t h1{font-size:30px; font-weight:700; line-height:1.05; letter-spacing:-.02em}
@@ -87,8 +92,8 @@ button{font:inherit; color:inherit; cursor:pointer; border:0; background:none}
 .role:hover .role-chev{color:var(--muted); transform:translateX(2px)}
 .role.is-picked{border-color:var(--accent); background:var(--accent-soft); box-shadow:var(--shadow-1)}
 .role.is-picked .role-icon{background:var(--accent); color:#fff}
-:root[data-theme="dark"] .role.is-picked .role-icon{color:#07181D}
-@media (prefers-color-scheme:dark){:root:not([data-theme="light"]) .role.is-picked .role-icon{color:#07181D}}
+:root[data-theme="dark"] .role.is-picked .role-icon{color:#0B1220}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]) .role.is-picked .role-icon{color:#0B1220}}
 .role.is-picked .role-chev{color:var(--accent); transform:translateX(2px)}
 
 .login-go{display:flex; align-items:center; gap:14px; flex-wrap:wrap; margin-top:20px;
@@ -141,9 +146,9 @@ button{font:inherit; color:inherit; cursor:pointer; border:0; background:none}
 .btn{border:1px solid var(--line-2); background:var(--surface); border-radius:4px; padding:6px 11px;
   font-size:12.5px; color:var(--ink-2); transition:border-color .14s, background .14s}
 .btn:hover{border-color:var(--accent); color:var(--ink)}
-.btn-primary{background:var(--accent); border-color:var(--accent); color:#fff}
-:root[data-theme="dark"] .btn-primary{color:#07181D}
-.btn-primary:hover{background:var(--accent-2); border-color:var(--accent-2)}
+.btn-primary{background:var(--action); border-color:var(--action); color:#fff}
+:root[data-theme="dark"] .btn-primary{color:#20140A}
+.btn-primary:hover{background:var(--action-2); border-color:var(--action-2)}
 .btn:disabled{opacity:.45; cursor:not-allowed}
 .content{padding:24px 20px 56px; max-width:1180px; width:100%}
 @media (max-width:520px){.topbar{padding:11px 16px} .content{padding:20px 16px 48px}}
@@ -278,6 +283,25 @@ tr.pick td{background:var(--ok-soft)}
   background:var(--accent-soft); border-radius:3px; padding:2px 6px; flex:none; margin-top:1px}
 .rule b{font-weight:600; display:block; margin-bottom:1px}
 .rule span{color:var(--ink-2); font-size:12.5px}
+
+/* Filtros, formulario y cabecera con acción */
+.page-head-row{display:flex; align-items:flex-start; gap:16px; flex-wrap:wrap; margin-bottom:4px}
+.page-head-row .page-head{flex:1; min-width:240px}
+.btn-lg{padding:10px 18px; font-size:13.5px; font-weight:600; border-radius:8px}
+.chip{display:inline-flex; align-items:center; gap:7px; padding:6px 13px; border-radius:999px;
+  border:1px solid var(--line-2); background:var(--surface); color:var(--ink-2);
+  font-size:12.5px; transition:border-color .14s, background .14s, color .14s}
+.chip:hover{border-color:var(--accent); color:var(--ink)}
+.chip.is-on{background:var(--accent); border-color:var(--accent); color:#fff; font-weight:500}
+:root[data-theme="dark"] .chip.is-on{color:#0B1220}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]) .chip.is-on{color:#0B1220}}
+.chip-n{font-family:"IBM Plex Mono",monospace; font-size:11px; opacity:.75}
+.form-grid{display:grid; grid-template-columns:repeat(auto-fit,minmax(215px,1fr)); gap:14px}
+.fld{display:flex; flex-direction:column; gap:5px}
+.fld select,.fld input{padding:9px 11px; border:1px solid var(--line-2); border-radius:7px;
+  background:var(--surface); color:var(--ink); font:inherit; width:100%}
+.chk{display:flex; align-items:center; gap:9px; margin-top:16px; font-size:13px; color:var(--ink-2)}
+.chk input{width:16px; height:16px; accent-color:var(--action); flex:none}
 
 /* Sheet */
 .sheet-bg{position:fixed; inset:0; background:rgba(9,17,20,.5); z-index:60}
@@ -593,7 +617,7 @@ function evaluarTodos(l){
 
 /* ===================== TRÁNSITO ===================== */
 var SHIPMENTS=[
- {code:"IMP-2026-0847",cliente:"Ferretería Illimani S.R.L.",carrierId:"illimani",
+ {code:"IMP-2026-0847",estado:"incidencia",cliente:"Ferretería Illimani S.R.L.",carrierId:"illimani",
   placa:"1842-KLP",ruta:"Arica → Tambo Quemado → La Paz",pct:62,eta:"18 sep 2026 · 10:00",
   gps:"Ruta 11-CH · km 218 · 3.940 m s.n.m. · señal hace 6 min",
   alerta:{t:"Demora en frontera Tambo Quemado",
@@ -605,7 +629,7 @@ var SHIPMENTS=[
    {n:"Control de frontera Tambo Quemado",t:"ETA 18 sep · 02:30",s:"next"},
    {n:"Tránsito Tambo Quemado → La Paz",t:"ETA 18 sep · 08:00",s:"next"},
    {n:"Entrega en almacén del cliente",t:"ETA 18 sep · 10:00",s:"next"}]},
- {code:"IMP-2026-0839",cliente:"Químicos del Altiplano S.R.L.",carrierId:"andina",
+ {code:"IMP-2026-0839",estado:"curso",cliente:"Químicos del Altiplano S.R.L.",carrierId:"andina",
   placa:"4419-PSD",ruta:"Ilo → Desaguadero → La Paz",pct:85,eta:"18 sep 2026 · 16:00",
   gps:"Recinto aduanero La Paz · en aforo",alerta:null,
   hitos:[{n:"Arribo a puerto Ilo",t:"05 sep · 11:05",s:"done"},
@@ -614,7 +638,7 @@ var SHIPMENTS=[
    {n:"Ingreso a recinto aduanero La Paz",t:"10 sep · 14:50",s:"done"},
    {n:"Aforo aduanero",t:"en curso · canal rojo",s:"now"},
    {n:"Entrega en planta del cliente",t:"ETA 18 sep · 16:00",s:"next"}]},
- {code:"IMP-2026-0851",cliente:"Repuestos Tunari S.A.",carrierId:"andes",
+ {code:"IMP-2026-0851",estado:"curso",cliente:"Repuestos Tunari S.A.",carrierId:"andes",
   placa:"3271-XRB",ruta:"Iquique → Pisiga → Oruro → Cochabamba",pct:28,eta:"22 sep 2026 · 12:00",
   gps:"Depósito LCL Iquique · desconsolidando",alerta:null,
   hitos:[{n:"Arribo a puerto Iquique",t:"14 sep · 07:40",s:"done"},
@@ -623,15 +647,46 @@ var SHIPMENTS=[
    {n:"Control de frontera Pisiga",t:"ETA 19 sep · 13:00",s:"next"},
    {n:"Tránsito Oruro → Cochabamba",t:"ETA 21 sep · 18:00",s:"next"},
    {n:"Entrega en almacén del cliente",t:"ETA 22 sep · 12:00",s:"next"}]},
- {code:"EXP-2026-0213",cliente:"AgroSur Bolivia S.A.",carrierId:"sur",
+ {code:"EXP-2026-0213",estado:"curso",cliente:"AgroSur Bolivia S.A.",carrierId:"sur",
   placa:"2284-MTQ",ruta:"Santa Cruz → Puerto Suárez → Santos",pct:12,eta:"29 sep 2026 · 09:00",
   gps:"Planta del exportador · pendiente de consolidación",alerta:null,
   hitos:[{n:"Reserva de booking naviera",t:"11 sep · 10:20",s:"done"},
    {n:"Armado de documentación de exportación",t:"en curso · 7 de 12 documentos",s:"now"},
    {n:"Consolidación y precintado en planta",t:"ETA 20 sep · 08:00",s:"next"},
    {n:"Tránsito Santa Cruz → Puerto Suárez",t:"ETA 22 sep · 20:00",s:"next"},
-   {n:"Embarque en Santos",t:"ETA 29 sep · 09:00",s:"next"}]}];
+   {n:"Embarque en Santos",t:"ETA 29 sep · 09:00",s:"next"}]},
+ {code:"EXP-2026-0209",estado:"entregado",cliente:"Andina Textil S.A.",carrierId:"sur",
+  placa:"2284-MTQ",ruta:"La Paz → Arica → Callao",pct:100,eta:"10 sep 2026 · 14:00",
+  entregado:"10 sep 2026 · 13:20",puntual:true,gps:"Entregado en puerto Arica",alerta:null,
+  hitos:[{n:"Consolidación y precintado en planta",t:"02 sep · 07:30",s:"done"},
+   {n:"Tránsito La Paz → Arica",t:"04 sep · 18:40",s:"done"},
+   {n:"Control de frontera Tambo Quemado",t:"05 sep · 01:15",s:"done"},
+   {n:"Ingreso a puerto Arica",t:"05 sep · 12:00",s:"done"},
+   {n:"Embarque y entrega documental",t:"10 sep · 13:20",s:"done"}]},
+ {code:"IMP-2026-0834",estado:"entregado",cliente:"Repuestos Tunari S.A.",carrierId:"andes",
+  placa:"3271-XRB",ruta:"Arica → Tambo Quemado → La Paz",pct:100,eta:"06 sep 2026 · 09:00",
+  entregado:"06 sep 2026 · 08:35",puntual:true,gps:"Entregado en almacén del cliente",alerta:null,
+  hitos:[{n:"Retiro de puerto Arica",t:"03 sep · 10:20",s:"done"},
+   {n:"Tránsito Arica → Tambo Quemado",t:"04 sep · 21:00",s:"done"},
+   {n:"Control de frontera Tambo Quemado",t:"05 sep · 03:40",s:"done"},
+   {n:"Entrega en almacén del cliente",t:"06 sep · 08:35",s:"done"}]},
+ {code:"IMP-2026-0828",estado:"entregado",cliente:"Químicos del Altiplano S.R.L.",carrierId:"andina",
+  placa:"4419-PSD",ruta:"Ilo → Desaguadero → La Paz",pct:100,eta:"01 sep 2026 · 12:00",
+  entregado:"02 sep 2026 · 07:10",puntual:false,gps:"Entregado en planta del cliente",alerta:null,
+  hitos:[{n:"Retiro de puerto Ilo",t:"28 ago · 09:00",s:"done"},
+   {n:"Tránsito Ilo → Desaguadero",t:"30 ago · 16:20",s:"done"},
+   {n:"Control de frontera Desaguadero",t:"31 ago · 22:45",s:"done"},
+   {n:"Entrega en planta del cliente",t:"02 sep · 07:10",s:"done"}]}];
 var shipmentBy=function(c){for(var i=0;i<SHIPMENTS.length;i++){if(SHIPMENTS[i].code===c)return SHIPMENTS[i];}return null;};
+
+var PERF={
+  periodo:"Septiembre 2026", total:128, aTiempo:119, tarde:9, incidencias:5,
+  horasMedias:41, mejorCorredor:"Arica – La Paz",
+  corredores:[
+    {n:"Arica – La Paz",       envios:58, puntual:95, horas:38, incid:1},
+    {n:"Ilo – La Paz",         envios:31, puntual:94, horas:42, incid:1},
+    {n:"Iquique – Cochabamba", envios:22, puntual:91, horas:56, incid:2},
+    {n:"Santa Cruz – Santos",  envios:17, puntual:88, horas:64, incid:1}]};
 
 var BA=[
  {l:"Tiempo medio para conseguir camión en el tramo terrestre",a:"1,8 días",b:"12 min"},
@@ -646,26 +701,26 @@ var ROLES=[
   rol:"Expedientes, asignación de carga y aprobación de papeles",
   entidad:"DMS Bolivia S.R.L.",
   icon:'<path d="M3 5.5h10M3 9h10M3 12.5h7"/>',
-  secs:["tablero","expedientes","asignacion","aprobaciones","transito"]},
+  secs:["tablero","transito","asignacion","expedientes","aprobaciones","rendimiento"]},
  {id:"ger",name:"Gerencia",mail:"gerencia@dms.demo",
   rol:"Tablero y resultados, sin detalle operativo",
   entidad:"DMS Bolivia S.R.L.",
   icon:'<rect x="2.5" y="2.5" width="4.5" height="4.5" rx="1"/><rect x="9" y="2.5" width="4.5" height="4.5" rx="1"/><rect x="2.5" y="9" width="4.5" height="4.5" rx="1"/><rect x="9" y="9" width="4.5" height="4.5" rx="1"/>',
-  secs:["tablero","expedientes","asignacion","transito"]},
+  secs:["tablero","transito","rendimiento","expedientes","asignacion"]},
  {id:"cli",name:"Cliente importador",mail:"cliente@dms.demo",
   rol:"Solo sus cargas y sus documentos",
   entidad:"Ferretería Illimani S.R.L.",
   icon:'<path d="M2.5 5.5 8 2.5l5.5 3v5L8 13.5l-5.5-3z"/><path d="M2.5 5.5 8 8.5l5.5-3M8 8.5v5"/>',
-  secs:["tablero","expedientes","transito"],cliente:"Ferretería Illimani S.R.L."},
+  secs:["tablero","transito","expedientes"],cliente:"Ferretería Illimani S.R.L."},
  {id:"tra",name:"Transportista",mail:"transportista@dms.demo",
   rol:"Su perfil, sus papeles y las cargas disponibles",
   entidad:"Transportes Vargas Hnos.",
   icon:'<path d="M1.5 4.5h7.5v6H1.5z"/><path d="M9 6.5h2.5L14 9v1.5H9z"/><circle cx="4" cy="11.5" r="1.4"/><circle cx="11" cy="11.5" r="1.4"/>',
   secs:["tablero","perfil","cargas"],carrierId:"vargas"}];
 var SEC_LABEL={tablero:"Tablero",expedientes:"Expedientes",asignacion:"Asignación de carga",
- aprobaciones:"Aprobaciones",transito:"Carga en tránsito",perfil:"Mi perfil y papeles",cargas:"Cargas disponibles"};
+ aprobaciones:"Aprobaciones",transito:"Envíos",rendimiento:"Rendimiento",nuevo:"Nuevo envío",perfil:"Mi perfil y papeles",cargas:"Cargas disponibles"};
 
-var S={role:null,sec:"tablero",expOpen:null,shipOpen:null,loadOpen:null,q:""};
+var S={filtro:"todos",track:"",role:null,sec:"tablero",expOpen:null,shipOpen:null,loadOpen:null,q:""};
 var $=function(id){return document.getElementById(id);};
 var visibleExps=function(){return S.role&&S.role.cliente?EXPEDIENTES.filter(function(e){return e.cliente===S.role.cliente;}):EXPEDIENTES;};
 var visibleShips=function(){return S.role&&S.role.cliente?SHIPMENTS.filter(function(s){return s.cliente===S.role.cliente;}):SHIPMENTS;};
@@ -734,7 +789,8 @@ function leave(){S.role=null;$("app").hidden=true;$("login").hidden=false;resetP
 function renderNav(){
   var pend=totalPendientes();
   var counts={expedientes:visibleExps().length,asignacion:LOADS.filter(function(l){return !l.asignado;}).length,
-    aprobaciones:pend,transito:visibleShips().length,cargas:LOADS.length};
+    aprobaciones:pend,transito:visibleShips().length,cargas:LOADS.length,
+    rendimiento:null,nuevo:null};
   var html='<div class="eyebrow">Operación</div>';
   html+=S.role.secs.map(function(s){
     var c="";
@@ -1117,16 +1173,126 @@ function shipTable(ships,title){
         +'<td class="mono t-sub">'+s.eta+(s.alerta?' <span class="badge b-warn"><span class="dot"></span>+4 h</span>':'')+'</td></tr>';}).join("")
     +'</tbody></table></div></div>';
 }
+function estadoEnvio(e){
+  var m={curso:["b-accent","En curso"],entregado:["b-ok","Entregado"],incidencia:["b-warn","Con incidencia"]};
+  return m[e]||["b-neutral","—"];
+}
 function viewTransito(){
-  var ships=visibleShips();
+  var todos=visibleShips();
   if(S.shipOpen) return viewShipDetail(S.shipOpen);
-  return pageHead("Puertas afuera","Carga en tránsito",
-    "El estado de cada envío se arma con los hitos que reportan el transportista, la aduana y el GPS de la unidad. Nadie del equipo llama al chofer para saber dónde está la carga.")
-    +tiles([{k:"Cargas en ruta",v:String(ships.length),n:"Corredores Arica, Ilo, Iquique y Santos"},
-      {k:"Con GPS en vivo",v:String(ships.filter(function(s){var c=carrierBy(s.carrierId);return c&&c.gps;}).length)+"/"+ships.length,n:"Unidades con posición reportada"},
-      {k:"Alertas abiertas",v:String(ships.filter(function(s){return s.alerta;}).length),n:"Demoras ya avisadas al cliente"},
-      {k:"Avisos automáticos",v:"3",n:"Cambios de ETA notificados este mes"}])
-    +(ships[0]&&ships[0].alerta?alertBox(ships[0].alerta):"")+shipTable(ships,"Envíos");
+
+  var cnt={todos:todos.length,
+    curso:todos.filter(function(s){return s.estado==="curso";}).length,
+    incidencia:todos.filter(function(s){return s.estado==="incidencia";}).length,
+    entregado:todos.filter(function(s){return s.estado==="entregado";}).length};
+
+  var lista=todos.filter(function(s){return S.filtro==="todos"||s.estado===S.filtro;});
+  if(S.track.length>=2){
+    var q=S.track.toLowerCase();
+    lista=lista.filter(function(s){
+      var c=carrierBy(s.carrierId);
+      return (s.code+" "+s.cliente+" "+s.placa+" "+s.ruta+" "+(c?c.n:"")).toLowerCase().indexOf(q)>=0;});
+  }
+
+  var chips=[["todos","Todos"],["curso","En curso"],["incidencia","Con incidencia"],["entregado","Entregados"]]
+    .map(function(f){
+      return '<button class="chip'+(S.filtro===f[0]?" is-on":"")+'" data-filtro="'+f[0]+'">'+
+        f[1]+'<span class="chip-n">'+cnt[f[0]]+'</span></button>';}).join("");
+
+  return '<div class="page-head-row">'
+    + pageHead("Operación","Envíos","Estado de cada envío en un solo lugar: lo que está en ruta, lo que ya se entregó y lo que necesita atención ahora.")
+    + (S.role.cliente?'':'<button class="btn btn-primary btn-lg" data-go="nuevo">+ Nuevo envío</button>')
+    + '</div>'
+    + tiles([
+      {k:"En curso",v:String(cnt.curso),n:"En ruta o en aduana ahora"},
+      {k:"Con incidencia",v:String(cnt.incidencia),n:"Demoras que requieren atención"},
+      {k:"Entregados",v:String(cnt.entregado),n:"Cerrados este mes"},
+      {k:"Entregas a tiempo",v:String(Math.round(PERF.aTiempo/PERF.total*100)),u:"%",n:PERF.total+" envíos en "+PERF.periodo}])
+    + (cnt.incidencia?alertBox({t:"1 envío con demora activa",
+        d:"IMP-2026-0847 está detenido en la frontera Tambo Quemado. La ETA ya se recalculó y el cliente fue notificado automáticamente."}):"")
+    + '<div class="card"><div class="card-head"><h3>Seguimiento</h3></div>'
+    + '<div class="card-body" style="padding-bottom:12px">'
+    + '<input id="track" type="search" value="'+S.track.replace(/"/g,"&quot;")+'" '
+    + 'placeholder="Rastrear por N° de trámite, cliente, placa o ruta…" style="max-width:420px">'
+    + '<div class="chips" style="margin-top:13px">'+chips+'</div></div>'
+    + (lista.length
+      ? '<div class="tw"><table><thead><tr><th>Trámite</th><th>Ruta</th><th>Transportista</th><th>Estado</th><th>Avance</th><th>Entrega</th></tr></thead><tbody>'
+        + lista.map(function(s){
+            var c=carrierBy(s.carrierId),b=estadoEnvio(s.estado);
+            return '<tr class="clickable" data-ship="'+s.code+'">'
+              +'<td class="mono t-strong">'+s.code+'<div class="t-sub">'+s.cliente+'</div></td>'
+              +'<td class="t-sub">'+s.ruta+'</td>'
+              +'<td>'+(c?c.n:"—")+'<div class="t-sub mono">'+s.placa+'</div></td>'
+              +'<td>'+badge(b[0],b[1])+'</td>'
+              +'<td><div class="meter-row"><div class="meter'+(s.pct>=100?" is-full":"")+'"><i style="width:'+s.pct+'%"></i></div><span class="mono">'+pctf(s.pct)+'</span></div></td>'
+              +'<td class="mono t-sub">'+(s.estado==="entregado"
+                  ? s.entregado+(s.puntual?' <span class="badge b-ok"><span class="dot"></span>a tiempo</span>':' <span class="badge b-warn"><span class="dot"></span>tarde</span>')
+                  : s.eta+(s.alerta?' <span class="badge b-warn"><span class="dot"></span>+4 h</span>':''))+'</td></tr>';
+          }).join("")
+        + '</tbody></table></div>'
+      : '<div class="card-body"><p class="t-sub">Ningún envío coincide con el filtro o la búsqueda.</p></div>')
+    + '</div>';
+}
+
+function viewNuevo(){
+  return '<button class="back" data-back="transito">← Envíos</button>'
+    + pageHead("Operación","Nuevo envío",
+      "Cargá los datos del despacho. Al crearlo, el sistema evalúa la red de transportistas y te muestra quién puede tomarlo.")
+    + '<div class="card"><div class="card-head"><h3>Datos del despacho</h3></div><div class="card-body">'
+    + '<div class="form-grid">'
+    + '<label class="fld"><span class="eyebrow">Cliente</span>'
+      + '<select id="f-cliente">'+["Ferretería Illimani S.R.L.","Químicos del Altiplano S.R.L.","AgroSur Bolivia S.A.","Repuestos Tunari S.A.","Andina Textil S.A."]
+        .map(function(c){return '<option>'+c+'</option>';}).join("")+'</select></label>'
+    + '<label class="fld"><span class="eyebrow">Corredor</span>'
+      + '<select id="f-corredor">'+["Arica – La Paz","Ilo – La Paz","Iquique – Oruro","Arica – Cochabamba","Santa Cruz – Santos"]
+        .map(function(c){return '<option>'+c+'</option>';}).join("")+'</select></label>'
+    + '<label class="fld"><span class="eyebrow">Descripción de la carga</span>'
+      + '<input id="f-carga" type="text" value="Carga general paletizada"></label>'
+    + '<label class="fld"><span class="eyebrow">Peso bruto (kg)</span>'
+      + '<input id="f-peso" type="text" value="18500"></label>'
+    + '<label class="fld"><span class="eyebrow">Retiro</span>'
+      + '<input id="f-retiro" type="text" value="24 sep 2026 · 07:00"></label>'
+    + '<label class="fld"><span class="eyebrow">Entrega comprometida</span>'
+      + '<input id="f-entrega" type="text" value="26 sep 2026"></label>'
+    + '</div>'
+    + '<label class="chk"><input type="checkbox" id="f-peligrosa"> '
+      + '<span>Mercadería peligrosa — exige transportista con certificación específica</span></label>'
+    + '<div style="margin-top:18px;display:flex;gap:10px;flex-wrap:wrap">'
+    + '<button class="btn btn-primary btn-lg" id="btn-crear">Crear envío y buscar transportista</button>'
+    + '<button class="btn" data-back="transito">Cancelar</button></div>'
+    + '</div><div class="card-note">El envío se crea como despacho abierto. El motor de asignación solo puede adjudicarlo a transportistas con documentación vigente para esa carga.</div></div>';
+}
+
+function viewRendimiento(){
+  var pct=Math.round(PERF.aTiempo/PERF.total*100);
+  return pageHead("Operación","Rendimiento de entregas",
+    "Cómo viene la operación en "+PERF.periodo+": puntualidad, tiempos por corredor y dónde se concentran las incidencias.")
+    + tiles([
+      {k:"Entregas a tiempo",v:String(pct),u:"%",n:PERF.aTiempo+" de "+PERF.total+" envíos"},
+      {k:"Entregas tardías",v:String(PERF.tarde),n:"Fuera de la fecha comprometida"},
+      {k:"Incidencias",v:String(PERF.incidencias),n:"Demoras en frontera o aduana"},
+      {k:"Tránsito medio",v:String(PERF.horasMedias),u:" h",n:"Puerta a puerta, todos los corredores"}])
+    + '<div class="card"><div class="card-head"><h3>Puntualidad por corredor</h3>'
+      + '<span class="spacer"></span><span class="t-sub">'+PERF.periodo+'</span></div>'
+      + '<div class="tw"><table><thead><tr><th>Corredor</th><th class="r">Envíos</th><th>Puntualidad</th><th class="r">Tránsito medio</th><th class="r">Incidencias</th></tr></thead><tbody>'
+      + PERF.corredores.map(function(c){
+          return '<tr><td class="t-strong">'+c.n+'</td>'
+            +'<td class="r mono">'+c.envios+'</td>'
+            +'<td><div class="meter-row"><div class="meter'+(c.puntual>=94?" is-full":(c.puntual<90?" is-low":""))+'">'
+              +'<i style="width:'+c.puntual+'%"></i></div><span class="mono">'+c.puntual+'%</span></div></td>'
+            +'<td class="r mono">'+c.horas+' h</td>'
+            +'<td class="r mono">'+c.incid+'</td></tr>';}).join("")
+      + '</tbody></table></div>'
+      + '<div class="card-note">El corredor más confiable es <b>'+PERF.mejorCorredor+'</b>. Los tránsitos largos concentran las incidencias: a más horas en ruta, más exposición a cola de frontera.</div></div>'
+    + '<div class="card"><div class="card-head"><h3>Últimas entregas</h3></div>'
+      + '<div class="tw"><table><thead><tr><th>Trámite</th><th>Cliente</th><th>Transportista</th><th>Entregado</th><th>Resultado</th></tr></thead><tbody>'
+      + SHIPMENTS.filter(function(s){return s.estado==="entregado";}).map(function(s){
+          var c=carrierBy(s.carrierId);
+          return '<tr class="clickable" data-ship="'+s.code+'"><td class="mono t-strong">'+s.code+'</td>'
+            +'<td>'+s.cliente+'</td><td class="t-sub">'+(c?c.n:"—")+'</td>'
+            +'<td class="mono t-sub">'+s.entregado+'</td>'
+            +'<td>'+(s.puntual?badge("b-ok","A tiempo"):badge("b-warn","Fuera de fecha"))+'</td></tr>';}).join("")
+      + '</tbody></table></div></div>';
 }
 function viewShipDetail(code){
   var s=shipmentBy(code); if(!s) return "";
@@ -1212,6 +1378,8 @@ function render(){
   else if(S.sec==="asignacion") h=viewAsignacion();
   else if(S.sec==="aprobaciones") h=S.carrierOpen?viewCarrierDetail(S.carrierOpen):viewAprobaciones();
   else if(S.sec==="transito") h=viewTransito();
+  else if(S.sec==="nuevo") h=viewNuevo();
+  else if(S.sec==="rendimiento") h=viewRendimiento();
   else if(S.sec==="perfil") h=viewPerfil();
   else if(S.sec==="cargas") h=viewCargasTransportista();
   $("content").innerHTML=h;
@@ -1235,6 +1403,12 @@ function wire(){
   on("[data-subir]",function(el){var p=el.getAttribute("data-subir").split("|");subir(p[0],p[1]);});
   var btnA=$("btn-asignar");
   if(btnA) btnA.addEventListener("click",function(){asignar(btnA.getAttribute("data-load"));});
+  on("[data-filtro]",function(el){S.filtro=el.getAttribute("data-filtro");render();});
+  var tr=$("track");
+  if(tr) tr.addEventListener("input",function(){S.track=tr.value;render();
+    var nt=$("track"); if(nt){nt.focus();nt.setSelectionRange(nt.value.length,nt.value.length);}});
+  var cr=$("btn-crear");
+  if(cr) cr.addEventListener("click",crearEnvio);
   var q=$("q");
   if(q) q.addEventListener("input",function(){S.q=q.value;render();
     var nq=$("q"); if(nq){nq.focus();nq.setSelectionRange(nq.value.length,nq.value.length);}});
@@ -1282,6 +1456,23 @@ function asignar(id){
   g.c.asignadas30d++;
   renderNav();render();window.scrollTo(0,0);
   toast("Asignado a "+g.c.n+" · unidad "+g.c.placa+" · puntaje "+g.p.total+".");
+}
+var seqEnvio=860;
+function crearEnvio(){
+  var cli=$("f-cliente").value, corr=$("f-corredor").value;
+  var peso=parseInt(String($("f-peso").value).replace(/\D/g,""),10)||0;
+  if(peso<=0){ toast("Poné un peso válido en kilos."); return; }
+  seqEnvio++;
+  var partes=corr.split(" – ");
+  var l={id:"CG-2026-0"+(414+LOADS.length),exp:"IMP-2026-0"+seqEnvio,cliente:cli,
+    origen:partes[0],destino:partes[1],corredor:partes[0]+"–"+partes[1],peso:peso,
+    carga:$("f-carga").value||"Carga general",peligrosa:$("f-peligrosa").checked,
+    retiro:$("f-retiro").value,entregaISO:"2026-09-26",entrega:$("f-entrega").value,asignado:null};
+  LOADS.push(l);
+  var r=evaluarTodos(l);
+  S.sec="asignacion"; S.loadOpen=l.id;
+  renderNav(); render(); window.scrollTo(0,0);
+  toast("Envío "+l.exp+" creado. "+r.elegibles.length+" transportista"+(r.elegibles.length===1?"":"s")+" puede"+(r.elegibles.length===1?"":"n")+" tomarlo.");
 }
 function uploadMissing(){
   var e=expBy(S.expOpen); if(!e) return;
