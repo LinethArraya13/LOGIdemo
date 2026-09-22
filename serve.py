@@ -7,7 +7,7 @@ porque la plataforma de Artifacts los agrega al publicar. Este servidor
 reproduce ese mismo envoltorio en local, para que lo que ves en el navegador
 sea igual a lo que se publica. Reenvuelve en cada request: guardás y refrescás.
 """
-import http.server, socketserver, pathlib
+import http.server, pathlib
 
 ROOT = pathlib.Path(__file__).resolve().parent
 PORT = 5173
@@ -51,7 +51,11 @@ class Handler(http.server.SimpleHTTPRequestHandler):
         pass
 
 if __name__ == "__main__":
-    socketserver.TCPServer.allow_reuse_address = True
-    with socketserver.TCPServer(("127.0.0.1", PORT), Handler) as httpd:
+    # ThreadingHTTPServer y no TCPServer: el navegador mantiene varias
+    # conexiones keep-alive abiertas, y un servidor de un solo hilo se queda
+    # bloqueado atendiendo la primera.
+    http.server.ThreadingHTTPServer.allow_reuse_address = True
+    http.server.ThreadingHTTPServer.daemon_threads = True
+    with http.server.ThreadingHTTPServer(("127.0.0.1", PORT), Handler) as httpd:
         print(f"Demo DMS en http://127.0.0.1:{PORT}  (Ctrl+C para parar)", flush=True)
         httpd.serve_forever()
