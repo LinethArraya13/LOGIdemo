@@ -578,40 +578,149 @@ tr.excl td:first-child{color:var(--muted)}
 <script>
 (function(){
 "use strict";
-var HOY="22 sep 2026";
-var $=function(id){return document.getElementById(id);};
-var nf=function(n){return (n||0).toLocaleString("de-DE");};
-var mb=function(n){return n>=1024?(n/1024).toFixed(1).replace(".",",")+" GB":n.toFixed(1).replace(".",",")+" MB";};
-var esc=function(t){return String(t).replace(/[&<>"]/g,function(c){
-  return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c];});};
 
-/* Generador determinista: el demo se ve igual en cada carga */
-var _seed=20260922;
-function rnd(){_seed=(_seed*1103515245+12345)&0x7fffffff;return _seed/0x7fffffff;}
-function pick(a){return a[Math.floor(rnd()*a.length)];}
-function ri(a,b){return a+Math.floor(rnd()*(b-a+1));}
+var HOY="23 sep 2026";
 
-/* ===================== SERVICIOS ===================== */
-var SERVICIOS=[
+var Dom={
+  byId:function(id){return document.getElementById(id);},
+  all:function(root,sel){return Array.prototype.slice.call(root.querySelectorAll(sel));},
+  on:function(el,ev,fn){if(el)el.addEventListener(ev,fn);},
+  html:function(id,h){var e=Dom.byId(id);if(e)e.innerHTML=h;},
+  hide:function(id,v){var e=Dom.byId(id);if(e)e.hidden=v;}
+};
+
+var Fmt={
+  num:function(n){return (n||0).toLocaleString("de-DE");},
+  size:function(n){return n>=1024?(n/1024).toFixed(1).replace(".",",")+" GB"
+    :n.toFixed(1).replace(".",",")+" MB";},
+  pct:function(n){return Math.round(n)+"%";},
+  esc:function(t){return String(t).replace(/[&<>"]/g,function(c){
+    return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c];});},
+  iso:function(f){
+    var p=String(f).split(" ");
+    if(p.length<3) return "2099-12-31";
+    return p[2]+"-"+(Seed.MESES[p[1]]||"01")+"-"+("0"+p[0]).slice(-2);
+  },
+  hora:function(){return HOY+" · "+Rng.int(8,18)+":"+("0"+Rng.int(0,59)).slice(-2);}
+};
+
+var Rng=(function(){
+  var seed=20260923;
+  function next(){seed=(seed*1103515245+12345)&0x7fffffff;return seed/0x7fffffff;}
+  return {next:next,
+    pick:function(a){return a[Math.floor(next()*a.length)];},
+    int:function(a,b){return a+Math.floor(next()*(b-a+1));}};
+})();
+
+var UI={
+  badge:function(cls,txt){
+    return '<span class="badge '+cls+'"><span class="dot"></span>'+txt+'</span>';},
+  pair:function(p){return UI.badge(p[0],p[1]);},
+  pill:function(l,v){return '<span class="pill">'+l+' <b>'+v+'</b></span>';},
+  head:function(o){
+    return '<div class="ph"><div class="ph-t">'
+      +(o.eyebrow?'<span class="eyebrow">'+o.eyebrow+'</span>':'')
+      +'<h2>'+o.t+'</h2></div>'
+      +(o.meta?'<div class="ph-meta">'+o.meta+'</div>':'')
+      +(o.act?'<div class="ph-act">'+o.act+'</div>':'')+'</div>';},
+  tiles:function(a){
+    return '<div class="tiles">'+a.map(function(t){
+      return '<div class="tile"><span class="tile-k">'+t.k+'</span>'
+        +'<span class="tile-v">'+t.v+(t.u?'<small>'+t.u+'</small>':'')+'</span>'
+        +(t.n?'<span class="tile-n">'+t.n+'</span>':'')+'</div>';}).join("")+'</div>';},
+  card:function(title,body,act,note){
+    return '<div class="card"><div class="card-head"><h3>'+title+'</h3>'
+      +(act?'<span class="spacer"></span>'+act:'')+'</div>'+body
+      +(note?'<div class="card-note">'+note+'</div>':'')+'</div>';},
+  table:function(cols,rows){
+    return '<div class="tw"><table><thead><tr>'
+      +cols.map(function(c){return '<th'+(c.r?' class="r"':'')+'>'+c.t+'</th>';}).join("")
+      +'</tr></thead><tbody>'+(rows||'')+'</tbody></table></div>';},
+  empty:function(n,msg){
+    return '<tr><td colspan="'+n+'" class="t-sub" style="padding:22px;text-align:center">'
+      +msg+'</td></tr>';},
+  meter:function(p,cls){
+    return '<div class="meter-row"><div class="meter'+(cls||"")+'">'
+      +'<i style="width:'+p+'%"></i></div><span class="mono">'+p+'%</span></div>';},
+  alert:function(t,d,cls){
+    return '<div class="alert '+(cls||"")+'"><span class="dot"></span><div><b>'+t+'</b>'
+      +(d?'<p>'+d+'</p>':'')+'</div></div>';},
+  chips:function(defs,activo,attr){
+    return defs.map(function(f){
+      return '<button class="chip'+(activo===f[0]?" is-on":"")+'" data-'+attr+'="'+f[0]+'">'
+        +f[1]+'<span class="chip-n">'+f[2]+'</span></button>';}).join("");},
+  kv:function(rows){
+    return '<div class="kvlist">'+rows.map(function(r){
+      return '<div class="kvrow"><span>'+r[0]+'</span><span>'+r[1]+'</span></div>';}).join("")+'</div>';},
+  grid:function(rows){
+    return '<div class="grid-kv">'+rows.map(function(r){
+      return '<div class="kv"><span class="eyebrow">'+r[0]+'</span><b>'+r[1]+'</b></div>';}).join("")+'</div>';}
+};
+
+var Toast=(function(){
+  var t=null;
+  return {show:function(msg){
+    var o=document.querySelector(".toast"); if(o) o.remove();
+    var d=document.createElement("div"); d.className="toast"; d.textContent=msg;
+    document.body.appendChild(d);
+    if(t) clearTimeout(t);
+    t=setTimeout(function(){if(d.parentNode)d.remove();},4200);}};
+})();
+
+var Modal=(function(){
+  var abierto=false;
+  function close(){abierto=false;Dom.html("modal-root","");}
+  function open(title,body,footer,onWire){
+    abierto=true;
+    Dom.html("modal-root",
+      '<div class="mbg" id="mbg"><div class="modal" role="dialog" aria-modal="true">'
+      +'<div class="modal-h"><h3>'+title+'</h3><button class="btn" id="m-x">Cerrar</button></div>'
+      +'<div class="modal-b">'+body+'</div>'
+      +(footer?'<div class="modal-f">'+footer+'</div>':'')+'</div></div>');
+    Dom.on(Dom.byId("m-x"),"click",close);
+    Dom.on(Dom.byId("mbg"),"click",function(e){if(e.target.id==="mbg")close();});
+    Dom.on(Dom.byId("m-cancel"),"click",close);
+    if(onWire) onWire();
+  }
+  return {open:open,close:close,isOpen:function(){return abierto;}};
+})();
+
+var Session=(function(){
+  var rol=null;
+  return {
+    set:function(r){rol=r;},
+    clear:function(){rol=null;},
+    rol:function(){return rol;},
+    id:function(){return rol?rol.id:null;},
+    nombre:function(){return rol?rol.name:"";},
+    entidad:function(){return rol?rol.entidad:"";},
+    modulos:function(){return rol?rol.mods:[];},
+    puede:function(m){return rol&&rol.mods.indexOf(m)>=0;},
+    clienteId:function(){return rol&&rol.cliente?rol.cliente:null;},
+    traId:function(){return rol&&rol.traId?rol.traId:null;},
+    esInterno:function(){return rol&&!rol.cliente&&!rol.traId;}
+  };
+})();
+
+var State={
+  mod:"dashboard",cliOpen:null,cliTab:"resumen",demOpen:null,viaOpen:null,traOpen:null,
+  docCat:"todas",docEstado:"todos",docOp:"todas",docQ:"",docPage:1,
+  q:"",filtro:"todos",
+  reset:function(){
+    this.cliOpen=null;this.demOpen=null;this.viaOpen=null;this.traOpen=null;
+    this.docPage=1;this.q="";}
+};
+var Seed={
+  SERVICIOS: [
  {id:"imp",n:"Importación"},{id:"exp",n:"Exportación"},
  {id:"tnac",n:"Transporte nacional"},{id:"tint",n:"Transporte internacional"},
  {id:"adu",n:"Aduana"},{id:"alm",n:"Almacenamiento"},
- {id:"seg",n:"Seguro de carga"},{id:"p2p",n:"Entrega puerta a puerta"}];
-var servN=function(id){for(var i=0;i<SERVICIOS.length;i++){if(SERVICIOS[i].id===id)return SERVICIOS[i].n;}return id;};
-
-/* ===================== CLIENTES ===================== */
-var ETAPAS=[
+ {id:"seg",n:"Seguro de carga"},{id:"p2p",n:"Entrega puerta a puerta"}],
+  ETAPAS: [
  {id:"prospecto",n:"Prospecto"},{id:"contactado",n:"Contactado"},
  {id:"oportunidad",n:"Oportunidad"},{id:"activo",n:"Cliente activo"},
- {id:"fidelizacion",n:"Fidelización"}];
-var etapaN=function(id){for(var i=0;i<ETAPAS.length;i++){if(ETAPAS[i].id===id)return ETAPAS[i].n;}return id;};
-var etapaBadge=function(id){
-  var m={prospecto:"b-neutral",contactado:"b-accent",oportunidad:"b-warn",
-         activo:"b-ok",fidelizacion:"b-ok"};
-  return [m[id]||"b-neutral",etapaN(id)];
-};
-
-var CLIENTES=[
+ {id:"fidelizacion",n:"Fidelización"}],
+  CLIENTES: [
  {id:"C001",n:"Comercial Andina S.R.L.",nit:"1028374650",ciudad:"La Paz",tipo:"Importador",
   etapa:"fidelizacion",ejecutivo:"Ana Quispe",desde:"mar 2023",
   serv:["imp","adu","tint","alm","p2p"],ultima:"19 sep 2026",proximo:"25 sep 2026",
@@ -661,11 +770,8 @@ var CLIENTES=[
   contactos:[{n:"Iván Peña",c:"Gerente Comercial",t:"+591 4 425-6612",m:"ipena@central.demo"}]},
  {id:"C013",n:"Agroindustrias Yapacaní S.A.",nit:"1044009980",ciudad:"Santa Cruz",tipo:"Exportador",
   etapa:"prospecto",ejecutivo:"Ana Quispe",desde:"—",serv:[],ultima:"05 sep 2026",proximo:"01 oct 2026",
-  contactos:[{n:"Tomás Áñez",c:"Operaciones",t:"+591 3 392-4478",m:"tanez@yapacani.demo"}]}];
-var cliBy=function(id){for(var i=0;i<CLIENTES.length;i++){if(CLIENTES[i].id===id)return CLIENTES[i];}return null;};
-
-/* ===================== OPORTUNIDADES ===================== */
-var OPORTUNIDADES=[
+  contactos:[{n:"Tomás Áñez",c:"Operaciones",t:"+591 3 392-4478",m:"tanez@yapacani.demo"}]}],
+  OPORTUNIDADES: [
  {id:"OP-041",cli:"C007",t:"Exportación de concentrado de zinc",serv:"exp",valor:48000,etapa:"oportunidad",prob:65,cierre:"10 oct 2026"},
  {id:"OP-042",cli:"C008",t:"Importación de línea blanca",serv:"imp",valor:32500,etapa:"oportunidad",prob:50,cierre:"15 oct 2026"},
  {id:"OP-043",cli:"C009",t:"Importación de insumos farmacéuticos",serv:"imp",valor:27800,etapa:"contactado",prob:30,cierre:"28 oct 2026"},
@@ -677,11 +783,9 @@ var OPORTUNIDADES=[
  {id:"OP-049",cli:"C012",t:"Importación de repuestos industriales",serv:"imp",valor:35100,etapa:"prospecto",prob:10,cierre:"25 nov 2026"},
  {id:"OP-050",cli:"C006",t:"Ampliación: transporte internacional",serv:"tint",valor:12900,etapa:"oportunidad",prob:40,cierre:"12 oct 2026"},
  {id:"OP-051",cli:"C013",t:"Exportación de soya en grano",serv:"exp",valor:41200,etapa:"prospecto",prob:15,cierre:"30 nov 2026"},
- {id:"OP-052",cli:"C003",t:"Ampliación: almacenamiento aduanero",serv:"alm",valor:11500,etapa:"oportunidad",prob:50,cierre:"14 oct 2026"}];
-
-/* ===================== ACTIVIDADES ===================== */
-var ACT_TIPOS={llamada:"Llamada",email:"Correo",reunion:"Reunión",visita:"Visita",tarea:"Tarea"};
-var ACTIVIDADES=[
+ {id:"OP-052",cli:"C003",t:"Ampliación: almacenamiento aduanero",serv:"alm",valor:11500,etapa:"oportunidad",prob:50,cierre:"14 oct 2026"}],
+  ACT_TIPOS: {llamada:"Llamada",email:"Correo",reunion:"Reunión",visita:"Visita",tarea:"Tarea"},
+  ACTIVIDADES: [
  {id:"A-201",cli:"C004",tipo:"llamada",fecha:"23 sep 2026",asunto:"Confirmar retiro en puerto Arica",estado:"pendiente",resp:"Ana Quispe"},
  {id:"A-202",cli:"C008",tipo:"reunion",fecha:"23 sep 2026",asunto:"Presentación de propuesta",estado:"pendiente",resp:"Ana Quispe"},
  {id:"A-203",cli:"C007",tipo:"visita",fecha:"24 sep 2026",asunto:"Visita a planta en Oruro",estado:"pendiente",resp:"Rodrigo Salazar"},
@@ -695,10 +799,8 @@ var ACTIVIDADES=[
  {id:"A-211",cli:"C007",tipo:"llamada",fecha:"18 sep 2026",asunto:"Primer contacto comercial",estado:"hecha",resp:"Rodrigo Salazar"},
  {id:"A-212",cli:"C002",tipo:"visita",fecha:"17 sep 2026",asunto:"Inspección de carga en planta",estado:"hecha",resp:"Ana Quispe"},
  {id:"A-213",cli:"C005",tipo:"email",fecha:"12 sep 2026",asunto:"Confirmación de embarque a Callao",estado:"hecha",resp:"Rodrigo Salazar"},
- {id:"A-214",cli:"C006",tipo:"tarea",fecha:"08 sep 2026",asunto:"Cargar documentos de desaduanización",estado:"hecha",resp:"Ana Quispe"}];
-
-/* ===================== OPERACIONES ===================== */
-var OPERACIONES=[
+ {id:"A-214",cli:"C006",tipo:"tarea",fecha:"08 sep 2026",asunto:"Cargar documentos de desaduanización",estado:"hecha",resp:"Ana Quispe"}],
+  OPERACIONES: [
  {id:"IMP-2026-0847",cli:"C004",tipo:"imp",ruta:"Arica → Tambo Quemado → La Paz",modal:"FCL 40'",peso:24100,
   merc:"Conductores eléctricos de cobre",estado:"transito",abierta:"02 sep 2026",fob:41280},
  {id:"IMP-2026-0855",cli:"C004",tipo:"imp",ruta:"Arica → Tambo Quemado → La Paz",modal:"FCL 20'",peso:18300,
@@ -722,15 +824,8 @@ var OPERACIONES=[
  {id:"IMP-2026-0858",cli:"C001",tipo:"imp",ruta:"Arica → Tambo Quemado → La Paz",modal:"FCL 40' HC",peso:28200,
   merc:"Mobiliario y menaje",estado:"transito",abierta:"16 sep 2026",fob:74900},
  {id:"EXP-2026-0198",cli:"C001",tipo:"exp",ruta:"La Paz → Arica",modal:"LCL",peso:4600,
-  merc:"Artesanía y textil andino",estado:"cerrada",abierta:"18 jun 2026",fob:28400}];
-var opBy=function(id){for(var i=0;i<OPERACIONES.length;i++){if(OPERACIONES[i].id===id)return OPERACIONES[i];}return null;};
-var opEstado=function(e){
-  var m={transito:["b-accent","En tránsito"],aduana:["b-warn","En aduana"],puerto:["b-warn","En puerto"],
-         docs:["b-neutral","Documentación"],cerrada:["b-ok","Cerrada"]};
-  return m[e]||["b-neutral","—"];};
-
-/* ===================== DOCUMENTOS ===================== */
-var DOC_CATS=[
+  merc:"Artesanía y textil andino",estado:"cerrada",abierta:"18 jun 2026",fob:28400}],
+  DOC_CATS: [
  {id:"factura",n:"Factura comercial",fmt:"PDF"},
  {id:"packing",n:"Packing list",fmt:"XLSX"},
  {id:"transporte",n:"Documento de transporte",fmt:"PDF"},
@@ -740,55 +835,17 @@ var DOC_CATS=[
  {id:"contrato",n:"Contratos",fmt:"PDF"},
  {id:"clientedoc",n:"Documentación del cliente",fmt:"PDF"},
  {id:"inspeccion",n:"Fotos de inspección",fmt:"JPG"},
- {id:"seguro",n:"Póliza de seguro",fmt:"PDF"}];
-var catN=function(id){for(var i=0;i<DOC_CATS.length;i++){if(DOC_CATS[i].id===id)return DOC_CATS[i];}return {id:id,n:id,fmt:"PDF"};};
-var DOC_ESTADOS={aprobado:["b-ok","Aprobado"],pendiente:["b-warn","Pendiente"],
-  rechazado:["b-crit","Rechazado"],vencido:["b-crit","Vencido"]};
-
-var DOCS=[];
-(function genDocs(){
-  var meses=["jun","jul","ago","sep"];
-  var seq=1000;
-  OPERACIONES.forEach(function(op){
-    /* Comercial Andina concentra el volumen alto: es el caso de prueba */
-    var densidad = op.cli==="C001" ? ri(26,34) : ri(8,14);
-    for(var i=0;i<densidad;i++){
-      var cat=pick(DOC_CATS);
-      var esFoto=cat.id==="inspeccion";
-      var size=esFoto?ri(18,42)+rnd():(cat.fmt==="XLSX"?0.3+rnd()*0.9:1.2+rnd()*7.5);
-      var est=rnd()<0.70?"aprobado":(rnd()<0.75?"pendiente":(rnd()<0.6?"rechazado":"vencido"));
-      seq++;
-      DOCS.push({
-        id:"D"+seq, cli:op.cli, op:op.id, cat:cat.id, fmt:cat.fmt,
-        n:cat.n.replace(/ /g,"_")+"_"+op.id+(esFoto?"_lote"+ri(1,3):"_v"+ri(1,3))+"."+cat.fmt.toLowerCase(),
-        size:Math.round(size*10)/10, estado:est,
-        fecha:ri(1,28)+" "+pick(meses)+" 2026",
-        por:pick(["Ana Quispe","Rodrigo Salazar","Marcela Ortiz","Sistema"]),
-        dup:false});
-    }
-  });
-  /* Duplicados deliberados: el sistema debe detectarlos */
-  var base=DOCS.filter(function(d){return d.cli==="C001";});
-  for(var k=0;k<4;k++){
-    var o=base[ri(0,base.length-1)];
-    seq++;
-    DOCS.push({id:"D"+seq,cli:o.cli,op:o.op,cat:o.cat,fmt:o.fmt,n:o.n,size:o.size,
-      estado:"pendiente",fecha:"21 sep 2026",por:"Marcela Ortiz",dup:true});
-  }
-})();
-var docsDe=function(cli){return DOCS.filter(function(d){return d.cli===cli;});};
-
-/* ===================== TRANSPORTISTAS ===================== */
-var CERT_TIPOS=[
+ {id:"seguro",n:"Póliza de seguro",fmt:"PDF"}],
+  DOC_ESTADOS: {aprobado:["b-ok","Aprobado"],pendiente:["b-warn","Pendiente"],
+  rechazado:["b-crit","Rechazado"],vencido:["b-crit","Vencido"]},
+  CERT_TIPOS: [
  {id:"licencia",n:"Licencia categoría C",oblig:true},
  {id:"seguro",n:"Seguro de carga",oblig:true},
  {id:"habilitacion",n:"Habilitación Viceministerio",oblig:true},
  {id:"antecedentes",n:"Antecedentes del conductor",oblig:true},
  {id:"defensivo",n:"Manejo defensivo",oblig:false},
- {id:"peligrosa",n:"Carga peligrosa",oblig:false}];
-var certN=function(id){for(var i=0;i<CERT_TIPOS.length;i++){if(CERT_TIPOS[i].id===id)return CERT_TIPOS[i].n;}return id;};
-
-var TRANSPORTISTAS=[
+ {id:"peligrosa",n:"Carga peligrosa",oblig:false}],
+  TRANSPORTISTAS: [
  {id:"T01",n:"Transportes Illimani S.R.L.",contacto:"Javier Mamani",tel:"+591 7 145-2230",
   tipo:"Internacional",cobertura:["Arica–La Paz","Ilo–La Paz"],cap:28,
   vehiculos:["Tracto + semirremolque","Furgón 15 t"],disp:"disponible",viajes:212,cumpl:96,
@@ -858,28 +915,14 @@ var TRANSPORTISTAS=[
          habilitacion:{est:"pendiente",em:"21 nov 2024",ven:"21 nov 2027"},
          antecedentes:{est:"pendiente",em:"01 dic 2025",ven:"01 dic 2027"},
          defensivo:{est:"ausente",em:"—",ven:"—"},
-         peligrosa:{est:"ausente",em:"—",ven:"—"}}}];
-var traBy=function(id){for(var i=0;i<TRANSPORTISTAS.length;i++){if(TRANSPORTISTAS[i].id===id)return TRANSPORTISTAS[i];}return null;};
-
-var CERT_EST={aprobado:["b-ok","Aprobado"],pendiente:["b-warn","Pendiente"],
-  vencido:["b-crit","Vencido"],ausente:["b-neutral","No presentado"]};
-function certEstado(t){
-  var pend=0,mal=0;
-  CERT_TIPOS.forEach(function(c){
-    if(!c.oblig) return;
-    var d=t.certs[c.id];
-    if(d.est==="pendiente") pend++; else if(d.est!=="aprobado") mal++;});
-  if(mal>0) return {cls:"b-crit",txt:"No certificado",code:"no"};
-  if(pend>0) return {cls:"b-warn",txt:"Validación pendiente",code:"pend"};
-  return {cls:"b-ok",txt:"Certificado",code:"ok"};
-}
-var DISP={disponible:["b-ok","Disponible"],en_viaje:["b-accent","En viaje"],no_disponible:["b-neutral","No disponible"]};
-
-/* ===================== DEMANDAS DE CARGA ===================== */
-var PRIOR={alta:["b-crit","Alta"],media:["b-warn","Media"],baja:["b-neutral","Baja"]};
-var DEM_EST={borrador:["b-neutral","Borrador"],publicada:["b-accent","Publicada"],
-  asignada:["b-warn","Asignada"],confirmada:["b-ok","Confirmada"],cerrada:["b-ok","Cerrada"]};
-var DEMANDAS=[
+         peligrosa:{est:"ausente",em:"—",ven:"—"}}}],
+  CERT_EST: {aprobado:["b-ok","Aprobado"],pendiente:["b-warn","Pendiente"],
+  vencido:["b-crit","Vencido"],ausente:["b-neutral","No presentado"]},
+  DISP: {disponible:["b-ok","Disponible"],en_viaje:["b-accent","En viaje"],no_disponible:["b-neutral","No disponible"]},
+  PRIOR: {alta:["b-crit","Alta"],media:["b-warn","Media"],baja:["b-neutral","Baja"]},
+  DEM_EST: {borrador:["b-neutral","Borrador"],publicada:["b-accent","Publicada"],
+  asignada:["b-warn","Asignada"],confirmada:["b-ok","Confirmada"],cerrada:["b-ok","Cerrada"]},
+  DEMANDAS: [
  {id:"DC-0412",cli:"C004",op:"IMP-2026-0847",origen:"Arica",destino:"La Paz",corredor:"Arica–La Paz",
   carga:"24 sep 2026",entrega:"26 sep 2026",entregaISO:"2026-09-26",merc:"Conductores eléctricos de cobre",
   peligrosa:false,peso:24100,vol:58,vehiculo:"Tracto + semirremolque",prior:"alta",
@@ -899,56 +942,13 @@ var DEMANDAS=[
  {id:"DC-0416",cli:"C002",op:"EXP-2026-0213",origen:"Santa Cruz",destino:"Santos",corredor:"Santa Cruz–Santos",
   carga:"29 sep 2026",entrega:"04 oct 2026",entregaISO:"2026-10-04",merc:"Quinua real orgánica",
   peligrosa:false,peso:26000,vol:68,vehiculo:"Portacontenedor 40'",prior:"media",
-  estado:"borrador",tra:null}];
-var demBy=function(id){for(var i=0;i<DEMANDAS.length;i++){if(DEMANDAS[i].id===id)return DEMANDAS[i];}return null;};
-
-/* ===================== MATCHING ===================== */
-function evaluar(t,d){
-  var st=certEstado(t);
-  if(st.code==="no"){
-    var f=CERT_TIPOS.filter(function(c){return c.oblig&&t.certs[c.id].est!=="aprobado";})
-      .map(function(c){return c.n.toLowerCase();});
-    return {motivo:"Certificación no vigente: "+f.join(", "),regla:1};}
-  if(st.code==="pend") return {motivo:"Validación de documentos pendiente",regla:1};
-  if(t.certs.seguro.est==="aprobado"&&isoDe(t.certs.seguro.ven)<d.entregaISO)
-    return {motivo:"Seguro vence el "+t.certs.seguro.ven+", antes de la entrega",regla:2};
-  if(d.peligrosa&&t.certs.peligrosa.est!=="aprobado")
-    return {motivo:"Sin certificación de carga peligrosa",regla:3};
-  if(t.cobertura.indexOf(d.corredor)<0) return {motivo:"No cubre "+d.corredor,regla:4};
-  if(t.cap*1000<d.peso) return {motivo:"Capacidad "+t.cap+" t < "+nf(d.peso)+" kg",regla:5};
-  if(t.disp==="no_disponible") return {motivo:"No disponible en la fecha de carga",regla:6};
-  return null;
-}
-var MESES={ene:"01",feb:"02",mar:"03",abr:"04",may:"05",jun:"06",jul:"07",ago:"08",sep:"09",oct:"10",nov:"11",dic:"12"};
-function isoDe(f){
-  var p=String(f).split(" ");
-  if(p.length<3) return "2099-12-31";
-  return p[2]+"-"+(MESES[p[1]]||"01")+"-"+("0"+p[0]).slice(-2);
-}
-function puntaje(t,d){
-  var cumpl=(t.cumpl/100)*40;
-  var rot=((12-Math.min(t.asignadas30d,12))/12)*30;
-  var prox=(t.en===d.origen)?20:6;
-  var disp=(t.disp==="disponible")?10:0;
-  return {total:Math.round(cumpl+rot+prox+disp),cumpl:Math.round(cumpl),
-          rot:Math.round(rot),prox:prox,disp:disp};
-}
-function candidatos(d){
-  var ok=[],no=[];
-  TRANSPORTISTAS.forEach(function(t){
-    var r=evaluar(t,d);
-    if(r) no.push({t:t,motivo:r.motivo,regla:r.regla}); else ok.push({t:t,p:puntaje(t,d)});});
-  ok.sort(function(a,b){return b.p.total-a.p.total;});
-  no.sort(function(a,b){return a.regla-b.regla;});
-  return {ok:ok,no:no};
-}
-
-/* ===================== VIAJES ===================== */
-var VIAJE_EST={pendiente:["b-neutral","Pendiente"],asignado:["b-warn","Asignado"],
+  estado:"borrador",tra:null}],
+  MESES: {ene:"01",feb:"02",mar:"03",abr:"04",may:"05",jun:"06",jul:"07",ago:"08",sep:"09",oct:"10",nov:"11",dic:"12"},
+  VIAJE_EST: {pendiente:["b-neutral","Pendiente"],asignado:["b-warn","Asignado"],
   confirmado:["b-accent","Confirmado"],carga:["b-accent","En carga"],
   transito:["b-accent","En tránsito"],reparto:["b-accent","En reparto"],
-  entregado:["b-ok","Entregado"],incidencia:["b-crit","Con incidencia"],cancelado:["b-neutral","Cancelado"]};
-var VIAJES=[
+  entregado:["b-ok","Entregado"],incidencia:["b-crit","Con incidencia"],cancelado:["b-neutral","Cancelado"]},
+  VIAJES: [
  {id:"VJ-1180",dem:"DC-0412",cli:"C004",tra:"T01",origen:"Arica",destino:"La Paz",
   estado:"incidencia",pct:62,eta:"26 sep 2026 · 10:00",pos:"Ruta 11-CH · km 218 · 3.940 m s.n.m.",
   inc:"Cola de 6 h en control fronterizo Tambo Quemado. ETA recalculada +4 h.",
@@ -992,17 +992,46 @@ var VIAJES=[
   entregado:"02 sep 2026 · 07:10",puntual:false,
   hitos:[{n:"Asignado",t:"26 ago · 08:00",s:"done"},{n:"Confirmado",t:"26 ago · 10:30",s:"done"},
     {n:"En carga",t:"28 ago · 09:00",s:"done"},{n:"En tránsito",t:"30 ago · 16:20",s:"done"},
-    {n:"Entregado",t:"02 sep · 07:10",s:"done"}],log:[]}];
-var viaBy=function(id){for(var i=0;i<VIAJES.length;i++){if(VIAJES[i].id===id)return VIAJES[i];}return null;};
-
-var PERF={periodo:"Septiembre 2026",total:128,aTiempo:119,tarde:9,incidencias:5,horas:41,
+    {n:"Entregado",t:"02 sep · 07:10",s:"done"}],log:[]}],
+  PERF: {periodo:"Septiembre 2026",total:128,aTiempo:119,tarde:9,incidencias:5,horas:41,
  corredores:[{n:"Arica – La Paz",envios:58,puntual:95,horas:38,incid:1},
    {n:"Ilo – La Paz",envios:31,puntual:94,horas:42,incid:1},
    {n:"Iquique – Cochabamba",envios:22,puntual:91,horas:56,incid:2},
-   {n:"Santa Cruz – Santos",envios:17,puntual:88,horas:64,incid:1}]};
-
-/* ===================== ROLES Y NAVEGACIÓN ===================== */
-var ROLES=[
+   {n:"Santa Cruz – Santos",envios:17,puntual:88,horas:64,incid:1}]},
+  RUTAS: {
+ "Arica–La Paz":{km:505,pts:[[28,150],[95,132],[150,108],[210,86],[288,62],[362,44]],
+   hitos:["Arica","Chacalluta","Tambo Quemado","Patacamaya","La Paz"]},
+ "Ilo–La Paz":{km:480,pts:[[24,158],[88,140],[152,116],[224,88],[300,64],[366,48]],
+   hitos:["Ilo","Moquegua","Desaguadero","Guaqui","La Paz"]},
+ "Iquique–Oruro":{km:440,pts:[[26,162],[96,144],[168,120],[244,92],[320,66],[368,52]],
+   hitos:["Iquique","Pozo Almonte","Colchane","Pisiga","Oruro"]},
+ "Arica–Cochabamba":{km:780,pts:[[26,156],[92,138],[158,116],[226,92],[300,70],[368,50]],
+   hitos:["Arica","Tambo Quemado","Oruro","Caracollo","Cochabamba"]},
+ "Santa Cruz–Santos":{km:2180,pts:[[24,150],[94,134],[162,112],[232,88],[302,64],[370,46]],
+   hitos:["Santa Cruz","Puerto Suárez","Corumbá","São Paulo","Santos"]}},
+  POD_REQ: {firma:true,receptor:true,fotoCarga:true,fotoLugar:false,obs:false},
+  POD_EST: {pendiente:["b-warn","Pendiente"],completado:["b-ok","Completado"],
+  rechazado:["b-crit","Rechazado"],incidencia:["b-crit","Con incidencia"]},
+  PODS: [
+ {id:"POD-1165",viaje:"VJ-1165",cli:"C005",op:"EXP-2026-0209",estado:"completado",
+  receptor:"Jorge Ayala",fecha:"10 sep 2026 · 13:20",gps:"-18.4783, -70.3126 (simulado)",
+  obs:"Recepción conforme, sin observaciones.",fotos:2,firma:true,motivo:null},
+ {id:"POD-1160",viaje:"VJ-1160",cli:"C006",op:"IMP-2026-0851",estado:"completado",
+  receptor:"Pablo Rocha",fecha:"06 sep 2026 · 08:35",gps:"-16.5000, -68.1500 (simulado)",
+  obs:"Dos bultos con embalaje dañado, carga completa.",fotos:3,firma:true,motivo:null},
+ {id:"POD-1152",viaje:"VJ-1152",cli:"C003",op:"IMP-2026-0839",estado:"incidencia",
+  receptor:"Elena Ríos",fecha:"02 sep 2026 · 07:10",gps:"-16.4897, -68.1193 (simulado)",
+  obs:"Entrega fuera de fecha comprometida.",fotos:1,firma:true,motivo:null}],
+  FLUJO_TRA: [
+ {id:"asignado",n:"Asignado"},{id:"aceptado",n:"Aceptado"},
+ {id:"a_cargar",n:"En camino a cargar"},{id:"carga",n:"En carga"},
+ {id:"cargado",n:"Carga completada"},{id:"transito",n:"En tránsito"},
+ {id:"destino",n:"En destino"},{id:"entregado",n:"Entrega realizada"}],
+  TIPOS_INC: ["Demora en frontera","Falla mecánica","Bloqueo de ruta","Carga dañada",
+  "Documentación observada","Condiciones climáticas"],
+  CLI_TABS: [["resumen","Resumen"],["operaciones","Operaciones"],["documentos","Documentos"],
+  ["servicios","Servicios"],["actividades","Actividades"],["contactos","Contactos"],["historial","Historial"]],
+  ROLES: [
  {id:"ops",name:"Operaciones",mail:"operaciones@dms.demo",entidad:"DMS Bolivia S.R.L.",
   rol:"CRM, documentos, demandas y viajes",
   icon:'<path d="M3 5.5h10M3 9h10M3 12.5h7"/>',
@@ -1018,523 +1047,732 @@ var ROLES=[
  {id:"tra",name:"Transportista",mail:"transportista@dms.demo",entidad:"Transportes Illimani S.R.L.",
   rol:"Demandas, viajes y certificaciones",traId:"T01",
   icon:'<path d="M1.5 4.5h7.5v6H1.5z"/><path d="M9 6.5h2.5L14 9v1.5H9z"/><circle cx="4" cy="11.5" r="1.4"/><circle cx="11" cy="11.5" r="1.4"/>',
-  mods:["dashboard","misviajes","demandas","certificaciones"]}];
-
-var MODS={dashboard:"Dashboard",clientes:"Clientes",pipeline:"Pipeline",actividades:"Actividades",
+  mods:["dashboard","misviajes","demandas","certificaciones"]}],
+  MODS: {dashboard:"Dashboard",clientes:"Clientes",pipeline:"Pipeline",actividades:"Actividades",
  documentos:"Documentos",operaciones:"Operaciones",demandas:"Demandas de carga",viajes:"Viajes",
- directorio:"Directorio",certificaciones:"Certificaciones",reportes:"Reportes",misviajes:"Mis viajes"};
-var GRUPOS=[
+ directorio:"Directorio",certificaciones:"Certificaciones",reportes:"Reportes",misviajes:"Mis viajes"},
+  GRUPOS: [
  {t:"General",items:["dashboard"]},
  {t:"CRM",items:["clientes","pipeline","actividades","documentos"]},
  {t:"Operaciones",items:["operaciones","demandas","viajes","misviajes"]},
  {t:"Transportistas",items:["directorio","certificaciones"]},
- {t:"Análisis",items:["reportes"]}];
+ {t:"Análisis",items:["reportes"]}],
+};
 
-var S={role:null,mod:"dashboard",cliOpen:null,cliTab:"resumen",demOpen:null,viaOpen:null,
-  traOpen:null,docCat:"todas",docEstado:"todos",docOp:"todas",docQ:"",docPage:1,
-  q:"",filtro:"todos",modal:null};
-
-/* ===================== HELPERS DE UI ===================== */
-function badge(c,t){return '<span class="badge '+c+'"><span class="dot"></span>'+t+'</span>';}
-function bd(pair){return badge(pair[0],pair[1]);}
-function pill(l,v){return '<span class="pill">'+l+' <b>'+v+'</b></span>';}
-function ph(o){
-  return '<div class="ph"><div class="ph-t">'
-    +(o.eyebrow?'<span class="eyebrow">'+o.eyebrow+'</span>':'')
-    +'<h2>'+o.t+'</h2></div>'
-    +(o.meta?'<div class="ph-meta">'+o.meta+'</div>':'')
-    +(o.act?'<div class="ph-act">'+o.act+'</div>':'')+'</div>';
-}
-function tiles(a){return '<div class="tiles">'+a.map(function(t){
-  return '<div class="tile"><span class="tile-k">'+t.k+'</span><span class="tile-v">'+t.v
-    +(t.u?'<small>'+t.u+'</small>':'')+'</span>'+(t.n?'<span class="tile-n">'+t.n+'</span>':'')+'</div>';
-}).join("")+'</div>';}
-function card(title,body,act,note){
-  return '<div class="card"><div class="card-head"><h3>'+title+'</h3>'
-    +(act?'<span class="spacer"></span>'+act:'')+'</div>'+body
-    +(note?'<div class="card-note">'+note+'</div>':'')+'</div>';
-}
-function tbl(cols,rows){
-  return '<div class="tw"><table><thead><tr>'
-    +cols.map(function(c){return '<th'+(c.r?' class="r"':'')+'>'+c.t+'</th>';}).join("")
-    +'</tr></thead><tbody>'+(rows||'')+'</tbody></table></div>';
-}
-function meter(p,cls){
-  return '<div class="meter-row"><div class="meter'+(cls||"")+'"><i style="width:'+p+'%"></i></div>'
-    +'<span class="mono">'+p+'%</span></div>';
-}
-function alerta(t,d,cls){
-  return '<div class="alert '+(cls||"")+'"><span class="dot"></span><div><b>'+t+'</b>'
-    +(d?'<p>'+d+'</p>':'')+'</div></div>';
-}
-function emptyRow(n,msg){return '<tr><td colspan="'+n+'" class="t-sub" style="padding:22px;text-align:center">'+msg+'</td></tr>';}
-
-var toastT=null;
-function toast(m){
-  var o=document.querySelector(".toast"); if(o) o.remove();
-  var d=document.createElement("div"); d.className="toast"; d.textContent=m;
-  document.body.appendChild(d);
-  if(toastT) clearTimeout(toastT);
-  toastT=setTimeout(function(){if(d.parentNode)d.remove();},4200);
-}
-function openModal(title,body,footer){
-  S.modal=true;
-  $("modal-root").innerHTML='<div class="mbg" id="mbg"><div class="modal" role="dialog" aria-modal="true">'
-    +'<div class="modal-h"><h3>'+title+'</h3><button class="btn" id="m-x">Cerrar</button></div>'
-    +'<div class="modal-b">'+body+'</div>'
-    +(footer?'<div class="modal-f">'+footer+'</div>':'')+'</div></div>';
-  $("m-x").addEventListener("click",closeModal);
-  $("mbg").addEventListener("click",function(e){if(e.target.id==="mbg")closeModal();});
-  wireModal();
-}
-function closeModal(){S.modal=null;$("modal-root").innerHTML="";}
-
-/* ===================== LOGIN ===================== */
-var pend=null;
-function renderLogin(){
-  $("roles").innerHTML=ROLES.map(function(r){
-    return '<button class="role" type="button" role="radio" aria-checked="false" data-role="'+r.id+'">'
-      +'<span class="role-icon" aria-hidden="true"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" '
-      +'stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round">'+r.icon+'</svg></span>'
-      +'<span class="role-txt"><span class="role-who">'+r.name+'</span>'
-      +'<span class="role-rol">'+r.rol+'</span><span class="role-mail">'+r.mail+'</span></span>'
-      +'<span class="role-chev" aria-hidden="true"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" '
-      +'stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M6 3.5 10.5 8 6 12.5"/></svg></span>'
-    +'</button>';}).join("");
-  Array.prototype.forEach.call($("roles").querySelectorAll(".role"),function(b){
-    b.addEventListener("click",function(){pickRole(b.getAttribute("data-role"));});
-    b.addEventListener("dblclick",function(){pickRole(b.getAttribute("data-role"));enter(pend);});});
-  $("btn-enter").addEventListener("click",function(){if(pend)enter(pend);});
-  document.addEventListener("keydown",function(e){
-    if(e.key==="Escape"&&S.modal){closeModal();return;}
-    if($("login").hidden)return;
-    if(e.key==="Enter"&&pend){e.preventDefault();enter(pend);}});
-  resetPick();
-}
-function resetPick(){
-  pend=null;
-  Array.prototype.forEach.call($("roles").querySelectorAll(".role"),function(b){
-    b.classList.remove("is-picked");b.setAttribute("aria-checked","false");});
-  $("login-pick").innerHTML='<span class="t-sub">Sin rol seleccionado</span>';
-  $("btn-enter").disabled=true;$("btn-enter").textContent="Entrar";
-}
-function pickRole(id){
-  var r=null;for(var i=0;i<ROLES.length;i++){if(ROLES[i].id===id)r=ROLES[i];}
-  if(!r)return;
-  pend=id;
-  Array.prototype.forEach.call($("roles").querySelectorAll(".role"),function(b){
-    var on=b.getAttribute("data-role")===id;
-    b.classList.toggle("is-picked",on);b.setAttribute("aria-checked",on?"true":"false");});
-  $("login-pick").innerHTML='<b>'+r.name+'</b><span class="t-sub">'+r.entidad+'</span>';
-  $("btn-enter").disabled=false;$("btn-enter").textContent="Entrar";
-}
-function enter(id){
-  for(var i=0;i<ROLES.length;i++){if(ROLES[i].id===id)S.role=ROLES[i];}
-  if(!S.role)return;
-  S.mod=S.role.mods[0];S.cliOpen=null;S.demOpen=null;S.viaOpen=null;S.traOpen=null;
-  $("login").hidden=true;$("app").hidden=false;
-  $("who-name").textContent=S.role.name;$("who-rol").textContent=S.role.entidad;
-  renderNav();render();window.scrollTo(0,0);
-}
-function leave(){S.role=null;$("app").hidden=true;$("login").hidden=false;resetPick();window.scrollTo(0,0);}
-
-function renderNav(){
-  var pendCerts=TRANSPORTISTAS.reduce(function(a,t){
-    return a+CERT_TIPOS.filter(function(c){return t.certs[c.id].est==="pendiente";}).length;},0);
-  var cnt={clientes:CLIENTES.length,pipeline:OPORTUNIDADES.length,
-    actividades:ACTIVIDADES.filter(function(a){return a.estado==="pendiente";}).length,
-    documentos:visibleDocs().length,operaciones:visibleOps().length,
-    demandas:DEMANDAS.length,viajes:visibleViajes().length,
-    directorio:TRANSPORTISTAS.length,certificaciones:pendCerts,misviajes:visibleViajes().length};
-  var html="";
-  GRUPOS.forEach(function(g){
-    var items=g.items.filter(function(m){return S.role.mods.indexOf(m)>=0;});
-    if(!items.length)return;
-    html+='<div class="nav-grp"><div class="nav-grp-t">'+g.t+'</div>'
-      +items.map(function(m){
-        var c=cnt[m]!=null?'<span class="nav-count'+(m==="certificaciones"&&cnt[m]>0?" alert":"")+'">'+cnt[m]+'</span>':'';
-        return '<button class="nav-item" data-mod="'+m+'" aria-current="'+(S.mod===m)+'">'+MODS[m]+c+'</button>';
-      }).join("")+'</div>';});
-  $("nav").innerHTML=html;
-  Array.prototype.forEach.call($("nav").querySelectorAll(".nav-item"),function(b){
-    b.addEventListener("click",function(){go(b.getAttribute("data-mod"));});});
-}
-function go(m){
-  S.mod=m;S.cliOpen=null;S.demOpen=null;S.viaOpen=null;S.traOpen=null;
-  S.docPage=1;S.q="";
-  renderNav();render();window.scrollTo(0,0);
+function Repo(items,clave){
+  var key=clave||"id";
+  return {
+    all:function(){return items;},
+    add:function(x){items.push(x);return x;},
+    byId:function(v){
+      for(var i=0;i<items.length;i++){if(items[i][key]===v)return items[i];}
+      return null;},
+    where:function(fn){return items.filter(fn);},
+    count:function(fn){return fn?items.filter(fn).length:items.length;},
+    sum:function(fn){return items.reduce(function(a,x){return a+fn(x);},0);}
+  };
 }
 
-/* ===================== ALCANCE POR ROL ===================== */
-function visibleOps(){
-  return S.role&&S.role.cliente?OPERACIONES.filter(function(o){return o.cli===S.role.cliente;}):OPERACIONES;}
-function visibleDocs(){
-  return S.role&&S.role.cliente?DOCS.filter(function(d){return d.cli===S.role.cliente;}):DOCS;}
-function visibleViajes(){
-  if(S.role&&S.role.cliente)return VIAJES.filter(function(v){return v.cli===S.role.cliente;});
-  if(S.role&&S.role.traId)return VIAJES.filter(function(v){return v.tra===S.role.traId;});
-  return VIAJES;}
+var Clientes=(function(){
+  var r=Repo(Seed.CLIENTES);
+  r.etapa=function(id){
+    for(var i=0;i<Seed.ETAPAS.length;i++){if(Seed.ETAPAS[i].id===id)return Seed.ETAPAS[i].n;}
+    return id;};
+  r.badgeEtapa=function(id){
+    var m={prospecto:"b-neutral",contactado:"b-accent",oportunidad:"b-warn",
+           activo:"b-ok",fidelizacion:"b-ok"};
+    return [m[id]||"b-neutral",r.etapa(id)];};
+  r.activos=function(){return r.where(function(c){
+    return c.etapa==="activo"||c.etapa==="fidelizacion";});};
+  r.prospectos=function(){return r.where(function(c){
+    return c.etapa==="prospecto"||c.etapa==="contactado";});};
+  r.sinActividad=function(){return r.where(function(c){return Fmt.iso(c.ultima)<"2026-09-16";});};
+  return r;
+})();
 
-/* ===================== DASHBOARD ===================== */
+var Servicios=(function(){
+  var r=Repo(Seed.SERVICIOS);
+  r.nombre=function(id){var s=r.byId(id);return s?s.n:id;};
+  r.faltantes=function(c){return r.where(function(s){return c.serv.indexOf(s.id)<0;});};
+  return r;
+})();
+
+var Oportunidades=(function(){
+  var r=Repo(Seed.OPORTUNIDADES);
+  r.deCliente=function(id){return r.where(function(o){return o.cli===id;});};
+  r.valor=function(list){return (list||r.all()).reduce(function(a,o){return a+o.valor;},0);};
+  return r;
+})();
+
+var Actividades=(function(){
+  var r=Repo(Seed.ACTIVIDADES);
+  r.pendientes=function(){return r.where(function(a){return a.estado==="pendiente";});};
+  r.deCliente=function(id){return r.where(function(a){return a.cli===id;});};
+  r.completar=function(id){var a=r.byId(id);if(a)a.estado="hecha";return a;};
+  return r;
+})();
+
+var Operaciones=(function(){
+  var r=Repo(Seed.OPERACIONES);
+  r.badge=function(e){
+    var m={transito:["b-accent","En tránsito"],aduana:["b-warn","En aduana"],
+           puerto:["b-warn","En puerto"],docs:["b-neutral","Documentación"],
+           cerrada:["b-ok","Cerrada"]};
+    return m[e]||["b-neutral","—"];};
+  r.deCliente=function(id){return r.where(function(o){return o.cli===id;});};
+  r.visibles=function(){
+    var c=Session.clienteId();
+    return c?r.deCliente(c):r.all();};
+  return r;
+})();
+
+var Documentos=(function(){
+  var items=[];
+  var r=Repo(items);
+  r.categoria=function(id){
+    for(var i=0;i<Seed.DOC_CATS.length;i++){if(Seed.DOC_CATS[i].id===id)return Seed.DOC_CATS[i];}
+    return {id:id,n:id,fmt:"PDF"};};
+  r.deCliente=function(id){return r.where(function(d){return d.cli===id;});};
+  r.deOperacion=function(id){return r.where(function(d){return d.op===id;});};
+  r.visibles=function(){
+    var c=Session.clienteId();
+    return c?r.deCliente(c):r.all();};
+  r.pendientes=function(list){return (list||r.all()).filter(function(d){
+    return d.estado==="pendiente";});};
+  r.duplicados=function(list){return (list||r.all()).filter(function(d){return d.dup;});};
+  r.peso=function(list){return (list||r.all()).reduce(function(a,d){return a+d.size;},0);};
+  r.esDuplicado=function(op,nombre){
+    return r.all().some(function(d){return d.op===op&&d.n===nombre;});};
+  r.filtrar=function(base,f){
+    var q=(f.q||"").toLowerCase();
+    return base.filter(function(d){
+      if(f.cat!=="todas"&&d.cat!==f.cat) return false;
+      if(f.estado!=="todos"&&d.estado!==f.estado) return false;
+      if(f.op!=="todas"&&d.op!==f.op) return false;
+      if(q.length>=2&&(d.n+" "+d.op+" "+r.categoria(d.cat).n).toLowerCase().indexOf(q)<0) return false;
+      return true;});};
+  r.generar=function(){
+    var meses=["jun","jul","ago","sep"],seq=1000;
+    Operaciones.all().forEach(function(op){
+      var n=op.cli==="C001"?Rng.int(26,34):Rng.int(8,14);
+      for(var i=0;i<n;i++){
+        var cat=Rng.pick(Seed.DOC_CATS),foto=cat.id==="inspeccion";
+        var size=foto?Rng.int(18,42)+Rng.next()
+          :(cat.fmt==="XLSX"?0.3+Rng.next()*0.9:1.2+Rng.next()*7.5);
+        var est=Rng.next()<0.70?"aprobado"
+          :(Rng.next()<0.75?"pendiente":(Rng.next()<0.6?"rechazado":"vencido"));
+        seq++;
+        items.push({id:"D"+seq,cli:op.cli,op:op.id,cat:cat.id,fmt:cat.fmt,
+          n:cat.n.replace(/ /g,"_")+"_"+op.id+(foto?"_lote"+Rng.int(1,3):"_v"+Rng.int(1,3))
+            +"."+cat.fmt.toLowerCase(),
+          size:Math.round(size*10)/10,estado:est,
+          fecha:Rng.int(1,28)+" "+Rng.pick(meses)+" 2026",
+          por:Rng.pick(["Ana Quispe","Rodrigo Salazar","Marcela Ortiz","Sistema"]),dup:false});}});
+    var base=items.filter(function(d){return d.cli==="C001";});
+    for(var k=0;k<4;k++){
+      var o=base[Rng.int(0,base.length-1)]; seq++;
+      items.push({id:"D"+seq,cli:o.cli,op:o.op,cat:o.cat,fmt:o.fmt,n:o.n,size:o.size,
+        estado:"pendiente",fecha:"21 sep 2026",por:"Marcela Ortiz",dup:true});}
+    return r;};
+  return r;
+})().generar();
+
+var Transportistas=(function(){
+  var r=Repo(Seed.TRANSPORTISTAS);
+  r.cert=function(id){
+    for(var i=0;i<Seed.CERT_TIPOS.length;i++){if(Seed.CERT_TIPOS[i].id===id)return Seed.CERT_TIPOS[i];}
+    return {id:id,n:id,oblig:false};};
+  r.estado=function(t){
+    var pend=0,mal=0;
+    Seed.CERT_TIPOS.forEach(function(c){
+      if(!c.oblig) return;
+      var d=t.certs[c.id];
+      if(d.est==="pendiente") pend++; else if(d.est!=="aprobado") mal++;});
+    if(mal>0) return {cls:"b-crit",txt:"No certificado",code:"no"};
+    if(pend>0) return {cls:"b-warn",txt:"Validación pendiente",code:"pend"};
+    return {cls:"b-ok",txt:"Certificado",code:"ok"};};
+  r.certificados=function(){return r.where(function(t){return r.estado(t).code==="ok";});};
+  r.pendientesValidacion=function(){
+    return r.all().reduce(function(a,t){
+      return a+Seed.CERT_TIPOS.filter(function(c){return t.certs[c.id].est==="pendiente";}).length;},0);};
+  return r;
+})();
+
+var Demandas=(function(){
+  var r=Repo(Seed.DEMANDAS);
+  r.sinAsignar=function(){return r.where(function(d){return !d.tra;});};
+  r.publicadas=function(){return r.where(function(d){return d.estado==="publicada";});};
+  return r;
+})();
+
+var Viajes=(function(){
+  var r=Repo(Seed.VIAJES);
+  r.deCliente=function(id){return r.where(function(v){return v.cli===id;});};
+  r.deTransportista=function(id){return r.where(function(v){return v.tra===id;});};
+  r.visibles=function(){
+    var c=Session.clienteId(),t=Session.traId();
+    if(c) return r.deCliente(c);
+    if(t) return r.deTransportista(t);
+    return r.all();};
+  r.enRuta=function(){return r.where(function(v){
+    return ["confirmado","carga","transito","reparto","aceptado","a_cargar","cargado","destino"]
+      .indexOf(v.estado)>=0;});};
+  r.conIncidencia=function(){return r.where(function(v){return v.estado==="incidencia";});};
+  r.byCode=function(c){
+    var m=r.where(function(v){return v.code===c;});
+    return m.length?m[0]:null;};
+  return r;
+})();
+
+var Pods=(function(){
+  var r=Repo(Seed.PODS);
+  r.deViaje=function(vid){
+    var m=r.where(function(p){return p.viaje===vid;});
+    return m.length?m[0]:null;};
+  return r;
+})();
+
+var Incidencias=Repo([]);
+
+var Reglas=[
+ {n:1,check:function(t,d){
+    var st=Transportistas.estado(t);
+    if(st.code==="no"){
+      var f=Seed.CERT_TIPOS.filter(function(c){return c.oblig&&t.certs[c.id].est!=="aprobado";})
+        .map(function(c){return c.n.toLowerCase();});
+      return "Certificación no vigente: "+f.join(", ");}
+    if(st.code==="pend") return "Validación de documentos pendiente";
+    return null;}},
+ {n:2,check:function(t,d){
+    return (t.certs.seguro.est==="aprobado"&&Fmt.iso(t.certs.seguro.ven)<d.entregaISO)
+      ?"Seguro vence el "+t.certs.seguro.ven+", antes de la entrega":null;}},
+ {n:3,check:function(t,d){
+    return (d.peligrosa&&t.certs.peligrosa.est!=="aprobado")
+      ?"Sin certificación de carga peligrosa":null;}},
+ {n:4,check:function(t,d){
+    return t.cobertura.indexOf(d.corredor)<0?"No cubre "+d.corredor:null;}},
+ {n:5,check:function(t,d){
+    return t.cap*1000<d.peso?"Capacidad "+t.cap+" t < "+Fmt.num(d.peso)+" kg":null;}},
+ {n:6,check:function(t,d){
+    return t.disp==="no_disponible"?"No disponible en la fecha de carga":null;}}
+];
+
+var Matching={
+  evaluar:function(t,d){
+    for(var i=0;i<Reglas.length;i++){
+      var m=Reglas[i].check(t,d);
+      if(m) return {motivo:m,regla:Reglas[i].n};}
+    return null;},
+  puntaje:function(t,d){
+    var cumpl=(t.cumpl/100)*40;
+    var rot=((12-Math.min(t.asignadas30d,12))/12)*30;
+    var prox=(t.en===d.origen)?20:6;
+    var disp=(t.disp==="disponible")?10:0;
+    return {total:Math.round(cumpl+rot+prox+disp),cumpl:Math.round(cumpl),
+            rot:Math.round(rot),prox:prox,disp:disp};},
+  candidatos:function(d){
+    var ok=[],no=[];
+    Transportistas.all().forEach(function(t){
+      var r=Matching.evaluar(t,d);
+      if(r) no.push({t:t,motivo:r.motivo,regla:r.regla});
+      else ok.push({t:t,p:Matching.puntaje(t,d)});});
+    ok.sort(function(a,b){return b.p.total-a.p.total;});
+    no.sort(function(a,b){return a.regla-b.regla;});
+    return {ok:ok,no:no};}
+};
+
+var Tracking={
+  ruta:function(v){
+    var d=Demandas.byId(v.dem);
+    if(d&&Seed.RUTAS[d.corredor]) return Seed.RUTAS[d.corredor];
+    var k=Object.keys(Seed.RUTAS);
+    for(var i=0;i<k.length;i++){
+      if(k[i].indexOf(v.origen)===0||k[i].indexOf(v.destino)>=0) return Seed.RUTAS[k[i]];}
+    return Seed.RUTAS["Arica–La Paz"];},
+  code:function(id){
+    var b="ABCDEFGHJKMNPQRSTUVWXYZ23456789",h=0;
+    for(var i=0;i<id.length;i++) h=(h*31+id.charCodeAt(i))>>>0;
+    var s="";
+    for(var j=0;j<6;j++){s+=b[h%b.length];h=Math.floor(h/7)+13;}
+    return "DMS-"+s;},
+  init:function(){
+    Viajes.all().forEach(function(v){
+      v.code=Tracking.code(v.id);
+      var r=Tracking.ruta(v);
+      v.kmTotal=r.km;
+      v.km=Math.round(r.km*v.pct/100);
+      v.vel=(v.estado==="transito"||v.estado==="reparto")?Rng.int(58,82):0;
+      v.ultPos=v.estado==="entregado"?(v.entregado||HOY):HOY+" · 11:"+Rng.int(10,59);
+      v.posHist=[{t:v.ultPos,km:v.km,pos:v.pos,vel:v.vel}];});},
+  avanzar:function(v){
+    var r=Tracking.ruta(v);
+    if(v.pct>=100) return false;
+    v.pct=Math.min(100,v.pct+Rng.int(8,16));
+    v.km=Math.round(r.km*v.pct/100);
+    v.vel=v.pct>=100?0:Rng.int(58,82);
+    var i=Math.min(r.hitos.length-1,Math.floor(v.pct/100*r.hitos.length));
+    v.pos=v.pct>=100?("Entregado en "+v.destino)
+      :("Tramo "+r.hitos[i]+" · km "+Fmt.num(v.km)+" de "+Fmt.num(r.km));
+    v.ultPos=Fmt.hora();
+    v.posHist.unshift({t:v.ultPos,km:v.km,pos:v.pos,vel:v.vel});
+    if(v.pct>=100&&v.estado!=="entregado"){
+      v.estado="destino";
+      v.log.unshift({t:v.ultPos,m:"Vehículo llegó a destino · pendiente de POD"});}
+    return true;},
+  punto:function(v){
+    var r=Tracking.ruta(v),p=v.pct/100;
+    var i=Math.min(r.pts.length-2,Math.floor(p*(r.pts.length-1)));
+    var f=p*(r.pts.length-1)-i;
+    return [r.pts[i][0]+(r.pts[i+1][0]-r.pts[i][0])*f,
+            r.pts[i][1]+(r.pts[i+1][1]-r.pts[i][1])*f];}
+};
+
+var FlujoViaje={
+  interno:["pendiente","asignado","confirmado","carga","transito","reparto","entregado"],
+  badge:function(e){return Seed.VIAJE_EST[e]||["b-neutral","—"];},
+  idxTra:function(e){
+    for(var i=0;i<Seed.FLUJO_TRA.length;i++){if(Seed.FLUJO_TRA[i].id===e)return i;}
+    return 0;},
+  siguienteTra:function(e){return Seed.FLUJO_TRA[FlujoViaje.idxTra(e)+1]||null;},
+  avanzarInterno:function(v){
+    var cur=v.estado==="incidencia"?"transito":v.estado;
+    var i=FlujoViaje.interno.indexOf(cur);
+    if(i<0||i>=FlujoViaje.interno.length-1) return null;
+    var next=FlujoViaje.interno[i+1];
+    v.estado=next; v.inc=null;
+    v.pct=Math.min(100,Math.round((i+2)/FlujoViaje.interno.length*100));
+    v.km=Math.round(v.kmTotal*v.pct/100);
+    if(next==="entregado"){
+      v.pct=100; v.km=v.kmTotal; v.entregado=HOY+" · 11:30"; v.puntual=true;
+      v.pos="Entregado en "+v.destino;
+      var d=Demandas.byId(v.dem); if(d) d.estado="cerrada";}
+    v.hitos.forEach(function(h,k){
+      if(next==="entregado") h.s="done";
+      else if(k<i+1) h.s="done"; else if(k===i+1) h.s="now"; else h.s="next";});
+    v.log.unshift({t:HOY,m:"Estado actualizado a "+FlujoViaje.badge(next)[1]});
+    return next;},
+  avanzarTra:function(v,est){
+    v.estado=est; v.inc=null;
+    if(est==="transito"&&v.pct<20) v.pct=20;
+    if(est==="destino") v.pct=Math.max(v.pct,95);
+    v.km=Math.round(v.kmTotal*v.pct/100);
+    var lbl=Seed.FLUJO_TRA[FlujoViaje.idxTra(est)].n;
+    v.log.unshift({t:Fmt.hora(),m:"Transportista actualizó estado a "+lbl});
+    return lbl;},
+  incidencia:function(v,txt){
+    v.estado="incidencia"; v.inc=txt; v.vel=0;
+    v.log.unshift({t:Fmt.hora(),m:"Incidencia reportada · "+txt});
+    Incidencias.add({viaje:v.id,t:txt,fecha:HOY});}
+};
+
+var PodService={
+  requisitos:Seed.POD_REQ,
+  etiquetas:{firma:"Firma",receptor:"Receptor",fotoCarga:"Foto de carga",
+    fotoLugar:"Foto del lugar",obs:"Observaciones"},
+  validar:function(borrador){
+    var falta=[];
+    if(PodService.requisitos.receptor&&borrador.receptor.length<3) falta.push("nombre del receptor");
+    if(PodService.requisitos.firma&&!borrador.firma) falta.push("firma");
+    if(PodService.requisitos.fotoCarga&&borrador.fotos.indexOf("carga")<0) falta.push("foto de carga");
+    if(PodService.requisitos.fotoLugar&&borrador.fotos.indexOf("lugar")<0) falta.push("foto del lugar");
+    if(borrador.resultado!=="completado"&&borrador.motivo.length<3) falta.push("motivo");
+    return falta;},
+  registrar:function(v,borrador){
+    var d=Demandas.byId(v.dem);
+    var pod=Pods.add({id:"POD-"+v.id.replace("VJ-",""),viaje:v.id,cli:v.cli,
+      op:d?d.op:"—",estado:borrador.resultado,receptor:borrador.receptor,
+      fecha:HOY+" · 11:30",gps:"-16.4897, -68.1193 (simulado)",
+      obs:borrador.obs||"—",fotos:borrador.fotos.length,firma:!!borrador.firma,
+      motivo:borrador.resultado==="completado"?null:borrador.motivo});
+    v.log.unshift({t:pod.fecha,
+      m:"POD registrado · "+Seed.POD_EST[borrador.resultado][1]+" · receptor "+borrador.receptor});
+    if(borrador.resultado==="rechazado"){
+      v.estado="incidencia";
+      v.inc="Entrega rechazada por el receptor: "+borrador.motivo;
+    } else {
+      v.estado="entregado"; v.pct=100; v.km=v.kmTotal; v.vel=0;
+      v.entregado=pod.fecha; v.puntual=borrador.resultado==="completado";
+      v.pos="Entregado en "+v.destino;
+      v.hitos.forEach(function(h){h.s="done";});
+      if(d) d.estado="cerrada";}
+    return pod;}
+};
+
+var Asignacion={
+  publicar:function(d){d.estado="publicada";return Matching.candidatos(d).ok.length;},
+  asignar:function(d){
+    var c=Matching.candidatos(d);
+    if(!c.ok.length) return null;
+    var g=c.ok[0];
+    d.tra=g.t.id; d.estado="asignada"; g.t.asignadas30d++;
+    var v=Viajes.add({id:"VJ-"+(1182+Viajes.count()),dem:d.id,cli:d.cli,tra:g.t.id,
+      origen:d.origen,destino:d.destino,estado:"asignado",pct:8,
+      eta:d.entrega+" · 12:00",pos:"Pendiente de confirmación del transportista",inc:null,
+      hitos:[{n:"Asignado",t:HOY,s:"done"},{n:"Confirmado por transportista",t:"pendiente",s:"now"},
+        {n:"En carga",t:"ETA "+d.carga,s:"next"},{n:"En tránsito",t:"—",s:"next"},
+        {n:"En reparto",t:"—",s:"next"},{n:"Entregado",t:"ETA "+d.entrega,s:"next"}],
+      log:[{t:HOY,m:"Transportista asignado: "+g.t.n+" (puntaje "+g.p.total+")"}]});
+    v.code=Tracking.code(v.id);
+    var r=Tracking.ruta(v);
+    v.kmTotal=r.km; v.km=Math.round(r.km*v.pct/100); v.vel=0;
+    v.ultPos=HOY; v.posHist=[{t:HOY,km:v.km,pos:v.pos,vel:0}];
+    return {viaje:v,ganador:g};}
+};
+
+var Certificaciones={
+  aprobar:function(t,cid){t.certs[cid].est="aprobado";return Transportistas.estado(t);},
+  subir:function(t,cid){t.certs[cid]={est:"pendiente",em:HOY,ven:"23 sep 2029"};},
+  filas:function(pool){
+    var out=[];
+    pool.forEach(function(t){Seed.CERT_TIPOS.forEach(function(ct){
+      out.push({t:t,ct:ct,d:t.certs[ct.id]});});});
+    return out;}
+};
+
+Tracking.init();
+
 function vDashboard(){
-  if(S.role.cliente) return vDashCliente();
-  if(S.role.traId) return vDashTransportista();
-  var act=CLIENTES.filter(function(c){return c.etapa==="activo"||c.etapa==="fidelizacion";});
-  var pros=CLIENTES.filter(function(c){return c.etapa==="prospecto"||c.etapa==="contactado";});
-  var opAb=OPORTUNIDADES.filter(function(o){return o.etapa!=="activo";});
+  if(Session.clienteId()) return vDashCliente();
+  if(Session.traId()) return vDashTransportista();
+  var act=Seed.CLIENTES.filter(function(c){return c.etapa==="activo"||c.etapa==="fidelizacion";});
+  var pros=Seed.CLIENTES.filter(function(c){return c.etapa==="prospecto"||c.etapa==="contactado";});
+  var opAb=Seed.OPORTUNIDADES.filter(function(o){return o.etapa!=="activo";});
   var valor=opAb.reduce(function(a,o){return a+o.valor;},0);
-  var sinAct=CLIENTES.filter(function(c){return isoDe(c.ultima)<"2026-09-15";});
-  var actPend=ACTIVIDADES.filter(function(a){return a.estado==="pendiente";});
-  var docPend=DOCS.filter(function(d){return d.estado==="pendiente";});
-  var enRuta=VIAJES.filter(function(v){return ["confirmado","carga","transito","reparto"].indexOf(v.estado)>=0;});
-  var inci=VIAJES.filter(function(v){return v.estado==="incidencia";});
-  var demAb=DEMANDAS.filter(function(d){return d.estado==="publicada"||d.estado==="borrador";});
-  var dispo=TRANSPORTISTAS.filter(function(t){return t.disp==="disponible"&&certEstado(t).code==="ok";});
+  var sinAct=Seed.CLIENTES.filter(function(c){return Fmt.iso(c.ultima)<"2026-09-15";});
+  var actPend=Seed.ACTIVIDADES.filter(function(a){return a.estado==="pendiente";});
+  var docPend=Documentos.all().filter(function(d){return d.estado==="pendiente";});
+  var enRuta=Seed.VIAJES.filter(function(v){return ["confirmado","carga","transito","reparto"].indexOf(v.estado)>=0;});
+  var inci=Seed.VIAJES.filter(function(v){return v.estado==="incidencia";});
+  var demAb=Seed.DEMANDAS.filter(function(d){return d.estado==="publicada"||d.estado==="borrador";});
+  var dispo=Seed.TRANSPORTISTAS.filter(function(t){return t.disp==="disponible"&&Transportistas.estado(t).code==="ok";});
 
-  /* Oportunidades por etapa */
-  var porEtapa=ETAPAS.map(function(e){
-    var o=OPORTUNIDADES.filter(function(x){return x.etapa===e.id;});
+  
+  var porEtapa=Seed.ETAPAS.map(function(e){
+    var o=Seed.OPORTUNIDADES.filter(function(x){return x.etapa===e.id;});
     return {n:e.n,c:o.length,v:o.reduce(function(a,x){return a+x.valor;},0)};});
 
-  return ph({eyebrow:"DMS Bolivia S.R.L.",t:"Dashboard",
-      meta:pill("Hoy",HOY)+pill("Ejecutivo","Ana Quispe")})
-    + tiles([
-      {k:"Clientes",v:String(CLIENTES.length),n:act.length+" activos"},
+  return UI.head({eyebrow:"DMS Bolivia State.R.L.",t:"Dashboard",
+      meta:UI.pill("Hoy",HOY)+UI.pill("Ejecutivo","Ana Quispe")})
+    + UI.tiles([
+      {k:"Clientes",v:String(Seed.CLIENTES.length),n:act.length+" activos"},
       {k:"Prospectos",v:String(pros.length),n:"En captación"},
-      {k:"Oportunidades",v:String(opAb.length),n:"USD "+nf(valor)},
+      {k:"Oportunidades",v:String(opAb.length),n:"USD "+Fmt.num(valor)},
       {k:"Sin actividad 7 d",v:String(sinAct.length),n:"Requieren contacto"},
       {k:"Actividades",v:String(actPend.length),n:"Pendientes"},
-      {k:"Docs por revisar",v:String(docPend.length),n:"De "+nf(DOCS.length)+" totales"}])
-    + tiles([
+      {k:"Docs por revisar",v:String(docPend.length),n:"De "+Fmt.num(Documentos.all().length)+" totales"}])
+    + UI.tiles([
       {k:"Viajes en ruta",v:String(enRuta.length),n:"Confirmados o en tránsito"},
       {k:"Incidencias",v:String(inci.length),n:"Requieren atención"},
       {k:"Demandas abiertas",v:String(demAb.length),n:"Sin transportista"},
-      {k:"Transportistas libres",v:String(dispo.length)+"/"+TRANSPORTISTAS.length,n:"Certificados y disponibles"},
-      {k:"Entrega a tiempo",v:String(Math.round(PERF.aTiempo/PERF.total*100)),u:"%",n:PERF.periodo},
-      {k:"Tránsito medio",v:String(PERF.horas),u:" h",n:"Puerta a puerta"}])
-    + (inci.length?alerta(inci.length+" viaje con incidencia activa",
+      {k:"Transportistas libres",v:String(dispo.length)+"/"+Seed.TRANSPORTISTAS.length,n:"Certificados y disponibles"},
+      {k:"Entrega a tiempo",v:String(Math.round(Seed.PERF.aTiempo/Seed.PERF.total*100)),u:"%",n:Seed.PERF.periodo},
+      {k:"Tránsito medio",v:String(Seed.PERF.horas),u:" h",n:"Puerta a puerta"}])
+    + (inci.length?UI.alert(inci.length+" viaje con incidencia activa",
         inci.map(function(v){return v.id+" · "+v.inc;}).join(" "),""):"")
     + '<div class="grid2">'
-    + card("Oportunidades por etapa",
-        tbl([{t:"Etapa"},{t:"Oportunidades",r:true},{t:"Valor USD",r:true}],
+    + UI.card("Oportunidades por etapa",
+        UI.table([{t:"Etapa"},{t:"Oportunidades",r:true},{t:"Valor USD",r:true}],
           porEtapa.map(function(e){
             return '<tr><td class="t-strong">'+e.n+'</td><td class="r mono">'+e.c+'</td>'
-              +'<td class="r mono">'+nf(e.v)+'</td></tr>';}).join("")))
-    + card("Servicios contratados",
-        tbl([{t:"Servicio"},{t:"Clientes",r:true},{t:"Potencial",r:true}],
-          SERVICIOS.map(function(sv){
-            var con=CLIENTES.filter(function(c){return c.serv.indexOf(sv.id)>=0;}).length;
-            var pot=CLIENTES.filter(function(c){return c.serv.length&&c.serv.indexOf(sv.id)<0;}).length;
+              +'<td class="r mono">'+Fmt.num(e.v)+'</td></tr>';}).join("")))
+    + UI.card("Servicios contratados",
+        UI.table([{t:"Servicio"},{t:"Clientes",r:true},{t:"Potencial",r:true}],
+          Seed.SERVICIOS.map(function(sv){
+            var con=Seed.CLIENTES.filter(function(c){return c.serv.indexOf(sv.id)>=0;}).length;
+            var pot=Seed.CLIENTES.filter(function(c){return c.serv.length&&c.serv.indexOf(sv.id)<0;}).length;
             return '<tr><td class="t-strong">'+sv.n+'</td><td class="r mono">'+con+'</td>'
               +'<td class="r mono" style="color:var(--action)">'+pot+'</td></tr>';}).join("")))
     + '</div>'
-    + card("Actividades pendientes",
-        tbl([{t:"Fecha"},{t:"Cliente"},{t:"Tipo"},{t:"Asunto"},{t:"Responsable"}],
+    + UI.card("Actividades pendientes",
+        UI.table([{t:"Fecha"},{t:"Cliente"},{t:"Tipo"},{t:"Asunto"},{t:"Responsable"}],
           actPend.slice(0,6).map(function(a){
-            var c=cliBy(a.cli);
+            var c=Clientes.byId(a.cli);
             return '<tr class="clickable" data-cli="'+a.cli+'"><td class="mono t-sub">'+a.fecha+'</td>'
-              +'<td class="t-strong">'+(c?c.n:"—")+'</td><td>'+badge("b-neutral",ACT_TIPOS[a.tipo])+'</td>'
+              +'<td class="t-strong">'+(c?c.n:"—")+'</td><td>'+UI.badge("b-neutral",Seed.ACT_TIPOS[a.tipo])+'</td>'
               +'<td>'+a.asunto+'</td><td class="t-sub">'+a.resp+'</td></tr>';}).join("")),
         '<button class="btn" data-go="actividades">Ver todas</button>');
 }
 function vDashCliente(){
-  var ops=visibleOps(),docs=visibleDocs(),via=visibleViajes();
-  var c=cliBy(S.role.cliente);
-  return ph({eyebrow:c.n,t:"Dashboard",meta:pill("NIT",c.nit)+pill("Ejecutivo",c.ejecutivo)})
-    + tiles([
+  var ops=Operaciones.visibles(),docs=Documentos.visibles(),via=Viajes.visibles();
+  var c=Clientes.byId(Session.clienteId());
+  return UI.head({eyebrow:c.n,t:"Dashboard",meta:UI.pill("NIT",c.nit)+UI.pill("Ejecutivo",c.ejecutivo)})
+    + UI.tiles([
       {k:"Operaciones",v:String(ops.length),n:ops.filter(function(o){return o.estado!=="cerrada";}).length+" abiertas"},
       {k:"Documentos",v:String(docs.length),n:docs.filter(function(d){return d.estado==="pendiente";}).length+" pendientes"},
       {k:"Viajes",v:String(via.length),n:"Asociados a sus cargas"},
       {k:"Servicios",v:String(c.serv.length),n:"Contratados"}])
-    + card("Operaciones",
-        tbl([{t:"Operación"},{t:"Ruta"},{t:"Mercancía"},{t:"Estado"},{t:"Docs",r:true}],
+    + UI.card("Operaciones",
+        UI.table([{t:"Operación"},{t:"Ruta"},{t:"Mercancía"},{t:"Estado"},{t:"Docs",r:true}],
           ops.map(function(o){
             return '<tr class="clickable" data-op="'+o.id+'"><td class="mono t-strong">'+o.id+'</td>'
-              +'<td class="t-sub">'+o.ruta+'</td><td>'+o.merc+'</td><td>'+bd(opEstado(o.estado))+'</td>'
-              +'<td class="r mono">'+DOCS.filter(function(d){return d.op===o.id;}).length+'</td></tr>';}).join("")));
+              +'<td class="t-sub">'+o.ruta+'</td><td>'+o.merc+'</td><td>'+UI.pair(Operaciones.UI.badge(o.estado))+'</td>'
+              +'<td class="r mono">'+Documentos.all().filter(function(d){return d.op===o.id;}).length+'</td></tr>';}).join("")));
 }
 function vDashTransportista(){
-  var t=traBy(S.role.traId),st=certEstado(t);
-  var mias=visibleViajes();
-  var abiertas=DEMANDAS.filter(function(d){return d.estado==="publicada";});
-  var elegibles=abiertas.filter(function(d){return !evaluar(t,d);});
-  return ph({eyebrow:t.n,t:"Dashboard",meta:bd([st.cls,st.txt])+pill("Placa",t.placa)})
-    + tiles([
+  var t=Transportistas.byId(Session.traId()),st=Transportistas.estado(t);
+  var mias=Viajes.visibles();
+  var abiertas=Seed.DEMANDAS.filter(function(d){return d.estado==="publicada";});
+  var elegibles=abiertas.filter(function(d){return !Matching.evaluar(t,d);});
+  return UI.head({eyebrow:t.n,t:"Dashboard",meta:UI.pair([st.cls,st.txt])+UI.pill("Placa",t.placa)})
+    + UI.tiles([
       {k:"Certificación",v:st.code==="ok"?"Vigente":"Bloqueada",n:st.txt},
       {k:"Demandas abiertas",v:String(abiertas.length),n:elegibles.length+" compatibles"},
       {k:"Mis viajes",v:String(mias.length),n:"Historial y activos"},
       {k:"Cumplimiento",v:String(t.cumpl),u:"%",n:t.viajes+" viajes"}])
-    + (st.code!=="ok"?alerta("Certificación no vigente",
+    + (st.code!=="ok"?UI.alert("Certificación no vigente",
         "Sin documentación aprobada no puede recibir asignaciones."):"")
-    + card("Demandas compatibles",
-        tbl([{t:"Demanda"},{t:"Ruta"},{t:"Carga"},{t:"Peso",r:true},{t:"Resultado"}],
+    + UI.card("Demandas compatibles",
+        UI.table([{t:"Demanda"},{t:"Ruta"},{t:"Carga"},{t:"Peso",r:true},{t:"Resultado"}],
           abiertas.map(function(d){
-            var no=evaluar(t,d);
+            var no=Matching.evaluar(t,d);
             return '<tr class="clickable" data-dem="'+d.id+'"><td class="mono t-strong">'+d.id+'</td>'
               +'<td class="t-sub">'+d.origen+' → '+d.destino+'</td><td>'+d.merc+'</td>'
-              +'<td class="r mono">'+nf(d.peso)+' kg</td>'
-              +'<td>'+(no?badge("b-crit",no.motivo):badge("b-ok","Compatible"))+'</td></tr>';}).join("")
-          ||emptyRow(5,"Sin demandas publicadas")));
+              +'<td class="r mono">'+Fmt.num(d.peso)+' kg</td>'
+              +'<td>'+(no?UI.badge("b-crit",no.motivo):UI.badge("b-ok","Compatible"))+'</td></tr>';}).join("")
+          ||UI.empty(5,"Sin demandas publicadas")));
 }
 
-/* ===================== CLIENTES ===================== */
 function vClientes(){
-  if(S.cliOpen) return vCliente(S.cliOpen);
-  var q=S.q.toLowerCase();
-  var lista=CLIENTES.filter(function(c){
-    if(S.filtro!=="todos"&&c.etapa!==S.filtro) return false;
+  if(State.cliOpen) return vCliente(State.cliOpen);
+  var q=State.q.toLowerCase();
+  var lista=Seed.CLIENTES.filter(function(c){
+    if(State.filtro!=="todos"&&c.etapa!==State.filtro) return false;
     if(q.length<2) return true;
     return (c.n+" "+c.nit+" "+c.ciudad+" "+c.tipo+" "+c.ejecutivo).toLowerCase().indexOf(q)>=0;});
-  var chips=[["todos","Todos",CLIENTES.length]].concat(ETAPAS.map(function(e){
-    return [e.id,e.n,CLIENTES.filter(function(c){return c.etapa===e.id;}).length];}))
-    .map(function(f){return '<button class="chip'+(S.filtro===f[0]?" is-on":"")+'" data-filtro="'+f[0]+'">'
+  var chips=[["todos","Todos",Seed.CLIENTES.length]].concat(Seed.ETAPAS.map(function(e){
+    return [e.id,e.n,Seed.CLIENTES.filter(function(c){return c.etapa===e.id;}).length];}))
+    .map(function(f){return '<button class="chip'+(State.filtro===f[0]?" is-on":"")+'" data-filtro="'+f[0]+'">'
       +f[1]+'<span class="chip-n">'+f[2]+'</span></button>';}).join("");
-  return ph({eyebrow:"CRM",t:"Clientes",
-      meta:pill("Total",CLIENTES.length)+pill("Activos",CLIENTES.filter(function(c){return c.etapa==="activo"||c.etapa==="fidelizacion";}).length),
+  return UI.head({eyebrow:"CRM",t:"Clientes",
+      meta:UI.pill("Total",Seed.CLIENTES.length)+UI.pill("Activos",Seed.CLIENTES.filter(function(c){return c.etapa==="activo"||c.etapa==="fidelizacion";}).length),
       act:'<button class="btn btn-primary" id="btn-nuevo-cli">+ Nuevo prospecto</button>'})
     + '<div class="card"><div class="card-body" style="padding-bottom:12px">'
-    + '<input id="q" type="search" value="'+esc(S.q)+'" placeholder="Buscar por nombre, NIT, ciudad…" style="max-width:380px">'
+    + '<input id="q" type="search" value="'+Fmt.esc(State.q)+'" placeholder="Buscar por nombre, NIT, ciudad…" style="max-width:380px">'
     + '<div class="chips" style="margin-top:12px">'+chips+'</div></div>'
-    + tbl([{t:"Cliente"},{t:"Tipo"},{t:"Ciudad"},{t:"Etapa"},{t:"Servicios",r:true},{t:"Docs",r:true},{t:"Próximo seg."}],
+    + UI.table([{t:"Cliente"},{t:"Tipo"},{t:"Ciudad"},{t:"Etapa"},{t:"Servicios",r:true},{t:"Docs",r:true},{t:"Próximo seg."}],
         lista.map(function(c){
           return '<tr class="clickable" data-cli="'+c.id+'">'
             +'<td class="t-strong">'+c.n+'<div class="t-sub mono">'+c.nit+'</div></td>'
             +'<td class="t-sub">'+c.tipo+'</td><td class="t-sub">'+c.ciudad+'</td>'
-            +'<td>'+bd(etapaBadge(c.etapa))+'</td>'
+            +'<td>'+UI.pair(Clientes.badgeEtapa(c.etapa))+'</td>'
             +'<td class="r mono">'+c.serv.length+'</td>'
-            +'<td class="r mono">'+docsDe(c.id).length+'</td>'
+            +'<td class="r mono">'+Documentos.deCliente(c.id).length+'</td>'
             +'<td class="mono t-sub">'+c.proximo+'</td></tr>';}).join("")
-        ||emptyRow(7,"Sin resultados"))
+        ||UI.empty(7,"Sin resultados"))
     + '</div>';
 }
 
-var CLI_TABS=[["resumen","Resumen"],["operaciones","Operaciones"],["documentos","Documentos"],
-  ["servicios","Servicios"],["actividades","Actividades"],["contactos","Contactos"],["historial","Historial"]];
 function vCliente(id){
-  var c=cliBy(id); if(!c) return "";
-  var ops=OPERACIONES.filter(function(o){return o.cli===id;});
-  var docs=docsDe(id);
-  var acts=ACTIVIDADES.filter(function(a){return a.cli===id;});
-  var oport=OPORTUNIDADES.filter(function(o){return o.cli===id;});
-  var tabs='<div class="tabs">'+CLI_TABS.map(function(t){
-    return '<button class="tab'+(S.cliTab===t[0]?" is-on":"")+'" data-clitab="'+t[0]+'">'+t[1]+'</button>';}).join("")+'</div>';
+  var c=Clientes.byId(id); if(!c) return "";
+  var ops=Seed.OPERACIONES.filter(function(o){return o.cli===id;});
+  var docs=Documentos.deCliente(id);
+  var acts=Seed.ACTIVIDADES.filter(function(a){return a.cli===id;});
+  var oport=Seed.OPORTUNIDADES.filter(function(o){return o.cli===id;});
+  var tabs='<div class="tabs">'+Seed.CLI_TABS.map(function(t){
+    return '<button class="tab'+(State.cliTab===t[0]?" is-on":"")+'" data-clitab="'+t[0]+'">'+t[1]+'</button>';}).join("")+'</div>';
   var body="";
 
-  if(S.cliTab==="resumen"){
-    var noTiene=SERVICIOS.filter(function(sv){return c.serv.indexOf(sv.id)<0;});
-    body=tiles([
-      {k:"Etapa",v:etapaN(c.etapa),n:"Desde "+c.desde},
+  if(State.cliTab==="resumen"){
+    var noTiene=Seed.SERVICIOS.filter(function(sv){return c.serv.indexOf(sv.id)<0;});
+    body=UI.tiles([
+      {k:"Etapa",v:Clientes.etapa(c.etapa),n:"Desde "+c.desde},
       {k:"Operaciones",v:String(ops.length),n:ops.filter(function(o){return o.estado!=="cerrada";}).length+" abiertas"},
       {k:"Documentos",v:String(docs.length),n:docs.filter(function(d){return d.estado==="pendiente";}).length+" pendientes"},
-      {k:"Servicios",v:String(c.serv.length)+"/"+SERVICIOS.length,n:noTiene.length+" sin contratar"},
-      {k:"Oportunidades",v:String(oport.length),n:"USD "+nf(oport.reduce(function(a,o){return a+o.valor;},0))},
+      {k:"Servicios",v:String(c.serv.length)+"/"+Seed.SERVICIOS.length,n:noTiene.length+" sin contratar"},
+      {k:"Oportunidades",v:String(oport.length),n:"USD "+Fmt.num(oport.reduce(function(a,o){return a+o.valor;},0))},
       {k:"Última interacción",v:c.ultima.split(" ")[0]+" "+c.ultima.split(" ")[1],n:"Próxima: "+c.proximo}])
     + '<div class="grid2">'
-    + card("Datos generales",'<div class="card-body"><div class="kvlist">'
+    + UI.card("Datos generales",'<div class="card-body"><div class="kvlist">'
         +'<div class="kvrow"><span>NIT</span><span class="mono">'+c.nit+'</span></div>'
         +'<div class="kvrow"><span>Tipo</span><span>'+c.tipo+'</span></div>'
         +'<div class="kvrow"><span>Ciudad</span><span>'+c.ciudad+'</span></div>'
         +'<div class="kvrow"><span>Ejecutivo</span><span>'+c.ejecutivo+'</span></div>'
         +'<div class="kvrow"><span>Cliente desde</span><span>'+c.desde+'</span></div>'
         +'</div></div>')
-    + card("Servicios contratados",'<div class="card-body"><div class="chips">'
-        +(c.serv.length?c.serv.map(function(s){return badge("b-ok",servN(s));}).join("")
+    + UI.card("Servicios contratados",'<div class="card-body"><div class="chips">'
+        +(c.serv.length?c.serv.map(function(s){return UI.badge("b-ok",Servicios.nombre(s));}).join("")
           :'<span class="t-sub">Ninguno</span>')+'</div>'
         +(noTiene.length?'<div class="eyebrow" style="margin:14px 0 8px">Sin contratar</div><div class="chips">'
-          +noTiene.map(function(s){return badge("b-neutral",s.n);}).join("")+'</div>':'')
+          +noTiene.map(function(s){return UI.badge("b-neutral",s.n);}).join("")+'</div>':'')
         +'</div>')
     + '</div>';
   }
-  else if(S.cliTab==="operaciones"){
-    body=tbl([{t:"Operación"},{t:"Tipo"},{t:"Ruta"},{t:"Mercancía"},{t:"Peso",r:true},{t:"Estado"},{t:"Docs",r:true}],
+  else if(State.cliTab==="operaciones"){
+    body=UI.table([{t:"Operación"},{t:"Tipo"},{t:"Ruta"},{t:"Mercancía"},{t:"Peso",r:true},{t:"Estado"},{t:"Docs",r:true}],
       ops.map(function(o){
         return '<tr class="clickable" data-op="'+o.id+'"><td class="mono t-strong">'+o.id+'</td>'
-          +'<td>'+badge("b-neutral",o.tipo==="imp"?"Importación":"Exportación")+'</td>'
+          +'<td>'+UI.badge("b-neutral",o.tipo==="imp"?"Importación":"Exportación")+'</td>'
           +'<td class="t-sub">'+o.ruta+'</td><td>'+o.merc+'</td>'
-          +'<td class="r mono">'+nf(o.peso)+' kg</td><td>'+bd(opEstado(o.estado))+'</td>'
-          +'<td class="r mono">'+DOCS.filter(function(d){return d.op===o.id;}).length+'</td></tr>';}).join("")
-      ||emptyRow(7,"Sin operaciones"));
+          +'<td class="r mono">'+Fmt.num(o.peso)+' kg</td><td>'+UI.pair(Operaciones.UI.badge(o.estado))+'</td>'
+          +'<td class="r mono">'+Documentos.all().filter(function(d){return d.op===o.id;}).length+'</td></tr>';}).join("")
+      ||UI.empty(7,"Sin operaciones"));
     body='<div class="card">'+body+'</div>';
   }
-  else if(S.cliTab==="documentos"){
+  else if(State.cliTab==="documentos"){
     body=docPanel(id);
   }
-  else if(S.cliTab==="servicios"){
-    var noTiene2=SERVICIOS.filter(function(sv){return c.serv.indexOf(sv.id)<0;});
-    body=card("Contratados",tbl([{t:"Servicio"},{t:"Estado"}],
+  else if(State.cliTab==="servicios"){
+    var noTiene2=Seed.SERVICIOS.filter(function(sv){return c.serv.indexOf(sv.id)<0;});
+    body=UI.card("Contratados",UI.table([{t:"Servicio"},{t:"Estado"}],
         (c.serv.length?c.serv.map(function(s){
-          return '<tr><td class="t-strong">'+servN(s)+'</td><td>'+badge("b-ok","Activo")+'</td></tr>';}).join("")
-          :emptyRow(2,"Ninguno"))))
-      + card("Oportunidades de ampliación",tbl(
+          return '<tr><td class="t-strong">'+Servicios.nombre(s)+'</td><td>'+UI.badge("b-ok","Activo")+'</td></tr>';}).join("")
+          :UI.empty(2,"Ninguno"))))
+      + UI.card("Oportunidades de ampliación",UI.table(
           [{t:"Servicio"},{t:"Oportunidad"},{t:"Valor USD",r:true},{t:"Prob.",r:true},{t:"Estado"}],
           (oport.length?oport.map(function(o){
-            return '<tr><td class="t-strong">'+servN(o.serv)+'</td><td>'+o.t+'</td>'
-              +'<td class="r mono">'+nf(o.valor)+'</td><td class="r mono">'+o.prob+'%</td>'
-              +'<td>'+bd(etapaBadge(o.etapa))+'</td></tr>';}).join("")
-            :emptyRow(5,"Sin oportunidades registradas"))))
-      + card("Sin contratar",tbl([{t:"Servicio"},{t:"Oportunidad"}],
+            return '<tr><td class="t-strong">'+Servicios.nombre(o.serv)+'</td><td>'+o.t+'</td>'
+              +'<td class="r mono">'+Fmt.num(o.valor)+'</td><td class="r mono">'+o.prob+'%</td>'
+              +'<td>'+UI.pair(Clientes.badgeEtapa(o.etapa))+'</td></tr>';}).join("")
+            :UI.empty(5,"Sin oportunidades registradas"))))
+      + UI.card("Sin contratar",UI.table([{t:"Servicio"},{t:"Oportunidad"}],
           (noTiene2.length?noTiene2.map(function(sv){
             var tiene=oport.filter(function(o){return o.serv===sv.id;}).length>0;
             return '<tr><td class="t-strong">'+sv.n+'</td>'
-              +'<td>'+(tiene?badge("b-warn","Oportunidad abierta"):badge("b-neutral","Sin registrar"))+'</td></tr>';}).join("")
-            :emptyRow(2,"Contrata todos los servicios"))));
+              +'<td>'+(tiene?UI.badge("b-warn","Oportunidad abierta"):UI.badge("b-neutral","Sin registrar"))+'</td></tr>';}).join("")
+            :UI.empty(2,"Contrata todos los servicios"))));
   }
-  else if(S.cliTab==="actividades"){
-    body='<div class="card">'+tbl([{t:"Fecha"},{t:"Tipo"},{t:"Asunto"},{t:"Responsable"},{t:"Estado"}],
+  else if(State.cliTab==="actividades"){
+    body='<div class="card">'+UI.table([{t:"Fecha"},{t:"Tipo"},{t:"Asunto"},{t:"Responsable"},{t:"Estado"}],
       acts.map(function(a){
-        return '<tr><td class="mono t-sub">'+a.fecha+'</td><td>'+badge("b-neutral",ACT_TIPOS[a.tipo])+'</td>'
+        return '<tr><td class="mono t-sub">'+a.fecha+'</td><td>'+UI.badge("b-neutral",Seed.ACT_TIPOS[a.tipo])+'</td>'
           +'<td>'+a.asunto+'</td><td class="t-sub">'+a.resp+'</td>'
-          +'<td>'+(a.estado==="hecha"?badge("b-ok","Hecha"):badge("b-warn","Pendiente"))+'</td></tr>';}).join("")
-      ||emptyRow(5,"Sin actividades"))+'</div>';
+          +'<td>'+(a.estado==="hecha"?UI.badge("b-ok","Hecha"):UI.badge("b-warn","Pendiente"))+'</td></tr>';}).join("")
+      ||UI.empty(5,"Sin actividades"))+'</div>';
   }
-  else if(S.cliTab==="contactos"){
-    body='<div class="card">'+tbl([{t:"Nombre"},{t:"Cargo"},{t:"Teléfono"},{t:"Correo"}],
+  else if(State.cliTab==="contactos"){
+    body='<div class="card">'+UI.table([{t:"Nombre"},{t:"Cargo"},{t:"Teléfono"},{t:"Correo"}],
       c.contactos.map(function(k){
         return '<tr><td class="t-strong">'+k.n+'</td><td class="t-sub">'+k.c+'</td>'
           +'<td class="mono t-sub">'+k.t+'</td><td class="mono t-sub">'+k.m+'</td></tr>';}).join(""))+'</div>';
   }
   else {
     var hist=acts.slice().reverse();
-    body=card("Historial",'<div class="card-body"><ol class="hitos">'
+    body=UI.card("Historial",'<div class="card-body"><ol class="hitos">'
       +(hist.length?hist.map(function(a,i){
         return '<li class="hito '+(a.estado==="hecha"?"done":"now")+'">'
           +'<span class="hito-rail"><span class="hito-dot"></span><span class="hito-line"></span></span>'
-          +'<span class="hito-b"><b>'+a.asunto+'</b><span>'+a.fecha+' · '+ACT_TIPOS[a.tipo]+' · '+a.resp+'</span></span></li>';
+          +'<span class="hito-b"><b>'+a.asunto+'</b><span>'+a.fecha+' · '+Seed.ACT_TIPOS[a.tipo]+' · '+a.resp+'</span></span></li>';
         }).join(""):'<li class="t-sub">Sin historial</li>')+'</ol></div>');
   }
 
   return '<button class="back" data-back="clientes">← Clientes</button>'
-    + ph({eyebrow:c.tipo+" · "+c.ciudad,t:c.n,
-        meta:bd(etapaBadge(c.etapa))+pill("NIT",c.nit)+pill("Docs",docs.length),
+    + UI.head({eyebrow:c.tipo+" · "+c.ciudad,t:c.n,
+        meta:UI.pair(Clientes.badgeEtapa(c.etapa))+UI.pill("NIT",c.nit)+UI.pill("Docs",docs.length),
         act:'<button class="btn btn-primary" data-crear-dem="'+c.id+'">+ Demanda de carga</button>'})
     + tabs + body;
 }
 
-/* ===================== PIPELINE ===================== */
 function vPipeline(){
-  var cols=ETAPAS.map(function(e){
-    var cl=CLIENTES.filter(function(c){return c.etapa===e.id;});
-    var op=OPORTUNIDADES.filter(function(o){return o.etapa===e.id;});
+  var cols=Seed.ETAPAS.map(function(e){
+    var cl=Seed.CLIENTES.filter(function(c){return c.etapa===e.id;});
+    var op=Seed.OPORTUNIDADES.filter(function(o){return o.etapa===e.id;});
     var val=op.reduce(function(a,o){return a+o.valor;},0);
     return '<div class="pipe-col"><div class="pipe-h"><b>'+e.n+'</b>'
-      +'<span>'+cl.length+' · USD '+nf(val)+'</span></div><div class="pipe-b">'
+      +'<span>'+cl.length+' · USD '+Fmt.num(val)+'</span></div><div class="pipe-b">'
       +(cl.length?cl.map(function(c){
-        var o=OPORTUNIDADES.filter(function(x){return x.cli===c.id;});
+        var o=Seed.OPORTUNIDADES.filter(function(x){return x.cli===c.id;});
         var v=o.reduce(function(a,x){return a+x.valor;},0);
         return '<button class="pcard" data-cli="'+c.id+'"><b>'+c.n+'</b>'
           +'<span>'+c.ciudad+' · '+c.ejecutivo+'</span>'
-          +(v?'<span class="val">USD '+nf(v)+'</span>':'')+'</button>';}).join("")
+          +(v?'<span class="val">USD '+Fmt.num(v)+'</span>':'')+'</button>';}).join("")
         :'<span class="t-sub" style="padding:6px">—</span>')
       +'</div></div>';}).join("");
-  var val=OPORTUNIDADES.reduce(function(a,o){return a+o.valor;},0);
-  return ph({eyebrow:"CRM",t:"Pipeline",
-      meta:pill("Oportunidades",OPORTUNIDADES.length)+pill("Valor","USD "+nf(val))})
+  var val=Seed.OPORTUNIDADES.reduce(function(a,o){return a+o.valor;},0);
+  return UI.head({eyebrow:"CRM",t:"Pipeline",
+      meta:UI.pill("Oportunidades",Seed.OPORTUNIDADES.length)+UI.pill("Valor","USD "+Fmt.num(val))})
     + '<div class="pipe">'+cols+'</div>'
     + '<div style="height:18px"></div>'
-    + card("Oportunidades",
-        tbl([{t:"ID"},{t:"Cliente"},{t:"Oportunidad"},{t:"Servicio"},{t:"Valor USD",r:true},{t:"Prob.",r:true},{t:"Cierre"},{t:"Etapa"}],
-          OPORTUNIDADES.map(function(o){
-            var c=cliBy(o.cli);
+    + UI.card("Oportunidades",
+        UI.table([{t:"ID"},{t:"Cliente"},{t:"Oportunidad"},{t:"Servicio"},{t:"Valor USD",r:true},{t:"Prob.",r:true},{t:"Cierre"},{t:"Etapa"}],
+          Seed.OPORTUNIDADES.map(function(o){
+            var c=Clientes.byId(o.cli);
             return '<tr class="clickable" data-cli="'+o.cli+'"><td class="mono t-strong">'+o.id+'</td>'
-              +'<td>'+(c?c.n:"—")+'</td><td>'+o.t+'</td><td class="t-sub">'+servN(o.serv)+'</td>'
-              +'<td class="r mono">'+nf(o.valor)+'</td><td class="r mono">'+o.prob+'%</td>'
-              +'<td class="mono t-sub">'+o.cierre+'</td><td>'+bd(etapaBadge(o.etapa))+'</td></tr>';}).join("")));
+              +'<td>'+(c?c.n:"—")+'</td><td>'+o.t+'</td><td class="t-sub">'+Servicios.nombre(o.serv)+'</td>'
+              +'<td class="r mono">'+Fmt.num(o.valor)+'</td><td class="r mono">'+o.prob+'%</td>'
+              +'<td class="mono t-sub">'+o.cierre+'</td><td>'+UI.pair(Clientes.badgeEtapa(o.etapa))+'</td></tr>';}).join("")));
 }
 
-/* ===================== ACTIVIDADES ===================== */
 function vActividades(){
-  var lista=ACTIVIDADES.filter(function(a){
-    return S.filtro==="todos"||(S.filtro==="pendiente"?a.estado==="pendiente":a.estado==="hecha");});
-  var chips=[["todos","Todas",ACTIVIDADES.length],
-    ["pendiente","Pendientes",ACTIVIDADES.filter(function(a){return a.estado==="pendiente";}).length],
-    ["hecha","Hechas",ACTIVIDADES.filter(function(a){return a.estado==="hecha";}).length]]
-    .map(function(f){return '<button class="chip'+(S.filtro===f[0]?" is-on":"")+'" data-filtro="'+f[0]+'">'
+  var lista=Seed.ACTIVIDADES.filter(function(a){
+    return State.filtro==="todos"||(State.filtro==="pendiente"?a.estado==="pendiente":a.estado==="hecha");});
+  var chips=[["todos","Todas",Seed.ACTIVIDADES.length],
+    ["pendiente","Pendientes",Seed.ACTIVIDADES.filter(function(a){return a.estado==="pendiente";}).length],
+    ["hecha","Hechas",Seed.ACTIVIDADES.filter(function(a){return a.estado==="hecha";}).length]]
+    .map(function(f){return '<button class="chip'+(State.filtro===f[0]?" is-on":"")+'" data-filtro="'+f[0]+'">'
       +f[1]+'<span class="chip-n">'+f[2]+'</span></button>';}).join("");
-  return ph({eyebrow:"CRM",t:"Actividades",
-      meta:pill("Pendientes",ACTIVIDADES.filter(function(a){return a.estado==="pendiente";}).length),
+  return UI.head({eyebrow:"CRM",t:"Actividades",
+      meta:UI.pill("Pendientes",Seed.ACTIVIDADES.filter(function(a){return a.estado==="pendiente";}).length),
       act:'<button class="btn btn-primary" id="btn-nueva-act">+ Nueva actividad</button>'})
     + '<div class="card"><div class="card-body" style="padding-bottom:12px"><div class="chips">'+chips+'</div></div>'
-    + tbl([{t:"Fecha"},{t:"Cliente"},{t:"Tipo"},{t:"Asunto"},{t:"Responsable"},{t:"Estado"},{t:""}],
+    + UI.table([{t:"Fecha"},{t:"Cliente"},{t:"Tipo"},{t:"Asunto"},{t:"Responsable"},{t:"Estado"},{t:""}],
         lista.map(function(a){
-          var c=cliBy(a.cli);
+          var c=Clientes.byId(a.cli);
           return '<tr><td class="mono t-sub">'+a.fecha+'</td>'
             +'<td class="t-strong clickable" data-cli="'+a.cli+'">'+(c?c.n:"—")+'</td>'
-            +'<td>'+badge("b-neutral",ACT_TIPOS[a.tipo])+'</td><td>'+a.asunto+'</td>'
+            +'<td>'+UI.badge("b-neutral",Seed.ACT_TIPOS[a.tipo])+'</td><td>'+a.asunto+'</td>'
             +'<td class="t-sub">'+a.resp+'</td>'
-            +'<td>'+(a.estado==="hecha"?badge("b-ok","Hecha"):badge("b-warn","Pendiente"))+'</td>'
+            +'<td>'+(a.estado==="hecha"?UI.badge("b-ok","Hecha"):UI.badge("b-warn","Pendiente"))+'</td>'
             +'<td class="r">'+(a.estado==="pendiente"
               ?'<button class="btn" data-act-ok="'+a.id+'">Marcar hecha</button>':'')+'</td></tr>';}).join("")
-        ||emptyRow(7,"Sin actividades"))
+        ||UI.empty(7,"Sin actividades"))
     + '</div>';
 }
 
-/* ===================== GESTIÓN DOCUMENTAL ===================== */
 var PAGE=20;
 
-function docFiltrados(cli){
-  var base=cli?docsDe(cli):visibleDocs();
-  var q=S.docQ.toLowerCase();
-  return base.filter(function(d){
-    if(S.docCat!=="todas"&&d.cat!==S.docCat) return false;
-    if(S.docEstado!=="todos"&&d.estado!==S.docEstado) return false;
-    if(S.docOp!=="todas"&&d.op!==S.docOp) return false;
-    if(q.length>=2&&(d.n+" "+d.op+" "+catN(d.cat).n).toLowerCase().indexOf(q)<0) return false;
-    return true;});
-}
-
 function docPanel(cli){
-  var base=cli?docsDe(cli):visibleDocs();
-  var lista=docFiltrados(cli);
+  var base=cli?Documentos.deCliente(cli):Documentos.visibles();
+  var lista=DocFiltro.aplicar(cli);
   var totalMB=base.reduce(function(a,d){return a+d.size;},0);
   var dups=base.filter(function(d){return d.dup;}).length;
   var pend=base.filter(function(d){return d.estado==="pendiente";}).length;
   var pages=Math.max(1,Math.ceil(lista.length/PAGE));
-  if(S.docPage>pages) S.docPage=pages;
-  var slice=lista.slice((S.docPage-1)*PAGE,S.docPage*PAGE);
+  if(State.docPage>pages) State.docPage=pages;
+  var slice=lista.slice((State.docPage-1)*PAGE,State.docPage*PAGE);
 
-  /* Carpetas por categoría */
-  var folders='<button class="tnode'+(S.docCat==="todas"?" is-on":"")+'" data-doccat="todas">'
+  
+  var folders='<button class="tnode'+(State.docCat==="todas"?" is-on":"")+'" data-doccat="todas">'
     +'<span class="tnode-n">Todas las categorías</span><span class="tnode-c">'+base.length+'</span></button>'
-    +DOC_CATS.map(function(c){
+    +Seed.DOC_CATS.map(function(c){
       var n=base.filter(function(d){return d.cat===c.id;}).length;
       if(!n) return "";
-      return '<button class="tnode'+(S.docCat===c.id?" is-on":"")+'" data-doccat="'+c.id+'">'
+      return '<button class="tnode'+(State.docCat===c.id?" is-on":"")+'" data-doccat="'+c.id+'">'
         +'<span class="tnode-n">'+c.n+'</span><span class="tnode-c">'+n+'</span></button>';}).join("");
 
-  /* Filtros */
-  var opsCli=(cli?OPERACIONES.filter(function(o){return o.cli===cli;}):visibleOps());
+  
+  var opsCli=(cli?Seed.OPERACIONES.filter(function(o){return o.cli===cli;}):Operaciones.visibles());
   var selOp='<select id="f-docop"><option value="todas">Todas las operaciones</option>'
-    +opsCli.map(function(o){return '<option value="'+o.id+'"'+(S.docOp===o.id?" selected":"")+'>'+o.id+'</option>';}).join("")
+    +opsCli.map(function(o){return '<option value="'+o.id+'"'+(State.docOp===o.id?" selected":"")+'>'+o.id+'</option>';}).join("")
     +'</select>';
   var selEst='<select id="f-docest"><option value="todos">Todos los estados</option>'
-    +Object.keys(DOC_ESTADOS).map(function(k){
-      return '<option value="'+k+'"'+(S.docEstado===k?" selected":"")+'>'+DOC_ESTADOS[k][1]+'</option>';}).join("")
+    +Object.keys(Seed.DOC_ESTADOS).map(function(k){
+      return '<option value="'+k+'"'+(State.docEstado===k?" selected":"")+'>'+Seed.DOC_ESTADOS[k][1]+'</option>';}).join("")
     +'</select>';
 
   var rows=slice.map(function(d){
-    var e=DOC_ESTADOS[d.estado];
+    var e=Seed.DOC_ESTADOS[d.estado];
     return '<tr class="clickable" data-doc="'+d.id+'">'
       +'<td><span class="doc-i">'+d.fmt+'</span></td>'
-      +'<td class="t-strong fname" title="'+esc(d.n)+'">'+d.n
-        +(d.dup?' '+badge("b-warn","Duplicado"):'')+'</td>'
-      +'<td class="t-sub">'+catN(d.cat).n+'</td>'
+      +'<td class="t-strong fname" title="'+Fmt.esc(d.n)+'">'+d.n
+        +(d.dup?' '+UI.badge("b-warn","Duplicado"):'')+'</td>'
+      +'<td class="t-sub">'+Documentos.categoria(d.cat).n+'</td>'
       +'<td class="mono t-sub">'+d.op+'</td>'
-      +'<td class="r mono">'+mb(d.size)+'</td>'
-      +'<td>'+bd(e)+'</td>'
+      +'<td class="r mono">'+Fmt.size(d.size)+'</td>'
+      +'<td>'+UI.pair(e)+'</td>'
       +'<td class="mono t-sub">'+d.fecha+'</td></tr>';}).join("");
 
-  var pg='<div class="pg"><span>'+(lista.length?((S.docPage-1)*PAGE+1)+'–'+Math.min(S.docPage*PAGE,lista.length):0)
+  var pg='<div class="pg"><span>'+(lista.length?((State.docPage-1)*PAGE+1)+'–'+Math.min(State.docPage*PAGE,lista.length):0)
     +' de '+lista.length+'</span><div class="pg-b">'
-    +'<button class="pg-btn" data-pg="'+(S.docPage-1)+'"'+(S.docPage<=1?" disabled":"")+'>‹</button>'
+    +'<button class="pg-btn" data-pg="'+(State.docPage-1)+'"'+(State.docPage<=1?" disabled":"")+'>‹</button>'
     +Array.apply(null,{length:Math.min(pages,7)}).map(function(_,i){
         var n=i+1;
-        return '<button class="pg-btn'+(n===S.docPage?" is-on":"")+'" data-pg="'+n+'">'+n+'</button>';}).join("")
+        return '<button class="pg-btn'+(n===State.docPage?" is-on":"")+'" data-pg="'+n+'">'+n+'</button>';}).join("")
     +(pages>7?'<span style="padding:0 4px">…</span>':'')
-    +'<button class="pg-btn" data-pg="'+(S.docPage+1)+'"'+(S.docPage>=pages?" disabled":"")+'>›</button>'
+    +'<button class="pg-btn" data-pg="'+(State.docPage+1)+'"'+(State.docPage>=pages?" disabled":"")+'>›</button>'
     +'</div></div>';
 
-  return tiles([
-      {k:"Archivos",v:nf(base.length),n:mb(totalMB)},
+  return UI.tiles([
+      {k:"Archivos",v:Fmt.num(base.length),n:Fmt.size(totalMB)},
       {k:"Pendientes",v:String(pend),n:"Por revisar"},
       {k:"Duplicados",v:String(dups),n:"Detectados"},
       {k:"Operaciones",v:String(opsCli.length),n:"Con documentos"}])
@@ -1544,29 +1782,28 @@ function docPanel(cli){
     + '<div style="min-width:0">'
       + '<div class="card"><div class="card-body" style="padding-bottom:12px">'
       + '<div class="filter-row">'
-      + '<input id="f-docq" type="search" value="'+esc(S.docQ)+'" placeholder="Buscar archivo…">'
+      + '<input id="f-docq" type="search" value="'+Fmt.esc(State.docQ)+'" placeholder="Buscar archivo…">'
       + selOp + selEst
       + '<button class="btn btn-primary" data-subir="'+(cli||"")+'">+ Subir archivos</button>'
       + '</div></div>'
-      + tbl([{t:""},{t:"Archivo"},{t:"Categoría"},{t:"Operación"},{t:"Tamaño",r:true},{t:"Estado"},{t:"Fecha"}],
-          rows||emptyRow(7,"Sin resultados"))
+      + UI.table([{t:""},{t:"Archivo"},{t:"Categoría"},{t:"Operación"},{t:"Tamaño",r:true},{t:"Estado"},{t:"Fecha"}],
+          rows||UI.empty(7,"Sin resultados"))
       + pg + '</div>'
     + '</div></div>';
 }
 
 function vDocumentos(){
-  var base=visibleDocs();
-  return ph({eyebrow:S.role.cliente?cliBy(S.role.cliente).n:"CRM",t:"Documentos",
-      meta:pill("Archivos",nf(base.length))
-        +pill("Pendientes",base.filter(function(d){return d.estado==="pendiente";}).length)
-        +pill("Volumen",mb(base.reduce(function(a,d){return a+d.size;},0)))})
-    + docPanel(S.role.cliente||null);
+  var base=Documentos.visibles();
+  return UI.head({eyebrow:Session.clienteId()?Clientes.byId(Session.clienteId()).n:"CRM",t:"Documentos",
+      meta:UI.pill("Archivos",Fmt.num(base.length))
+        +UI.pill("Pendientes",base.filter(function(d){return d.estado==="pendiente";}).length)
+        +UI.pill("Volumen",Fmt.size(base.reduce(function(a,d){return a+d.size;},0)))})
+    + docPanel(Session.clienteId()||null);
 }
 
-/* Subida simulada con arrastrar y soltar */
 function modalSubir(cli){
-  var ops=(cli?OPERACIONES.filter(function(o){return o.cli===cli;}):visibleOps());
-  openModal("Subir archivos",
+  var ops=(cli?Seed.OPERACIONES.filter(function(o){return o.cli===cli;}):Operaciones.visibles());
+  Modal.open("Subir archivos",
     '<div class="drop" id="drop"><div class="drop-i">'
     +'<svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.7" '
     +'stroke-linecap="round" stroke-linejoin="round"><path d="M12 16V4"/><path d="m7 9 5-5 5 5"/>'
@@ -1578,15 +1815,16 @@ function modalSubir(cli){
       +ops.map(function(o){return '<option value="'+o.id+'">'+o.id+' · '+o.merc+'</option>';}).join("")
       +'</select></label>'
     +'<label class="fld"><span class="eyebrow">Categoría</span><select id="f-upcat">'
-      +DOC_CATS.map(function(c){return '<option value="'+c.id+'">'+c.n+'</option>';}).join("")
+      +Seed.DOC_CATS.map(function(c){return '<option value="'+c.id+'">'+c.n+'</option>';}).join("")
       +'</select></label></div>'
     +'<div id="up-list" style="margin-top:14px"></div>',
     '<button class="btn" id="m-cancel">Cancelar</button>'
     +'<button class="btn btn-primary" id="m-up" data-cli="'+(cli||"C001")+'">Subir</button>');
+  wireModal();
 }
 
 function wireModal(){
-  var drop=$("drop");
+  var drop=Dom.byId("drop");
   if(drop){
     ["dragenter","dragover"].forEach(function(ev){
       drop.addEventListener(ev,function(e){e.preventDefault();drop.classList.add("is-over");});});
@@ -1597,54 +1835,54 @@ function wireModal(){
       var f=e.dataTransfer&&e.dataTransfer.files;
       if(f&&f.length) listarArchivos(Array.prototype.slice.call(f));});
   }
-  var inp=$("f-files");
+  var inp=Dom.byId("f-files");
   if(inp) inp.addEventListener("change",function(){
     listarArchivos(Array.prototype.slice.call(inp.files));});
-  var c=$("m-cancel"); if(c) c.addEventListener("click",closeModal);
-  var u=$("m-up"); if(u) u.addEventListener("click",function(){subirArchivos(u.getAttribute("data-cli"));});
+  var c=Dom.byId("m-cancel"); if(c) c.addEventListener("click",Modal.close);
+  var u=Dom.byId("m-up"); if(u) u.addEventListener("click",function(){subirArchivos(u.getAttribute("data-cli"));});
 }
 var pendientesSubida=[];
 function listarArchivos(files){
   pendientesSubida=files.map(function(f){
     return {n:f.name,size:Math.round((f.size/1048576)*10)/10||0.4};});
-  $("up-list").innerHTML='<div class="eyebrow" style="margin-bottom:8px">'+files.length+' archivo(s)</div>'
+  Dom.byId("up-list").innerHTML='<div class="eyebrow" style="margin-bottom:8px">'+files.length+' archivo(s)</div>'
     +'<div class="docs" style="border:1px solid var(--line);border-radius:8px">'
     +pendientesSubida.map(function(f){
-      return '<div class="doc"><span class="doc-n"><b>'+esc(f.n)+'</b></span>'
-        +'<span class="doc-sz">'+mb(f.size)+'</span></div>';}).join("")+'</div>';
+      return '<div class="doc"><span class="doc-n"><b>'+Fmt.esc(f.n)+'</b></span>'
+        +'<span class="doc-sz">'+Fmt.size(f.size)+'</span></div>';}).join("")+'</div>';
 }
 function subirArchivos(cli){
-  var op=$("f-upop")?$("f-upop").value:"";
-  var cat=$("f-upcat")?$("f-upcat").value:"factura";
+  var op=Dom.byId("f-upop")?Dom.byId("f-upop").value:"";
+  var cat=Dom.byId("f-upcat")?Dom.byId("f-upcat").value:"factura";
   var lote=pendientesSubida.length?pendientesSubida
     :[{n:"documento_"+Date.now()+".pdf",size:2.4},{n:"anexo_"+Date.now()+".pdf",size:5.1}];
   var nuevos=0,dups=0;
   lote.forEach(function(f){
-    var existe=DOCS.some(function(d){return d.op===op&&d.n===f.n;});
-    DOCS.push({id:"D"+(9000+DOCS.length),cli:cli,op:op,cat:cat,fmt:catN(cat).fmt,
-      n:f.n,size:f.size,estado:"pendiente",fecha:"22 sep 2026",por:S.role.name,dup:existe});
+    var existe=Documentos.all().some(function(d){return d.op===op&&d.n===f.n;});
+    Documentos.all().push({id:"D"+(9000+Documentos.all().length),cli:cli,op:op,cat:cat,fmt:Documentos.categoria(cat).fmt,
+      n:f.n,size:f.size,estado:"pendiente",fecha:"22 sep 2026",por:Session.nombre(),dup:existe});
     if(existe) dups++; else nuevos++;});
   pendientesSubida=[];
-  closeModal();
-  S.docPage=1;
-  renderNav();render();
-  toast(nuevos+" archivo(s) cargado(s) en "+op+(dups?" · "+dups+" duplicado(s) marcado(s)":""));
+  Modal.close();
+  State.docPage=1;
+  Router.refresh();
+  Toast.show(nuevos+" archivo(s) cargado(s) en "+op+(dups?" · "+dups+" duplicado(s) marcado(s)":""));
 }
 function modalDoc(id){
-  var d=null;for(var i=0;i<DOCS.length;i++){if(DOCS[i].id===id)d=DOCS[i];}
+  var d=null;for(var i=0;i<Documentos.all().length;i++){if(Documentos.all()[i].id===id)d=Documentos.all()[i];}
   if(!d)return;
-  var c=cliBy(d.cli);
-  openModal(d.n,
-    '<div class="fprev">'+d.fmt+' · '+mb(d.size)+'</div>'
+  var c=Clientes.byId(d.cli);
+  Modal.open(d.n,
+    '<div class="fprev">'+d.fmt+' · '+Fmt.size(d.size)+'</div>'
     +'<div class="kvlist">'
     +'<div class="kvrow"><span>Cliente</span><span>'+(c?c.n:"—")+'</span></div>'
     +'<div class="kvrow"><span>Operación</span><span class="mono">'+d.op+'</span></div>'
-    +'<div class="kvrow"><span>Categoría</span><span>'+catN(d.cat).n+'</span></div>'
+    +'<div class="kvrow"><span>Categoría</span><span>'+Documentos.categoria(d.cat).n+'</span></div>'
     +'<div class="kvrow"><span>Formato</span><span>'+d.fmt+'</span></div>'
-    +'<div class="kvrow"><span>Tamaño</span><span class="mono">'+mb(d.size)+'</span></div>'
+    +'<div class="kvrow"><span>Tamaño</span><span class="mono">'+Fmt.size(d.size)+'</span></div>'
     +'<div class="kvrow"><span>Subido</span><span>'+d.fecha+' · '+d.por+'</span></div>'
-    +'<div class="kvrow"><span>Estado</span><span>'+bd(DOC_ESTADOS[d.estado])+'</span></div>'
-    +(d.dup?'<div class="kvrow"><span>Duplicado</span><span>'+badge("b-warn","Mismo nombre en la operación")+'</span></div>':'')
+    +'<div class="kvrow"><span>Estado</span><span>'+UI.pair(Seed.DOC_ESTADOS[d.estado])+'</span></div>'
+    +(d.dup?'<div class="kvrow"><span>Duplicado</span><span>'+UI.badge("b-warn","Mismo nombre en la operación")+'</span></div>':'')
     +'</div>',
     (d.estado==="pendiente"
       ?'<button class="btn" data-doc-rech="'+d.id+'">Rechazar</button>'
@@ -1652,86 +1890,84 @@ function modalDoc(id){
       :'<button class="btn" id="m-cancel">Cerrar</button>'));
 }
 
-/* ===================== OPERACIONES ===================== */
 function vOperaciones(){
-  var ops=visibleOps();
-  var lista=ops.filter(function(o){return S.filtro==="todos"||o.estado===S.filtro;});
+  var ops=Operaciones.visibles();
+  var lista=ops.filter(function(o){return State.filtro==="todos"||o.estado===State.filtro;});
   var chips=[["todos","Todas",ops.length],
     ["transito","En tránsito",ops.filter(function(o){return o.estado==="transito";}).length],
     ["aduana","En aduana",ops.filter(function(o){return o.estado==="aduana";}).length],
     ["puerto","En puerto",ops.filter(function(o){return o.estado==="puerto";}).length],
     ["docs","Documentación",ops.filter(function(o){return o.estado==="docs";}).length],
     ["cerrada","Cerradas",ops.filter(function(o){return o.estado==="cerrada";}).length]]
-    .map(function(f){return '<button class="chip'+(S.filtro===f[0]?" is-on":"")+'" data-filtro="'+f[0]+'">'
+    .map(function(f){return '<button class="chip'+(State.filtro===f[0]?" is-on":"")+'" data-filtro="'+f[0]+'">'
       +f[1]+'<span class="chip-n">'+f[2]+'</span></button>';}).join("");
-  return ph({eyebrow:"Operaciones",t:"Operaciones",
-      meta:pill("Total",ops.length)+pill("Abiertas",ops.filter(function(o){return o.estado!=="cerrada";}).length)})
+  return UI.head({eyebrow:"Operaciones",t:"Operaciones",
+      meta:UI.pill("Total",ops.length)+UI.pill("Abiertas",ops.filter(function(o){return o.estado!=="cerrada";}).length)})
     + '<div class="card"><div class="card-body" style="padding-bottom:12px"><div class="chips">'+chips+'</div></div>'
-    + tbl([{t:"Operación"},{t:"Cliente"},{t:"Tipo"},{t:"Ruta"},{t:"Peso",r:true},{t:"Estado"},{t:"Docs",r:true}],
+    + UI.table([{t:"Operación"},{t:"Cliente"},{t:"Tipo"},{t:"Ruta"},{t:"Peso",r:true},{t:"Estado"},{t:"Docs",r:true}],
         lista.map(function(o){
-          var c=cliBy(o.cli);
+          var c=Clientes.byId(o.cli);
           return '<tr class="clickable" data-op="'+o.id+'"><td class="mono t-strong">'+o.id+'</td>'
             +'<td>'+(c?c.n:"—")+'</td>'
-            +'<td>'+badge("b-neutral",o.tipo==="imp"?"Importación":"Exportación")+'</td>'
-            +'<td class="t-sub">'+o.ruta+'</td><td class="r mono">'+nf(o.peso)+' kg</td>'
-            +'<td>'+bd(opEstado(o.estado))+'</td>'
-            +'<td class="r mono">'+DOCS.filter(function(d){return d.op===o.id;}).length+'</td></tr>';}).join("")
-        ||emptyRow(7,"Sin operaciones"))
+            +'<td>'+UI.badge("b-neutral",o.tipo==="imp"?"Importación":"Exportación")+'</td>'
+            +'<td class="t-sub">'+o.ruta+'</td><td class="r mono">'+Fmt.num(o.peso)+' kg</td>'
+            +'<td>'+UI.pair(Operaciones.UI.badge(o.estado))+'</td>'
+            +'<td class="r mono">'+Documentos.all().filter(function(d){return d.op===o.id;}).length+'</td></tr>';}).join("")
+        ||UI.empty(7,"Sin operaciones"))
     + '</div>';
 }
 
-/* ===================== DEMANDAS DE CARGA ===================== */
 function vDemandas(){
-  if(S.demOpen) return vDemanda(S.demOpen);
-  var lista=DEMANDAS.filter(function(d){return S.filtro==="todos"||d.estado===S.filtro;});
-  var chips=[["todos","Todas",DEMANDAS.length]].concat(Object.keys(DEM_EST).map(function(k){
-      return [k,DEM_EST[k][1],DEMANDAS.filter(function(d){return d.estado===k;}).length];}))
+  if(State.demOpen) return vDemanda(State.demOpen);
+  var lista=Seed.DEMANDAS.filter(function(d){return State.filtro==="todos"||d.estado===State.filtro;});
+  var chips=[["todos","Todas",Seed.DEMANDAS.length]].concat(Object.keys(Seed.DEM_EST).map(function(k){
+      return [k,Seed.DEM_EST[k][1],Seed.DEMANDAS.filter(function(d){return d.estado===k;}).length];}))
     .filter(function(f){return f[0]==="todos"||f[2]>0;})
-    .map(function(f){return '<button class="chip'+(S.filtro===f[0]?" is-on":"")+'" data-filtro="'+f[0]+'">'
+    .map(function(f){return '<button class="chip'+(State.filtro===f[0]?" is-on":"")+'" data-filtro="'+f[0]+'">'
       +f[1]+'<span class="chip-n">'+f[2]+'</span></button>';}).join("");
-  return ph({eyebrow:"Operaciones",t:"Demandas de carga",
-      meta:pill("Total",DEMANDAS.length)
-        +pill("Sin asignar",DEMANDAS.filter(function(d){return !d.tra;}).length),
-      act:S.role.traId?'':'<button class="btn btn-primary" id="btn-nueva-dem">+ Publicar demanda</button>'})
+  return UI.head({eyebrow:"Operaciones",t:"Demandas de carga",
+      meta:UI.pill("Total",Seed.DEMANDAS.length)
+        +UI.pill("Sin asignar",Seed.DEMANDAS.filter(function(d){return !d.tra;}).length),
+      act:Session.traId()?'':'<button class="btn btn-primary" id="btn-nueva-dem">+ Publicar demanda</button>'})
     + '<div class="card"><div class="card-body" style="padding-bottom:12px"><div class="chips">'+chips+'</div></div>'
-    + tbl([{t:"Demanda"},{t:"Cliente"},{t:"Origen → Destino"},{t:"Carga"},{t:"Peso",r:true},
+    + UI.table([{t:"Demanda"},{t:"Cliente"},{t:"Origen → Destino"},{t:"Carga"},{t:"Peso",r:true},
            {t:"Vehículo"},{t:"Prioridad"},{t:"Estado"},{t:"Transportista"}],
         lista.map(function(d){
-          var c=cliBy(d.cli),t=d.tra?traBy(d.tra):null;
+          var c=Clientes.byId(d.cli),t=d.tra?Transportistas.byId(d.tra):null;
           return '<tr class="clickable" data-dem="'+d.id+'"><td class="mono t-strong">'+d.id+'</td>'
             +'<td>'+(c?c.n:"—")+'</td><td class="t-sub">'+d.origen+' → '+d.destino+'</td>'
-            +'<td class="mono t-sub">'+d.carga+'</td><td class="r mono">'+nf(d.peso)+' kg</td>'
-            +'<td class="t-sub">'+d.vehiculo+'</td><td>'+bd(PRIOR[d.prior])+'</td>'
-            +'<td>'+bd(DEM_EST[d.estado])+'</td>'
+            +'<td class="mono t-sub">'+d.carga+'</td><td class="r mono">'+Fmt.num(d.peso)+' kg</td>'
+            +'<td class="t-sub">'+d.vehiculo+'</td><td>'+UI.pair(Seed.PRIOR[d.prior])+'</td>'
+            +'<td>'+UI.pair(Seed.DEM_EST[d.estado])+'</td>'
             +'<td class="t-sub">'+(t?t.n:"—")+'</td></tr>';}).join("")
-        ||emptyRow(9,"Sin demandas"))
+        ||UI.empty(9,"Sin demandas"))
     + '</div>';
 }
 function vDemanda(id){
-  var d=demBy(id); if(!d) return "";
-  var c=cliBy(d.cli),cand=candidatos(d),asig=d.tra?traBy(d.tra):null;
-  var puedeAsignar=!d.tra&&d.estado==="publicada"&&cand.ok.length&&!S.role.traId;
-  var viaje=VIAJES.filter(function(v){return v.dem===d.id;})[0];
+  var d=Demandas.byId(id); if(!d) return "";
+  var c=Clientes.byId(d.cli),cand=Matching.candidatos(d),asig=d.tra?Transportistas.byId(d.tra):null;
+  var puedeAsignar=!d.tra&&d.estado==="publicada"&&cand.ok.length&&!Session.traId();
+  var viaje=Seed.VIAJES.filter(function(v){return v.dem===d.id;})[0];
 
   return '<button class="back" data-back="demandas">← Demandas</button>'
-    + ph({eyebrow:(c?c.n:"")+" · "+d.op,t:d.id,
-        meta:bd(DEM_EST[d.estado])+bd(PRIOR[d.prior])+(d.peligrosa?badge("b-crit","Carga peligrosa"):""),
-        act:(d.estado==="borrador"&&!S.role.traId?'<button class="btn btn-primary" data-pub="'+d.id+'">Publicar</button>':'')
+    + UI.head({eyebrow:(c?c.n:"")+" · "+d.op,t:d.id,
+        meta:UI.pair(Seed.DEM_EST[d.estado])+UI.pair(Seed.PRIOR[d.prior])+(d.peligrosa?UI.badge("b-crit","Carga peligrosa"):""),
+        act:(d.estado==="borrador"&&!Session.traId()?'<button class="btn btn-primary" data-pub="'+d.id+'">Publicar</button>':'')
           +(puedeAsignar?'<button class="btn btn-primary" data-asig="'+d.id+'">Asignar automáticamente</button>':'')
           +(viaje?'<button class="btn" data-via="'+viaje.id+'">Ver viaje</button>':'')})
-    + card("Datos","<div class='card-body'><div class='grid-kv'>"
+    + UI.card("Datos","<div class='card-body'><div class='grid-kv'>"
         +"<div class='kv'><span class='eyebrow'>Origen</span><b>"+d.origen+"</b></div>"
         +"<div class='kv'><span class='eyebrow'>Destino</span><b>"+d.destino+"</b></div>"
         +"<div class='kv'><span class='eyebrow'>Fecha de carga</span><b>"+d.carga+"</b></div>"
         +"<div class='kv'><span class='eyebrow'>Entrega estimada</span><b>"+d.entrega+"</b></div>"
         +"<div class='kv'><span class='eyebrow'>Mercancía</span><b>"+d.merc+"</b></div>"
-        +"<div class='kv'><span class='eyebrow'>Peso</span><b class='mono'>"+nf(d.peso)+" kg</b></div>"
+        +"<div class='kv'><span class='eyebrow'>Peso</span><b class='mono'>"+Fmt.num(d.peso)+" kg</b></div>"
         +"<div class='kv'><span class='eyebrow'>Volumen</span><b class='mono'>"+d.vol+" m³</b></div>"
         +"<div class='kv'><span class='eyebrow'>Vehículo</span><b>"+d.vehiculo+"</b></div>"
         +"</div></div>")
-    + (asig?alerta("Asignada a "+asig.n,asig.unidad+" · "+asig.placa,"good"):"")
-    + card("Candidatos compatibles",
-        tbl([{t:"Transportista"},{t:"Vehículo"},{t:"Cobertura"},{t:"Cumpl.",r:true},
+    + (asig?UI.alert("Asignada a "+asig.n,asig.unidad+" · "+asig.placa,"good"):"")
+    + UI.card("Candidatos compatibles",
+        UI.table([{t:"Transportista"},{t:"Vehículo"},{t:"Cobertura"},{t:"Cumpl.",r:true},
              {t:"Rotación",r:true},{t:"Disponibilidad"},{t:"Puntaje",r:true}],
           (cand.ok.length?cand.ok.map(function(x){
             var win=asig?asig.id===x.t.id:false;
@@ -1741,317 +1977,242 @@ function vDemanda(id){
               +'<td class="t-sub">'+x.t.cobertura.join("<br>")+'</td>'
               +'<td class="r mono">'+x.t.cumpl+'%</td>'
               +'<td class="r mono">'+x.t.asignadas30d+'/30 d</td>'
-              +'<td>'+bd(DISP[x.t.disp])+'</td>'
+              +'<td>'+UI.pair(Seed.DISP[x.t.disp])+'</td>'
               +'<td class="r"><span class="score-bar"><i style="width:'+x.p.total+'%"></i></span> '
               +'<span class="mono t-strong">'+x.p.total+'</span></td></tr>';}).join("")
-            :emptyRow(7,"Ningún transportista cumple los requisitos"))),
+            :UI.empty(7,"Ningún transportista cumple los requisitos"))),
         cand.ok.length?"Puntaje: cumplimiento "+cand.ok[0].p.cumpl+" + rotación "+cand.ok[0].p.rot
           +" + origen "+cand.ok[0].p.prox+" + disponibilidad "+cand.ok[0].p.disp:null)
-    + card("Descartados",
-        tbl([{t:"Transportista"},{t:"Regla"},{t:"Motivo"}],
+    + UI.card("Descartados",
+        UI.table([{t:"Transportista"},{t:"Regla"},{t:"Motivo"}],
           cand.no.map(function(x){
             return '<tr class="excl"><td class="t-strong">'+x.t.n+'</td>'
               +'<td class="mono t-sub">R0'+x.regla+'</td><td>'+x.motivo+'</td></tr>';}).join("")
-          ||emptyRow(3,"Ninguno")));
+          ||UI.empty(3,"Ninguno")));
 }
 
-/* ===================== VIAJES ===================== */
 function vViajes(){
-  if(S.viaOpen) return vViaje(S.viaOpen);
-  var todos=visibleViajes();
-  var lista=todos.filter(function(v){return S.filtro==="todos"||v.estado===S.filtro;});
-  var estados=["todos"].concat(Object.keys(VIAJE_EST));
+  if(State.viaOpen) return vViaje(State.viaOpen);
+  var todos=Viajes.visibles();
+  var lista=todos.filter(function(v){return State.filtro==="todos"||v.estado===State.filtro;});
+  var estados=["todos"].concat(Object.keys(Seed.VIAJE_EST));
   var chips=estados.map(function(k){
       var n=k==="todos"?todos.length:todos.filter(function(v){return v.estado===k;}).length;
       if(k!=="todos"&&!n) return "";
-      return '<button class="chip'+(S.filtro===k?" is-on":"")+'" data-filtro="'+k+'">'
-        +(k==="todos"?"Todos":VIAJE_EST[k][1])+'<span class="chip-n">'+n+'</span></button>';}).join("");
-  var q=S.q.toLowerCase();
+      return '<button class="chip'+(State.filtro===k?" is-on":"")+'" data-filtro="'+k+'">'
+        +(k==="todos"?"Todos":Seed.VIAJE_EST[k][1])+'<span class="chip-n">'+n+'</span></button>';}).join("");
+  var q=State.q.toLowerCase();
   if(q.length>=2) lista=lista.filter(function(v){
-    var t=traBy(v.tra),c=cliBy(v.cli);
+    var t=Transportistas.byId(v.tra),c=Clientes.byId(v.cli);
     return (v.id+" "+v.dem+" "+(t?t.n+" "+t.placa:"")+" "+(c?c.n:"")+" "+v.origen+" "+v.destino)
       .toLowerCase().indexOf(q)>=0;});
-  return ph({eyebrow:"Operaciones",t:"Viajes",
-      meta:pill("Total",todos.length)
-        +pill("En ruta",todos.filter(function(v){return ["confirmado","carga","transito","reparto"].indexOf(v.estado)>=0;}).length)
-        +pill("Incidencias",todos.filter(function(v){return v.estado==="incidencia";}).length)})
+  return UI.head({eyebrow:"Operaciones",t:"Viajes",
+      meta:UI.pill("Total",todos.length)
+        +UI.pill("En ruta",todos.filter(function(v){return ["confirmado","carga","transito","reparto"].indexOf(v.estado)>=0;}).length)
+        +UI.pill("Incidencias",todos.filter(function(v){return v.estado==="incidencia";}).length)})
     + '<div class="card"><div class="card-body" style="padding-bottom:12px">'
-    + '<input id="q" type="search" value="'+esc(S.q)+'" placeholder="Rastrear por código, demanda, cliente o placa…" style="max-width:400px">'
+    + '<input id="q" type="search" value="'+Fmt.esc(State.q)+'" placeholder="Rastrear por código, demanda, cliente o placa…" style="max-width:400px">'
     + '<div class="chips" style="margin-top:12px">'+chips+'</div></div>'
-    + tbl([{t:"Viaje"},{t:"Demanda"},{t:"Cliente"},{t:"Transportista"},{t:"Ruta"},{t:"Estado"},{t:"Avance"},{t:"ETA"}],
+    + UI.table([{t:"Viaje"},{t:"Demanda"},{t:"Cliente"},{t:"Transportista"},{t:"Ruta"},{t:"Estado"},{t:"Avance"},{t:"ETA"}],
         lista.map(function(v){
-          var t=traBy(v.tra),c=cliBy(v.cli);
+          var t=Transportistas.byId(v.tra),c=Clientes.byId(v.cli);
           return '<tr class="clickable" data-via="'+v.id+'"><td class="mono t-strong">'+v.id+'</td>'
             +'<td class="mono t-sub">'+v.dem+'</td><td>'+(c?c.n:"—")+'</td>'
             +'<td>'+(t?t.n:"—")+'<div class="t-sub mono">'+(t?t.placa:"")+'</div></td>'
             +'<td class="t-sub">'+v.origen+' → '+v.destino+'</td>'
-            +'<td>'+bd(VIAJE_EST[v.estado])+'</td>'
-            +'<td>'+meter(v.pct,v.pct>=100?" is-full":"")+'</td>'
+            +'<td>'+UI.pair(Seed.VIAJE_EST[v.estado])+'</td>'
+            +'<td>'+UI.meter(v.pct,v.pct>=100?" is-full":"")+'</td>'
             +'<td class="mono t-sub">'+(v.estado==="entregado"?v.entregado:v.eta)+'</td></tr>';}).join("")
-        ||emptyRow(8,"Sin viajes"))
+        ||UI.empty(8,"Sin viajes"))
     + '</div>';
 }
 function vViaje(id){
-  var v=viaBy(id); if(!v) return "";
-  var t=traBy(v.tra),c=cliBy(v.cli),d=demBy(v.dem);
+  var v=Viajes.byId(id); if(!v) return "";
+  var t=Transportistas.byId(v.tra),c=Clientes.byId(v.cli),d=Demandas.byId(v.dem);
   var sig={pendiente:"asignado",asignado:"confirmado",confirmado:"carga",carga:"transito",
     transito:"reparto",reparto:"entregado",incidencia:"transito"};
   return '<button class="back" data-back="viajes">← Viajes</button>'
-    + ph({eyebrow:(c?c.n:"")+" · "+v.dem,t:v.id,
-        meta:bd(VIAJE_EST[v.estado])+pill("ETA",v.estado==="entregado"?v.entregado:v.eta),
-        act:(v.estado!=="entregado"&&v.estado!=="cancelado"&&!S.role.cliente
-          ?'<button class="btn btn-primary" data-avanzar="'+v.id+'">Avanzar a '+VIAJE_EST[sig[v.estado]][1]+'</button>':'')})
-    + (v.inc?alerta("Incidencia",v.inc):"")
-    + card("Datos","<div class='card-body'><div class='grid-kv'>"
+    + UI.head({eyebrow:(c?c.n:"")+" · "+v.dem,t:v.id,
+        meta:UI.pair(Seed.VIAJE_EST[v.estado])+UI.pill("ETA",v.estado==="entregado"?v.entregado:v.eta),
+        act:(v.estado!=="entregado"&&v.estado!=="cancelado"&&!Session.clienteId()
+          ?'<button class="btn btn-primary" data-avanzar="'+v.id+'">Avanzar a '+Seed.VIAJE_EST[sig[v.estado]][1]+'</button>':'')})
+    + (v.inc?UI.alert("Incidencia",v.inc):"")
+    + UI.card("Datos","<div class='card-body'><div class='grid-kv'>"
         +"<div class='kv'><span class='eyebrow'>Cliente</span><b>"+(c?c.n:"—")+"</b></div>"
         +"<div class='kv'><span class='eyebrow'>Transportista</span><b>"+(t?t.n:"—")+"</b></div>"
         +"<div class='kv'><span class='eyebrow'>Unidad</span><b class='mono'>"+(t?t.placa:"—")+"</b></div>"
         +"<div class='kv'><span class='eyebrow'>Origen</span><b>"+v.origen+"</b></div>"
         +"<div class='kv'><span class='eyebrow'>Destino</span><b>"+v.destino+"</b></div>"
         +"<div class='kv'><span class='eyebrow'>Mercancía</span><b>"+(d?d.merc:"—")+"</b></div>"
-        +"</div><div style='margin-top:16px'>"+meter(v.pct,v.pct>=100?" is-full":"")+"</div></div>")
+        +"</div><div style='margin-top:16px'>"+UI.meter(v.pct,v.pct>=100?" is-full":"")+"</div></div>")
     + panelTracking(v)
     + panelPOD(v)
-    + card("Línea de tiempo",'<div class="card-body"><ol class="hitos">'
+    + UI.card("Línea de tiempo",'<div class="card-body"><ol class="hitos">'
         +v.hitos.map(function(h){
           return '<li class="hito '+h.s+'"><span class="hito-rail"><span class="hito-dot"></span>'
             +'<span class="hito-line"></span></span><span class="hito-b"><b>'+h.n+'</b>'
             +'<span>'+h.t+'</span></span></li>';}).join("")+'</ol></div>')
-    + card("Historial de actualizaciones",
-        tbl([{t:"Momento"},{t:"Actualización"}],
+    + UI.card("Historial de actualizaciones",
+        UI.table([{t:"Momento"},{t:"Actualización"}],
           (v.log&&v.log.length?v.log.map(function(l){
             return '<tr><td class="mono t-sub">'+l.t+'</td><td>'+l.m+'</td></tr>';}).join("")
-            :emptyRow(2,"Sin actualizaciones"))));
+            :UI.empty(2,"Sin actualizaciones"))));
 }
 
-/* ===================== TRANSPORTISTAS ===================== */
 function vDirectorio(){
-  if(S.traOpen) return vTransportista(S.traOpen);
-  var lista=TRANSPORTISTAS.filter(function(t){
-    if(S.filtro==="todos") return true;
-    if(S.filtro==="certificados") return certEstado(t).code==="ok";
-    if(S.filtro==="pendientes") return certEstado(t).code==="pend";
-    if(S.filtro==="bloqueados") return certEstado(t).code==="no";
-    return t.disp===S.filtro;});
-  var chips=[["todos","Todos",TRANSPORTISTAS.length],
-    ["certificados","Certificados",TRANSPORTISTAS.filter(function(t){return certEstado(t).code==="ok";}).length],
-    ["pendientes","Validación pendiente",TRANSPORTISTAS.filter(function(t){return certEstado(t).code==="pend";}).length],
-    ["bloqueados","No certificados",TRANSPORTISTAS.filter(function(t){return certEstado(t).code==="no";}).length],
-    ["disponible","Disponibles",TRANSPORTISTAS.filter(function(t){return t.disp==="disponible";}).length]]
-    .map(function(f){return '<button class="chip'+(S.filtro===f[0]?" is-on":"")+'" data-filtro="'+f[0]+'">'
+  if(State.traOpen) return vTransportista(State.traOpen);
+  var lista=Seed.TRANSPORTISTAS.filter(function(t){
+    if(State.filtro==="todos") return true;
+    if(State.filtro==="certificados") return Transportistas.estado(t).code==="ok";
+    if(State.filtro==="pendientes") return Transportistas.estado(t).code==="pend";
+    if(State.filtro==="bloqueados") return Transportistas.estado(t).code==="no";
+    return t.disp===State.filtro;});
+  var chips=[["todos","Todos",Seed.TRANSPORTISTAS.length],
+    ["certificados","Certificados",Seed.TRANSPORTISTAS.filter(function(t){return Transportistas.estado(t).code==="ok";}).length],
+    ["pendientes","Validación pendiente",Seed.TRANSPORTISTAS.filter(function(t){return Transportistas.estado(t).code==="pend";}).length],
+    ["bloqueados","No certificados",Seed.TRANSPORTISTAS.filter(function(t){return Transportistas.estado(t).code==="no";}).length],
+    ["disponible","Disponibles",Seed.TRANSPORTISTAS.filter(function(t){return t.disp==="disponible";}).length]]
+    .map(function(f){return '<button class="chip'+(State.filtro===f[0]?" is-on":"")+'" data-filtro="'+f[0]+'">'
       +f[1]+'<span class="chip-n">'+f[2]+'</span></button>';}).join("");
-  return ph({eyebrow:"Transportistas",t:"Directorio",
-      meta:pill("Registrados",TRANSPORTISTAS.length)
-        +pill("Certificados",TRANSPORTISTAS.filter(function(t){return certEstado(t).code==="ok";}).length),
+  return UI.head({eyebrow:"Transportistas",t:"Directorio",
+      meta:UI.pill("Registrados",Seed.TRANSPORTISTAS.length)
+        +UI.pill("Certificados",Seed.TRANSPORTISTAS.filter(function(t){return Transportistas.estado(t).code==="ok";}).length),
       act:'<button class="btn btn-primary" id="btn-nuevo-tra">+ Registrar transportista</button>'})
     + '<div class="card"><div class="card-body" style="padding-bottom:12px"><div class="chips">'+chips+'</div></div>'
-    + tbl([{t:"Transportista"},{t:"Contacto"},{t:"Tipo"},{t:"Cobertura"},{t:"Capacidad",r:true},
+    + UI.table([{t:"Transportista"},{t:"Contacto"},{t:"Tipo"},{t:"Cobertura"},{t:"Capacidad",r:true},
            {t:"Disponibilidad"},{t:"Cumpl.",r:true},{t:"Certificación"}],
         lista.map(function(t){
-          var st=certEstado(t);
+          var st=Transportistas.estado(t);
           return '<tr class="clickable" data-tra="'+t.id+'">'
             +'<td class="t-strong">'+t.n+'<div class="t-sub">'+t.base+'</div></td>'
             +'<td class="t-sub">'+t.contacto+'<div class="mono">'+t.tel+'</div></td>'
             +'<td class="t-sub">'+t.tipo+'</td>'
             +'<td class="t-sub">'+t.cobertura.join("<br>")+'</td>'
             +'<td class="r mono">'+t.cap+' t</td>'
-            +'<td>'+bd(DISP[t.disp])+'</td>'
+            +'<td>'+UI.pair(Seed.DISP[t.disp])+'</td>'
             +'<td class="r mono">'+(t.viajes?t.cumpl+"%":"—")+'</td>'
-            +'<td>'+bd([st.cls,st.txt])+'</td></tr>';}).join("")
-        ||emptyRow(8,"Sin resultados"))
+            +'<td>'+UI.pair([st.cls,st.txt])+'</td></tr>';}).join("")
+        ||UI.empty(8,"Sin resultados"))
     + '</div>';
 }
 function vTransportista(id){
-  var t=traBy(id); if(!t) return "";
-  var st=certEstado(t);
-  var mis=VIAJES.filter(function(v){return v.tra===t.id;});
+  var t=Transportistas.byId(id); if(!t) return "";
+  var st=Transportistas.estado(t);
+  var mis=Seed.VIAJES.filter(function(v){return v.tra===t.id;});
   return '<button class="back" data-back="directorio">← Directorio</button>'
-    + ph({eyebrow:t.tipo+" · "+t.base,t:t.n,
-        meta:bd([st.cls,st.txt])+bd(DISP[t.disp])+pill("Placa",t.placa)})
-    + tiles([
+    + UI.head({eyebrow:t.tipo+" · "+t.base,t:t.n,
+        meta:UI.pair([st.cls,st.txt])+UI.pair(Seed.DISP[t.disp])+UI.pill("Placa",t.placa)})
+    + UI.tiles([
       {k:"Capacidad",v:String(t.cap),u:" t",n:t.unidad},
       {k:"Viajes",v:String(t.viajes),n:"Con DMS"},
       {k:"Cumplimiento",v:t.viajes?String(t.cumpl):"—",u:t.viajes?"%":"",n:"Entregas a tiempo"},
       {k:"Asignaciones",v:String(t.asignadas30d),n:"Últimos 30 días"}])
-    + card("Perfil","<div class='card-body'><div class='grid-kv'>"
+    + UI.card("Perfil","<div class='card-body'><div class='grid-kv'>"
         +"<div class='kv'><span class='eyebrow'>Contacto</span><b>"+t.contacto+"</b></div>"
         +"<div class='kv'><span class='eyebrow'>Teléfono</span><b class='mono'>"+t.tel+"</b></div>"
         +"<div class='kv'><span class='eyebrow'>Cobertura</span><b>"+t.cobertura.join(" · ")+"</b></div>"
         +"<div class='kv'><span class='eyebrow'>Vehículos</span><b>"+t.vehiculos.join(" · ")+"</b></div>"
         +"</div></div>")
-    + card("Certificaciones",
-        tbl([{t:"Certificación"},{t:"Tipo"},{t:"Emisión"},{t:"Vencimiento"},{t:"Estado"},{t:"",r:true}],
-          CERT_TIPOS.map(function(ct){
+    + UI.card("Certificaciones",
+        UI.table([{t:"Certificación"},{t:"Tipo"},{t:"Emisión"},{t:"Vencimiento"},{t:"Estado"},{t:"",r:true}],
+          Seed.CERT_TIPOS.map(function(ct){
             var d=t.certs[ct.id];
             return '<tr><td class="t-strong">'+ct.n+'</td>'
-              +'<td>'+badge("b-neutral",ct.oblig?"Obligatoria":"Opcional")+'</td>'
+              +'<td>'+UI.badge("b-neutral",ct.oblig?"Obligatoria":"Opcional")+'</td>'
               +'<td class="mono t-sub">'+d.em+'</td><td class="mono">'+d.ven+'</td>'
-              +'<td>'+bd(CERT_EST[d.est])+'</td>'
+              +'<td>'+UI.pair(Seed.CERT_EST[d.est])+'</td>'
               +'<td class="r">'+(d.est==="pendiente"
                 ?'<button class="btn btn-primary" data-cert-ok="'+t.id+'|'+ct.id+'">Aprobar</button>'
-                :(d.est!=="aprobado"&&S.role.traId===t.id
+                :(d.est!=="aprobado"&&Session.traId()===t.id
                   ?'<button class="btn btn-primary" data-cert-up="'+t.id+'|'+ct.id+'">Subir</button>':'—'))
               +'</td></tr>';}).join("")))
-    + card("Historial de viajes",
-        tbl([{t:"Viaje"},{t:"Ruta"},{t:"Estado"},{t:"Entrega"}],
+    + UI.card("Historial de viajes",
+        UI.table([{t:"Viaje"},{t:"Ruta"},{t:"Estado"},{t:"Entrega"}],
           (mis.length?mis.map(function(v){
             return '<tr class="clickable" data-via="'+v.id+'"><td class="mono t-strong">'+v.id+'</td>'
               +'<td class="t-sub">'+v.origen+' → '+v.destino+'</td>'
-              +'<td>'+bd(VIAJE_EST[v.estado])+'</td>'
+              +'<td>'+UI.pair(Seed.VIAJE_EST[v.estado])+'</td>'
               +'<td class="mono t-sub">'+(v.estado==="entregado"?v.entregado:v.eta)+'</td></tr>';}).join("")
-            :emptyRow(4,"Sin viajes registrados"))));
+            :UI.empty(4,"Sin viajes registrados"))));
 }
 function vCertificaciones(){
   var filas=[];
-  var pool=S.role.traId?[traBy(S.role.traId)]:TRANSPORTISTAS;
-  pool.forEach(function(t){CERT_TIPOS.forEach(function(ct){
+  var pool=Session.traId()?[Transportistas.byId(Session.traId())]:Seed.TRANSPORTISTAS;
+  pool.forEach(function(t){Seed.CERT_TIPOS.forEach(function(ct){
     filas.push({t:t,ct:ct,d:t.certs[ct.id]});});});
-  var lista=filas.filter(function(f){return S.filtro==="todos"||f.d.est===S.filtro;});
-  var chips=[["todos","Todas",filas.length]].concat(Object.keys(CERT_EST).map(function(k){
-      return [k,CERT_EST[k][1],filas.filter(function(f){return f.d.est===k;}).length];}))
-    .map(function(f){return '<button class="chip'+(S.filtro===f[0]?" is-on":"")+'" data-filtro="'+f[0]+'">'
+  var lista=filas.filter(function(f){return State.filtro==="todos"||f.d.est===State.filtro;});
+  var chips=[["todos","Todas",filas.length]].concat(Object.keys(Seed.CERT_EST).map(function(k){
+      return [k,Seed.CERT_EST[k][1],filas.filter(function(f){return f.d.est===k;}).length];}))
+    .map(function(f){return '<button class="chip'+(State.filtro===f[0]?" is-on":"")+'" data-filtro="'+f[0]+'">'
       +f[1]+'<span class="chip-n">'+f[2]+'</span></button>';}).join("");
-  return ph({eyebrow:"Transportistas",t:"Certificaciones",
-      meta:pill("Pendientes",filas.filter(function(f){return f.d.est==="pendiente";}).length)
-        +pill("Vencidas",filas.filter(function(f){return f.d.est==="vencido";}).length)})
+  return UI.head({eyebrow:"Transportistas",t:"Certificaciones",
+      meta:UI.pill("Pendientes",filas.filter(function(f){return f.d.est==="pendiente";}).length)
+        +UI.pill("Vencidas",filas.filter(function(f){return f.d.est==="vencido";}).length)})
     + '<div class="card"><div class="card-body" style="padding-bottom:12px"><div class="chips">'+chips+'</div></div>'
-    + tbl([{t:"Transportista"},{t:"Certificación"},{t:"Emisión"},{t:"Vencimiento"},{t:"Estado"},{t:"",r:true}],
+    + UI.table([{t:"Transportista"},{t:"Certificación"},{t:"Emisión"},{t:"Vencimiento"},{t:"Estado"},{t:"",r:true}],
         lista.map(function(f){
           return '<tr><td class="t-strong clickable" data-tra="'+f.t.id+'">'+f.t.n+'</td>'
-            +'<td>'+f.ct.n+(f.ct.oblig?' '+badge("b-neutral","Obligatoria"):'')+'</td>'
+            +'<td>'+f.ct.n+(f.ct.oblig?' '+UI.badge("b-neutral","Obligatoria"):'')+'</td>'
             +'<td class="mono t-sub">'+f.d.em+'</td><td class="mono">'+f.d.ven+'</td>'
-            +'<td>'+bd(CERT_EST[f.d.est])+'</td>'
-            +'<td class="r">'+(f.d.est==="pendiente"&&!S.role.traId
+            +'<td>'+UI.pair(Seed.CERT_EST[f.d.est])+'</td>'
+            +'<td class="r">'+(f.d.est==="pendiente"&&!Session.traId()
               ?'<button class="btn btn-primary" data-cert-ok="'+f.t.id+'|'+f.ct.id+'">Aprobar</button>'
-              :(f.d.est!=="aprobado"&&S.role.traId===f.t.id
+              :(f.d.est!=="aprobado"&&Session.traId()===f.t.id
                 ?'<button class="btn btn-primary" data-cert-up="'+f.t.id+'|'+f.ct.id+'">Subir</button>':'—'))
             +'</td></tr>';}).join("")
-        ||emptyRow(6,"Sin certificaciones"))
+        ||UI.empty(6,"Sin certificaciones"))
     + '</div>';
 }
 
-/* ===================== REPORTES ===================== */
 function vReportes(){
-  var pct=Math.round(PERF.aTiempo/PERF.total*100);
-  var valor=OPORTUNIDADES.reduce(function(a,o){return a+o.valor;},0);
-  var porEtapa=ETAPAS.map(function(e){
-    return {n:e.n,c:CLIENTES.filter(function(c){return c.etapa===e.id;}).length};});
+  var pct=Math.round(Seed.PERF.aTiempo/Seed.PERF.total*100);
+  var valor=Seed.OPORTUNIDADES.reduce(function(a,o){return a+o.valor;},0);
+  var porEtapa=Seed.ETAPAS.map(function(e){
+    return {n:e.n,c:Seed.CLIENTES.filter(function(c){return c.etapa===e.id;}).length};});
   var maxC=Math.max.apply(null,porEtapa.map(function(e){return e.c;}))||1;
-  return ph({eyebrow:"Análisis",t:"Reportes",meta:pill("Periodo",PERF.periodo)})
-    + tiles([
-      {k:"Entregas a tiempo",v:String(pct),u:"%",n:PERF.aTiempo+" de "+PERF.total},
-      {k:"Tardías",v:String(PERF.tarde),n:"Fuera de fecha"},
-      {k:"Incidencias",v:String(PERF.incidencias),n:"Frontera o aduana"},
-      {k:"Tránsito medio",v:String(PERF.horas),u:" h",n:"Puerta a puerta"},
-      {k:"Pipeline",v:"USD "+nf(Math.round(valor/1000))+"k",n:OPORTUNIDADES.length+" oportunidades"},
-      {k:"Documentos",v:nf(DOCS.length),n:mb(DOCS.reduce(function(a,d){return a+d.size;},0))}])
+  return UI.head({eyebrow:"Análisis",t:"Reportes",meta:UI.pill("Periodo",Seed.PERF.periodo)})
+    + UI.tiles([
+      {k:"Entregas a tiempo",v:String(pct),u:"%",n:Seed.PERF.aTiempo+" de "+Seed.PERF.total},
+      {k:"Tardías",v:String(Seed.PERF.tarde),n:"Fuera de fecha"},
+      {k:"Incidencias",v:String(Seed.PERF.incidencias),n:"Frontera o aduana"},
+      {k:"Tránsito medio",v:String(Seed.PERF.horas),u:" h",n:"Puerta a puerta"},
+      {k:"Pipeline",v:"USD "+Fmt.num(Math.round(valor/1000))+"k",n:Seed.OPORTUNIDADES.length+" oportunidades"},
+      {k:"Documentos",v:Fmt.num(Documentos.all().length),n:Fmt.size(Documentos.all().reduce(function(a,d){return a+d.size;},0))}])
     + '<div class="grid2">'
-    + card("Puntualidad por corredor",
-        tbl([{t:"Corredor"},{t:"Envíos",r:true},{t:"Puntualidad"},{t:"Tránsito",r:true},{t:"Incid.",r:true}],
-          PERF.corredores.map(function(c){
+    + UI.card("Puntualidad por corredor",
+        UI.table([{t:"Corredor"},{t:"Envíos",r:true},{t:"Puntualidad"},{t:"Tránsito",r:true},{t:"Incid.",r:true}],
+          Seed.PERF.corredores.map(function(c){
             return '<tr><td class="t-strong">'+c.n+'</td><td class="r mono">'+c.envios+'</td>'
-              +'<td>'+meter(c.puntual,c.puntual>=94?" is-full":(c.puntual<90?" is-low":""))+'</td>'
+              +'<td>'+UI.meter(c.puntual,c.puntual>=94?" is-full":(c.puntual<90?" is-low":""))+'</td>'
               +'<td class="r mono">'+c.horas+' h</td><td class="r mono">'+c.incid+'</td></tr>';}).join("")))
-    + card("Clientes por etapa",
-        tbl([{t:"Etapa"},{t:"Clientes"},{t:"",r:true}],
+    + UI.card("Clientes por etapa",
+        UI.table([{t:"Etapa"},{t:"Clientes"},{t:"",r:true}],
           porEtapa.map(function(e){
             return '<tr><td class="t-strong">'+e.n+'</td>'
-              +'<td>'+meter(Math.round(e.c/maxC*100))+'</td>'
+              +'<td>'+UI.meter(Math.round(e.c/maxC*100))+'</td>'
               +'<td class="r mono">'+e.c+'</td></tr>';}).join("")))
     + '</div>'
-    + card("Volumen documental por cliente",
-        tbl([{t:"Cliente"},{t:"Archivos",r:true},{t:"Volumen",r:true},{t:"Pendientes",r:true},{t:"Operaciones",r:true}],
-          CLIENTES.filter(function(c){return docsDe(c.id).length;})
-            .sort(function(a,b){return docsDe(b.id).length-docsDe(a.id).length;})
+    + UI.card("Volumen documental por cliente",
+        UI.table([{t:"Cliente"},{t:"Archivos",r:true},{t:"Volumen",r:true},{t:"Pendientes",r:true},{t:"Operaciones",r:true}],
+          Seed.CLIENTES.filter(function(c){return Documentos.deCliente(c.id).length;})
+            .sort(function(a,b){return Documentos.deCliente(b.id).length-Documentos.deCliente(a.id).length;})
             .map(function(c){
-              var d=docsDe(c.id);
+              var d=Documentos.deCliente(c.id);
               return '<tr class="clickable" data-cli="'+c.id+'"><td class="t-strong">'+c.n+'</td>'
-                +'<td class="r mono">'+nf(d.length)+'</td>'
-                +'<td class="r mono">'+mb(d.reduce(function(a,x){return a+x.size;},0))+'</td>'
+                +'<td class="r mono">'+Fmt.num(d.length)+'</td>'
+                +'<td class="r mono">'+Fmt.size(d.reduce(function(a,x){return a+x.size;},0))+'</td>'
                 +'<td class="r mono">'+d.filter(function(x){return x.estado==="pendiente";}).length+'</td>'
-                +'<td class="r mono">'+OPERACIONES.filter(function(o){return o.cli===c.id;}).length+'</td></tr>';}).join("")));
+                +'<td class="r mono">'+Seed.OPERACIONES.filter(function(o){return o.cli===c.id;}).length+'</td></tr>';}).join("")));
 }
 
-/* ===================== FASE 1 · RUTAS Y POSICIÓN ===================== */
-/* SUPUESTO: sin integración GPS real. Las coordenadas son puntos de un mapa
-   esquemático propio (viewBox 0 0 400 200), no latitud/longitud. El avance se
-   simula con el botón "Simular avance". */
-var RUTAS={
- "Arica–La Paz":{km:505,pts:[[28,150],[95,132],[150,108],[210,86],[288,62],[362,44]],
-   hitos:["Arica","Chacalluta","Tambo Quemado","Patacamaya","La Paz"]},
- "Ilo–La Paz":{km:480,pts:[[24,158],[88,140],[152,116],[224,88],[300,64],[366,48]],
-   hitos:["Ilo","Moquegua","Desaguadero","Guaqui","La Paz"]},
- "Iquique–Oruro":{km:440,pts:[[26,162],[96,144],[168,120],[244,92],[320,66],[368,52]],
-   hitos:["Iquique","Pozo Almonte","Colchane","Pisiga","Oruro"]},
- "Arica–Cochabamba":{km:780,pts:[[26,156],[92,138],[158,116],[226,92],[300,70],[368,50]],
-   hitos:["Arica","Tambo Quemado","Oruro","Caracollo","Cochabamba"]},
- "Santa Cruz–Santos":{km:2180,pts:[[24,150],[94,134],[162,112],[232,88],[302,64],[370,46]],
-   hitos:["Santa Cruz","Puerto Suárez","Corumbá","São Paulo","Santos"]}};
-function rutaDe(v){
-  var d=demBy(v.dem);
-  if(d&&RUTAS[d.corredor]) return RUTAS[d.corredor];
-  var k=Object.keys(RUTAS);
-  for(var i=0;i<k.length;i++){
-    if(k[i].indexOf(v.origen)===0||k[i].indexOf(v.destino)>=0) return RUTAS[k[i]];}
-  return RUTAS["Arica–La Paz"];
-}
+var podDe=function(vid){for(var i=0;i<Seed.PODS.length;i++){if(Seed.PODS[i].viaje===vid)return Seed.PODS[i];}return null;};
 
-/* Código público de seguimiento */
-function trackCode(id){
-  var b="ABCDEFGHJKMNPQRSTUVWXYZ23456789",h=0;
-  for(var i=0;i<id.length;i++) h=(h*31+id.charCodeAt(i))>>>0;
-  var s="";
-  for(var j=0;j<6;j++){s+=b[h%b.length];h=Math.floor(h/7)+13;}
-  return "DMS-"+s;
-}
-VIAJES.forEach(function(v){
-  v.code=trackCode(v.id);
-  var r=rutaDe(v);
-  v.km=Math.round(r.km*v.pct/100);
-  v.kmTotal=r.km;
-  v.vel=(v.estado==="transito"||v.estado==="reparto")?ri(58,82):0;
-  v.ultPos=v.estado==="entregado"?(v.entregado||HOY):HOY+" · 11:"+ri(10,59);
-  v.posHist=[{t:v.ultPos,km:v.km,pos:v.pos,vel:v.vel}];
-});
+var traIdx=function(e){for(var i=0;i<Seed.FLUJO_TRA.length;i++){if(Seed.FLUJO_TRA[i].id===e)return i;}return 0;};
 
-/* ===================== POD ===================== */
-/* SUPUESTO: la firma se dibuja en canvas y se guarda como dataURL en memoria.
-   Las fotos se simulan con marcadores; no se sube nada a ningún servidor. */
-var POD_REQ={firma:true,receptor:true,fotoCarga:true,fotoLugar:false,obs:false};
-var POD_EST={pendiente:["b-warn","Pendiente"],completado:["b-ok","Completado"],
-  rechazado:["b-crit","Rechazado"],incidencia:["b-crit","Con incidencia"]};
-var PODS=[
- {id:"POD-1165",viaje:"VJ-1165",cli:"C005",op:"EXP-2026-0209",estado:"completado",
-  receptor:"Jorge Ayala",fecha:"10 sep 2026 · 13:20",gps:"-18.4783, -70.3126 (simulado)",
-  obs:"Recepción conforme, sin observaciones.",fotos:2,firma:true,motivo:null},
- {id:"POD-1160",viaje:"VJ-1160",cli:"C006",op:"IMP-2026-0851",estado:"completado",
-  receptor:"Pablo Rocha",fecha:"06 sep 2026 · 08:35",gps:"-16.5000, -68.1500 (simulado)",
-  obs:"Dos bultos con embalaje dañado, carga completa.",fotos:3,firma:true,motivo:null},
- {id:"POD-1152",viaje:"VJ-1152",cli:"C003",op:"IMP-2026-0839",estado:"incidencia",
-  receptor:"Elena Ríos",fecha:"02 sep 2026 · 07:10",gps:"-16.4897, -68.1193 (simulado)",
-  obs:"Entrega fuera de fecha comprometida.",fotos:1,firma:true,motivo:null}];
-var podDe=function(vid){for(var i=0;i<PODS.length;i++){if(PODS[i].viaje===vid)return PODS[i];}return null;};
-
-/* ===================== ESTADOS DEL TRANSPORTISTA ===================== */
-var FLUJO_TRA=[
- {id:"asignado",n:"Asignado"},{id:"aceptado",n:"Aceptado"},
- {id:"a_cargar",n:"En camino a cargar"},{id:"carga",n:"En carga"},
- {id:"cargado",n:"Carga completada"},{id:"transito",n:"En tránsito"},
- {id:"destino",n:"En destino"},{id:"entregado",n:"Entrega realizada"}];
-VIAJE_EST.aceptado=["b-accent","Aceptado"];
-VIAJE_EST.a_cargar=["b-accent","En camino a cargar"];
-VIAJE_EST.cargado=["b-accent","Carga completada"];
-VIAJE_EST.destino=["b-accent","En destino"];
-var traIdx=function(e){for(var i=0;i<FLUJO_TRA.length;i++){if(FLUJO_TRA[i].id===e)return i;}return 0;};
-
-/* Incidencias */
 var INCIDENCIAS=[];
-var TIPOS_INC=["Demora en frontera","Falla mecánica","Bloqueo de ruta","Carga dañada",
-  "Documentación observada","Condiciones climáticas"];
 
-/* ===================== MAPA ESQUEMÁTICO ===================== */
 function mapaViaje(v){
-  var r=rutaDe(v),p=v.pct/100;
+  var r=Tracking.ruta(v),p=v.pct/100;
   var d="M"+r.pts.map(function(q){return q[0]+","+q[1];}).join(" L");
   var i=Math.min(r.pts.length-2,Math.floor(p*(r.pts.length-1)));
   var f=p*(r.pts.length-1)-i;
@@ -2075,62 +2236,42 @@ function mapaViaje(v){
     +'<div class="map-note">Mapa esquemático · posición simulada, sin GPS real</div></div>';
 }
 function panelTracking(v){
-  var r=rutaDe(v);
+  var r=Tracking.ruta(v);
   var sim=(v.estado!=="entregado"&&v.estado!=="cancelado");
-  return card("Seguimiento",
+  return UI.card("Seguimiento",
     '<div class="card-body">'+mapaViaje(v)
     +'<div class="trk">'
-      +'<div class="trk-i"><span class="eyebrow">Recorrido</span><b class="mono">'+nf(v.km)+' km</b></div>'
-      +'<div class="trk-i"><span class="eyebrow">Restante</span><b class="mono">'+nf(v.kmTotal-v.km)+' km</b></div>'
+      +'<div class="trk-i"><span class="eyebrow">Recorrido</span><b class="mono">'+Fmt.num(v.km)+' km</b></div>'
+      +'<div class="trk-i"><span class="eyebrow">Restante</span><b class="mono">'+Fmt.num(v.kmTotal-v.km)+' km</b></div>'
       +'<div class="trk-i"><span class="eyebrow">Avance</span><b class="mono">'+v.pct+'%</b></div>'
       +'<div class="trk-i"><span class="eyebrow">Velocidad</span><b class="mono">'+(v.vel?v.vel+' km/h':'detenido')+'</b></div>'
       +'<div class="trk-i"><span class="eyebrow">ETA</span><b class="mono">'+(v.estado==="entregado"?v.entregado:v.eta)+'</b></div>'
-      +'<div class="trk-i"><span class="eyebrow">Estado</span><b>'+bd(VIAJE_EST[v.estado])+'</b></div>'
+      +'<div class="trk-i"><span class="eyebrow">Estado</span><b>'+UI.pair(Seed.VIAJE_EST[v.estado])+'</b></div>'
     +'</div>'
     +'<div class="trk-last"><span class="mono">'+v.pos+'</span>'
       +'<span class="t-sub">Última posición: '+v.ultPos+'</span></div>'
     +'</div>',
     sim?'<button class="btn btn-primary" data-sim="'+v.id+'">Simular avance</button>':'')
-  + card("Historial de posiciones",
-      tbl([{t:"Momento"},{t:"Ubicación"},{t:"Km",r:true},{t:"Velocidad",r:true}],
+  + UI.card("Historial de posiciones",
+      UI.table([{t:"Momento"},{t:"Ubicación"},{t:"Km",r:true},{t:"Velocidad",r:true}],
         v.posHist.map(function(h){
           return '<tr><td class="mono t-sub">'+h.t+'</td><td>'+h.pos+'</td>'
-            +'<td class="r mono">'+nf(h.km)+'</td>'
+            +'<td class="r mono">'+Fmt.num(h.km)+'</td>'
             +'<td class="r mono">'+(h.vel?h.vel+' km/h':'—')+'</td></tr>';}).join("")));
 }
-function simularAvance(id){
-  var v=viaBy(id); if(!v) return;
-  var r=rutaDe(v);
-  if(v.pct>=100){toast("El viaje ya llegó a destino");return;}
-  v.pct=Math.min(100,v.pct+ri(8,16));
-  v.km=Math.round(r.km*v.pct/100);
-  v.vel=v.pct>=100?0:ri(58,82);
-  var idx=Math.min(r.hitos.length-1,Math.floor(v.pct/100*r.hitos.length));
-  v.pos=v.pct>=100?("Entregado en "+v.destino)
-    :("Tramo "+r.hitos[idx]+" · km "+nf(v.km)+" de "+nf(r.km));
-  v.ultPos=HOY+" · "+ri(10,19)+":"+("0"+ri(0,59)).slice(-2);
-  v.posHist.unshift({t:v.ultPos,km:v.km,pos:v.pos,vel:v.vel});
-  if(v.pct>=100&&v.estado!=="entregado"){
-    v.estado="destino";
-    v.log.unshift({t:v.ultPos,m:"Vehículo llegó a destino · pendiente de POD"});
-  }
-  renderNav();render();
-  toast("Posición actualizada · "+nf(v.km)+" km de "+nf(r.km));
-}
 
-/* ===================== POD ===================== */
 var podDraft={firma:null,fotos:[],receptor:"",obs:"",resultado:"completado",motivo:""};
 function modalPOD(vid){
-  var v=viaBy(vid); if(!v) return;
-  var c=cliBy(v.cli),d=demBy(v.dem);
+  var v=Viajes.byId(vid); if(!v) return;
+  var c=Clientes.byId(v.cli),d=Demandas.byId(v.dem);
   podDraft={firma:null,fotos:[],receptor:"",obs:"",resultado:"completado",motivo:""};
-  openModal("Registrar entrega · "+v.id,
+  Modal.open("Registrar entrega · "+v.id,
     '<div class="pod-req">'
-      +Object.keys(POD_REQ).map(function(k){
+      +Object.keys(PodService.requisitos).map(function(k){
         var lab={firma:"Firma",receptor:"Receptor",fotoCarga:"Foto de carga",
           fotoLugar:"Foto del lugar",obs:"Observaciones"}[k];
         return '<label class="chk" style="margin:0"><input type="checkbox" data-req="'+k+'"'
-          +(POD_REQ[k]?" checked":"")+'> <span>'+lab+'</span></label>';}).join("")
+          +(PodService.requisitos[k]?" checked":"")+'> <span>'+lab+'</span></label>';}).join("")
     +'</div>'
     +'<div class="form-grid" style="margin-top:14px">'
     +'<label class="fld"><span class="eyebrow">Nombre del receptor</span>'
@@ -2162,22 +2303,22 @@ function modalPOD(vid){
     '<button class="btn" id="m-cancel">Cancelar</button>'
     +'<button class="btn btn-primary" id="pod-ok" data-via="'+vid+'">Confirmar entrega</button>');
   initFirma();
-  $("m-cancel").addEventListener("click",closeModal);
-  $("pod-res").addEventListener("change",function(){
-    $("pod-motivo").hidden=$("pod-res").value==="completado";});
-  Array.prototype.forEach.call($("modal-root").querySelectorAll("[data-req]"),function(cb){
-    cb.addEventListener("change",function(){POD_REQ[cb.getAttribute("data-req")]=cb.checked;});});
-  Array.prototype.forEach.call($("modal-root").querySelectorAll("[data-foto]"),function(b){
+  Dom.byId("m-cancel").addEventListener("click",Modal.close);
+  Dom.byId("pod-res").addEventListener("change",function(){
+    Dom.byId("pod-motivo").hidden=Dom.byId("pod-res").value==="completado";});
+  Array.prototype.forEach.call(Dom.byId("modal-root").querySelectorAll("[data-req]"),function(cb){
+    cb.addEventListener("change",function(){PodService.requisitos[cb.getAttribute("data-req")]=cb.checked;});});
+  Array.prototype.forEach.call(Dom.byId("modal-root").querySelectorAll("[data-foto]"),function(b){
     b.addEventListener("click",function(){
       var t=b.getAttribute("data-foto");
       if(podDraft.fotos.indexOf(t)>=0) return;
       podDraft.fotos.push(t);
       b.outerHTML='<span class="photo-thumb">'+(t==="carga"?"Carga":"Lugar")
-        +'<em>IMG_'+ri(1000,9999)+'.jpg</em></span>';});});
-  $("pod-ok").addEventListener("click",function(){guardarPOD(vid);});
+        +'<em>IMG_'+Rng.int(1000,9999)+'.jpg</em></span>';});});
+  Dom.byId("pod-ok").addEventListener("click",function(){guardarPOD(vid);});
 }
 function initFirma(){
-  var c=$("pod-sign"); if(!c) return;
+  var c=Dom.byId("pod-sign"); if(!c) return;
   var ctx=c.getContext("2d"),draw=false;
   function pos(e){
     var r=c.getBoundingClientRect();
@@ -2191,53 +2332,24 @@ function initFirma(){
   ["mousedown","touchstart"].forEach(function(e){c.addEventListener(e,start,{passive:false});});
   ["mousemove","touchmove"].forEach(function(e){c.addEventListener(e,move,{passive:false});});
   ["mouseup","mouseleave","touchend"].forEach(function(e){c.addEventListener(e,end);});
-  $("pod-clear").addEventListener("click",function(){
+  Dom.byId("pod-clear").addEventListener("click",function(){
     ctx.clearRect(0,0,c.width,c.height);podDraft.firma=null;});
 }
-function guardarPOD(vid){
-  var v=viaBy(vid); if(!v) return;
-  var rec=$("pod-rec").value.trim(),res=$("pod-res").value;
-  var mot=$("pod-mot")?$("pod-mot").value.trim():"";
-  var falta=[];
-  if(POD_REQ.receptor&&rec.length<3) falta.push("nombre del receptor");
-  if(POD_REQ.firma&&!podDraft.firma) falta.push("firma");
-  if(POD_REQ.fotoCarga&&podDraft.fotos.indexOf("carga")<0) falta.push("foto de carga");
-  if(POD_REQ.fotoLugar&&podDraft.fotos.indexOf("lugar")<0) falta.push("foto del lugar");
-  if(res!=="completado"&&mot.length<3) falta.push("motivo");
-  if(falta.length){$("pod-err").textContent="Falta: "+falta.join(", ")+".";return;}
-  var d=demBy(v.dem);
-  var pod={id:"POD-"+v.id.replace("VJ-",""),viaje:v.id,cli:v.cli,op:d?d.op:"—",
-    estado:res,receptor:rec,fecha:HOY+" · 11:30",gps:"-16.4897, -68.1193 (simulado)",
-    obs:$("pod-obs").value||"—",fotos:podDraft.fotos.length,firma:!!podDraft.firma,
-    motivo:res==="completado"?null:mot};
-  PODS.push(pod);
-  v.log.unshift({t:pod.fecha,m:"POD registrado · "+POD_EST[res][1]+" · receptor "+rec});
-  if(res==="completado"||res==="incidencia"){
-    v.estado="entregado";v.pct=100;v.km=v.kmTotal;v.vel=0;
-    v.entregado=pod.fecha;v.puntual=res==="completado";
-    v.pos="Entregado en "+v.destino;
-    v.hitos.forEach(function(h){h.s="done";});
-    if(d) d.estado="cerrada";
-  } else {
-    v.estado="incidencia";v.inc="Entrega rechazada por el receptor: "+mot;
-  }
-  closeModal();renderNav();render();
-  toast("POD "+pod.id+" registrado · "+POD_EST[res][1]);
-}
+
 function panelPOD(v){
-  var p=podDe(v.id);
-  if(!p) return card("Prueba de entrega",
-    '<div class="card-body"><div class="empty">'+badge("b-warn","POD pendiente")
+  var p=Pods.deViaje(v.id);
+  if(!p) return UI.card("Prueba de entrega",
+    '<div class="card-body"><div class="empty">'+UI.badge("b-warn","POD pendiente")
     +'<span class="t-sub">Sin evidencia registrada</span></div></div>',
-    (!S.role.cliente&&v.estado!=="entregado"
+    (!Session.clienteId()&&v.estado!=="entregado"
       ?'<button class="btn btn-primary" data-pod="'+v.id+'">Registrar entrega</button>':''));
-  return card("Prueba de entrega · "+p.id,
+  return UI.card("Prueba de entrega · "+p.id,
     '<div class="card-body"><div class="kvlist">'
-    +'<div class="kvrow"><span>Estado</span><span>'+bd(POD_EST[p.estado])+'</span></div>'
+    +'<div class="kvrow"><span>Estado</span><span>'+UI.pair(Seed.POD_EST[p.estado])+'</span></div>'
     +'<div class="kvrow"><span>Receptor</span><span>'+p.receptor+'</span></div>'
     +'<div class="kvrow"><span>Fecha y hora</span><span class="mono">'+p.fecha+'</span></div>'
     +'<div class="kvrow"><span>GPS</span><span class="mono">'+p.gps+'</span></div>'
-    +'<div class="kvrow"><span>Firma</span><span>'+(p.firma?badge("b-ok","Registrada"):badge("b-neutral","Sin firma"))+'</span></div>'
+    +'<div class="kvrow"><span>Firma</span><span>'+(p.firma?UI.badge("b-ok","Registrada"):UI.badge("b-neutral","Sin firma"))+'</span></div>'
     +'<div class="kvrow"><span>Fotografías</span><span class="mono">'+p.fotos+'</span></div>'
     +'<div class="kvrow"><span>Operación</span><span class="mono">'+p.op+'</span></div>'
     +(p.motivo?'<div class="kvrow"><span>Motivo</span><span>'+p.motivo+'</span></div>':'')
@@ -2245,110 +2357,96 @@ function panelPOD(v){
     +'</div></div>');
 }
 
-/* ===================== PORTAL DEL TRANSPORTISTA ===================== */
 function vMisViajes(){
-  if(S.viaOpen) return vViajeTra(S.viaOpen);
-  var mis=visibleViajes();
+  if(State.viaOpen) return vViajeTra(State.viaOpen);
+  var mis=Viajes.visibles();
   var act=mis.filter(function(v){return v.estado!=="entregado"&&v.estado!=="cancelado";});
-  return ph({eyebrow:traBy(S.role.traId).n,t:"Mis viajes",
-      meta:pill("Activos",act.length)+pill("Total",mis.length)})
-    + tbl([{t:"Viaje"},{t:"Ruta"},{t:"Cliente"},{t:"Estado"},{t:"Avance"},{t:"ETA"}],
+  return UI.head({eyebrow:Transportistas.byId(Session.traId()).n,t:"Mis viajes",
+      meta:UI.pill("Activos",act.length)+UI.pill("Total",mis.length)})
+    + UI.table([{t:"Viaje"},{t:"Ruta"},{t:"Cliente"},{t:"Estado"},{t:"Avance"},{t:"ETA"}],
         mis.map(function(v){
-          var c=cliBy(v.cli);
+          var c=Clientes.byId(v.cli);
           return '<tr class="clickable" data-viatra="'+v.id+'"><td class="mono t-strong">'+v.id
             +'<div class="t-sub mono">'+v.code+'</div></td>'
             +'<td class="t-sub">'+v.origen+' → '+v.destino+'</td>'
-            +'<td>'+(c?c.n:"—")+'</td><td>'+bd(VIAJE_EST[v.estado])+'</td>'
-            +'<td>'+meter(v.pct,v.pct>=100?" is-full":"")+'</td>'
+            +'<td>'+(c?c.n:"—")+'</td><td>'+UI.pair(Seed.VIAJE_EST[v.estado])+'</td>'
+            +'<td>'+UI.meter(v.pct,v.pct>=100?" is-full":"")+'</td>'
             +'<td class="mono t-sub">'+(v.estado==="entregado"?v.entregado:v.eta)+'</td></tr>';}).join("")
-        ||emptyRow(6,"Sin viajes asignados"));
+        ||UI.empty(6,"Sin viajes asignados"));
 }
 function vViajeTra(id){
-  var v=viaBy(id); if(!v) return "";
-  var c=cliBy(v.cli),d=demBy(v.dem);
-  var i=traIdx(v.estado),sig=FLUJO_TRA[i+1];
+  var v=Viajes.byId(id); if(!v) return "";
+  var c=Clientes.byId(v.cli),d=Demandas.byId(v.dem);
+  var i=FlujoViaje.idxTra(v.estado),sig=Seed.FLUJO_TRA[i+1];
   var puedeEntregar=v.estado==="destino"||v.estado==="transito"||v.estado==="cargado";
   return '<button class="back" data-back="viajes">← Mis viajes</button>'
-    + ph({eyebrow:(c?c.n:"")+" · "+v.code,t:v.id,
-        meta:bd(VIAJE_EST[v.estado])+pill("ETA",v.estado==="entregado"?v.entregado:v.eta)})
+    + UI.head({eyebrow:(c?c.n:"")+" · "+v.code,t:v.id,
+        meta:UI.pair(Seed.VIAJE_EST[v.estado])+UI.pill("ETA",v.estado==="entregado"?v.entregado:v.eta)})
     + '<div class="tra-actions">'
       + (sig&&v.estado!=="entregado"
         ?'<button class="btn btn-primary btn-lg" data-traest="'+v.id+'|'+sig.id+'">'+sig.n+'</button>':'')
       + (v.estado!=="entregado"?'<button class="btn btn-lg" data-inc="'+v.id+'">Registrar incidencia</button>':'')
       + (puedeEntregar?'<button class="btn btn-lg" data-pod="'+v.id+'">Registrar entrega</button>':'')
     + '</div>'
-    + (v.inc?alerta("Incidencia activa",v.inc):"")
-    + card("Carga","<div class='card-body'><div class='grid-kv'>"
+    + (v.inc?UI.alert("Incidencia activa",v.inc):"")
+    + UI.card("Carga","<div class='card-body'><div class='grid-kv'>"
         +"<div class='kv'><span class='eyebrow'>Origen</span><b>"+v.origen+"</b></div>"
         +"<div class='kv'><span class='eyebrow'>Destino</span><b>"+v.destino+"</b></div>"
         +"<div class='kv'><span class='eyebrow'>Mercancía</span><b>"+(d?d.merc:"—")+"</b></div>"
-        +"<div class='kv'><span class='eyebrow'>Peso</span><b class='mono'>"+(d?nf(d.peso)+" kg":"—")+"</b></div>"
+        +"<div class='kv'><span class='eyebrow'>Peso</span><b class='mono'>"+(d?Fmt.num(d.peso)+" kg":"—")+"</b></div>"
         +"<div class='kv'><span class='eyebrow'>Vehículo</span><b>"+(d?d.vehiculo:"—")+"</b></div>"
         +"<div class='kv'><span class='eyebrow'>Código público</span><b class='mono'>"+v.code+"</b></div>"
         +"</div></div>")
     + panelTracking(v)
     + panelPOD(v)
-    + card("Mis actualizaciones",
-        tbl([{t:"Momento"},{t:"Actualización"}],
+    + UI.card("Mis actualizaciones",
+        UI.table([{t:"Momento"},{t:"Actualización"}],
           (v.log&&v.log.length?v.log.map(function(l){
             return '<tr><td class="mono t-sub">'+l.t+'</td><td>'+l.m+'</td></tr>';}).join("")
-            :emptyRow(2,"Sin actualizaciones"))));
+            :UI.empty(2,"Sin actualizaciones"))));
 }
-function avanzarTra(vid,est){
-  var v=viaBy(vid); if(!v) return;
-  v.estado=est;
-  var lbl=FLUJO_TRA[traIdx(est)].n;
-  v.inc=null;
-  if(est==="transito"&&v.pct<20) v.pct=20;
-  if(est==="destino") v.pct=Math.max(v.pct,95);
-  v.km=Math.round(v.kmTotal*v.pct/100);
-  v.log.unshift({t:HOY+" · "+ri(8,18)+":"+("0"+ri(0,59)).slice(-2),
-    m:"Transportista actualizó estado a "+lbl});
-  renderNav();render();
-  toast("Estado: "+lbl);
-}
+
 function modalIncidencia(vid){
-  openModal("Registrar incidencia",
+  Modal.open("Registrar incidencia",
     '<label class="fld"><span class="eyebrow">Tipo</span><select id="i-tipo">'
-    +TIPOS_INC.map(function(t){return '<option>'+t+'</option>';}).join("")+'</select></label>'
+    +Seed.TIPOS_INC.map(function(t){return '<option>'+t+'</option>';}).join("")+'</select></label>'
     +'<label class="fld" style="margin-top:14px"><span class="eyebrow">Detalle</span>'
     +'<input id="i-det" type="text" placeholder="Qué ocurrió"></label>'
     +'<div id="i-err" class="t-sub" style="color:var(--crit);margin-top:10px"></div>',
     '<button class="btn" id="m-cancel">Cancelar</button>'
     +'<button class="btn btn-primary" id="i-ok">Registrar</button>');
-  $("m-cancel").addEventListener("click",closeModal);
-  $("i-ok").addEventListener("click",function(){
-    var det=$("i-det").value.trim();
-    if(det.length<4){$("i-err").textContent="Describí qué ocurrió.";return;}
-    var v=viaBy(vid);
-    var txt=$("i-tipo").value+": "+det;
+  Dom.byId("m-cancel").addEventListener("click",Modal.close);
+  Dom.byId("i-ok").addEventListener("click",function(){
+    var det=Dom.byId("i-det").value.trim();
+    if(det.length<4){Dom.byId("i-err").textContent="Describí qué ocurrió.";return;}
+    var v=Viajes.byId(vid);
+    var txt=Dom.byId("i-tipo").value+": "+det;
     v.estado="incidencia";v.inc=txt;v.vel=0;
-    v.log.unshift({t:HOY+" · "+ri(8,18)+":00",m:"Incidencia reportada · "+txt});
+    v.log.unshift({t:HOY+" · "+Rng.int(8,18)+":00",m:"Incidencia reportada · "+txt});
     INCIDENCIAS.push({viaje:vid,t:txt,fecha:HOY});
-    closeModal();renderNav();render();toast("Incidencia registrada");});
+    Modal.close();Router.refresh();Toast.show("Incidencia registrada");});
 }
 
-/* ===================== TRACKING PÚBLICO ===================== */
 function vPublico(code){
   var v=null;
-  for(var i=0;i<VIAJES.length;i++){if(VIAJES[i].code===code)v=VIAJES[i];}
+  for(var i=0;i<Seed.VIAJES.length;i++){if(Seed.VIAJES[i].code===code)v=Seed.VIAJES[i];}
   if(!v) return '<div class="pub-wrap"><div class="pub-card">'
     +'<div class="pub-brand"><span class="brand-mark">DMS</span>'
     +'<span class="brand-sub">SEGUIMIENTO</span></div>'
-    +'<div class="empty" style="padding:34px 0">'+badge("b-crit","Código no encontrado")
-    +'<span class="t-sub">'+esc(code)+'</span></div>'
+    +'<div class="empty" style="padding:34px 0">'+UI.badge("b-crit","Código no encontrado")
+    +'<span class="t-sub">'+Fmt.esc(code)+'</span></div>'
     +'<button class="btn" data-pubhome="1">Volver</button></div></div>';
-  var p=podDe(v.id);
+  var p=Pods.deViaje(v.id);
   return '<div class="pub-wrap"><div class="pub-card">'
     +'<div class="pub-brand"><span class="brand-mark">DMS</span>'
       +'<span class="brand-sub">SEGUIMIENTO</span></div>'
     +'<div class="pub-code mono">'+v.code+'</div>'
-    +'<div class="pub-est">'+bd(VIAJE_EST[v.estado])+'</div>'
+    +'<div class="pub-est">'+UI.pair(Seed.VIAJE_EST[v.estado])+'</div>'
     +'<div class="pub-route"><b>'+v.origen+'</b><span>→</span><b>'+v.destino+'</b></div>'
     + mapaViaje(v)
     +'<div class="trk">'
       +'<div class="trk-i"><span class="eyebrow">Avance</span><b class="mono">'+v.pct+'%</b></div>'
-      +'<div class="trk-i"><span class="eyebrow">Restante</span><b class="mono">'+nf(v.kmTotal-v.km)+' km</b></div>'
+      +'<div class="trk-i"><span class="eyebrow">Restante</span><b class="mono">'+Fmt.num(v.kmTotal-v.km)+' km</b></div>'
       +'<div class="trk-i"><span class="eyebrow">ETA</span><b class="mono">'+(v.estado==="entregado"?v.entregado:v.eta)+'</b></div>'
       +'<div class="trk-i"><span class="eyebrow">Actualizado</span><b class="mono">'+v.ultPos+'</b></div>'
     +'</div>'
@@ -2358,7 +2456,7 @@ function vPublico(code){
           +'<span class="hito-line"></span></span><span class="hito-b"><b>'+h.n+'</b>'
           +'<span>'+h.t+'</span></span></li>';}).join("")+'</ol>'
     +(p?'<div class="eyebrow" style="margin:18px 0 10px">Entrega</div><div class="kvlist">'
-        +'<div class="kvrow"><span>Estado</span><span>'+bd(POD_EST[p.estado])+'</span></div>'
+        +'<div class="kvrow"><span>Estado</span><span>'+UI.pair(Seed.POD_EST[p.estado])+'</span></div>'
         +'<div class="kvrow"><span>Recibido por</span><span>'+p.receptor+'</span></div>'
         +'<div class="kvrow"><span>Fecha</span><span class="mono">'+p.fecha+'</span></div>'
         +'</div>':'')
@@ -2366,168 +2464,11 @@ function vPublico(code){
     +'<button class="btn" data-pubhome="1" style="margin-top:14px">Volver</button>'
     +'</div></div>';
 }
-function rutaHash(){
-  var h=(location.hash||"").replace(/^#\/?/,"");
-  if(h.indexOf("tracking/")===0) return h.slice(9).toUpperCase();
-  return null;
-}
 
-/* ===================== ROUTER ===================== */
-function render(){
-  var pub=rutaHash();
-  if(pub){ $("login").hidden=true; $("app").hidden=true;
-    $("modal-root").innerHTML=vPublico(pub); wirePublico(); return; }
-  $("modal-root").innerHTML="";
-  var h="";
-  switch(S.mod){
-    case "dashboard": h=vDashboard(); break;
-    case "clientes": h=vClientes(); break;
-    case "pipeline": h=vPipeline(); break;
-    case "actividades": h=vActividades(); break;
-    case "documentos": h=vDocumentos(); break;
-    case "operaciones": h=vOperaciones(); break;
-    case "demandas": h=vDemandas(); break;
-    case "viajes": h=vViajes(); break;
-    case "directorio": h=vDirectorio(); break;
-    case "certificaciones": h=vCertificaciones(); break;
-    case "reportes": h=vReportes(); break;
-    case "misviajes": h=vMisViajes(); break;
-  }
-  $("content").innerHTML=h;
-  wire();
-}
-function wire(){
-  var root=$("content");
-  function on(sel,fn){Array.prototype.forEach.call(root.querySelectorAll(sel),function(el){
-    el.addEventListener("click",function(e){e.stopPropagation();fn(el);});});}
-
-  on("[data-mod]",function(el){go(el.getAttribute("data-mod"));});
-  on("[data-go]",function(el){go(el.getAttribute("data-go"));});
-  on("[data-back]",function(el){go(el.getAttribute("data-back"));});
-  on("[data-cli]",function(el){
-    S.cliOpen=el.getAttribute("data-cli");S.cliTab="resumen";S.mod="clientes";
-    S.docCat="todas";S.docEstado="todos";S.docOp="todas";S.docQ="";S.docPage=1;
-    renderNav();render();window.scrollTo(0,0);});
-  on("[data-clitab]",function(el){S.cliTab=el.getAttribute("data-clitab");
-    S.docPage=1;render();window.scrollTo(0,0);});
-  on("[data-op]",function(el){
-    var o=opBy(el.getAttribute("data-op"));
-    if(!o)return;
-    S.cliOpen=o.cli;S.cliTab="documentos";S.mod="clientes";
-    S.docOp=o.id;S.docCat="todas";S.docEstado="todos";S.docQ="";S.docPage=1;
-    renderNav();render();window.scrollTo(0,0);});
-  on("[data-dem]",function(el){S.demOpen=el.getAttribute("data-dem");S.mod="demandas";
-    renderNav();render();window.scrollTo(0,0);});
-  on("[data-via]",function(el){S.viaOpen=el.getAttribute("data-via");S.mod="viajes";
-    renderNav();render();window.scrollTo(0,0);});
-  on("[data-tra]",function(el){S.traOpen=el.getAttribute("data-tra");S.mod="directorio";
-    renderNav();render();window.scrollTo(0,0);});
-  on("[data-filtro]",function(el){S.filtro=el.getAttribute("data-filtro");S.docPage=1;render();});
-  on("[data-doccat]",function(el){S.docCat=el.getAttribute("data-doccat");S.docPage=1;render();});
-  on("[data-pg]",function(el){
-    var n=parseInt(el.getAttribute("data-pg"),10);
-    if(n>=1){S.docPage=n;render();}});
-  on("[data-doc]",function(el){modalDoc(el.getAttribute("data-doc"));});
-  on("[data-subir]",function(el){modalSubir(el.getAttribute("data-subir")||null);});
-  on("[data-pub]",function(el){publicar(el.getAttribute("data-pub"));});
-  on("[data-asig]",function(el){asignar(el.getAttribute("data-asig"));});
-  on("[data-avanzar]",function(el){avanzar(el.getAttribute("data-avanzar"));});
-  on("[data-sim]",function(el){simularAvance(el.getAttribute("data-sim"));});
-  on("[data-pod]",function(el){modalPOD(el.getAttribute("data-pod"));});
-  on("[data-inc]",function(el){modalIncidencia(el.getAttribute("data-inc"));});
-  on("[data-viatra]",function(el){S.viaOpen=el.getAttribute("data-viatra");S.mod="misviajes";
-    renderNav();render();window.scrollTo(0,0);});
-  on("[data-traest]",function(el){var p=el.getAttribute("data-traest").split("|");avanzarTra(p[0],p[1]);});
-  on("[data-track]",function(el){location.hash="#/tracking/"+el.getAttribute("data-track");});
-  on("[data-act-ok]",function(el){
-    var id=el.getAttribute("data-act-ok");
-    ACTIVIDADES.forEach(function(a){if(a.id===id)a.estado="hecha";});
-    renderNav();render();toast("Actividad marcada como hecha");});
-  on("[data-cert-ok]",function(el){
-    var p=el.getAttribute("data-cert-ok").split("|");aprobarCert(p[0],p[1]);});
-  on("[data-cert-up]",function(el){
-    var p=el.getAttribute("data-cert-up").split("|");subirCert(p[0],p[1]);});
-  on("[data-crear-dem]",function(el){modalDemanda(el.getAttribute("data-crear-dem"));});
-
-  var q=$("q");
-  if(q) q.addEventListener("input",function(){S.q=q.value;render();
-    var n=$("q");if(n){n.focus();n.setSelectionRange(n.value.length,n.value.length);}});
-  var dq=$("f-docq");
-  if(dq) dq.addEventListener("input",function(){S.docQ=dq.value;S.docPage=1;render();
-    var n=$("f-docq");if(n){n.focus();n.setSelectionRange(n.value.length,n.value.length);}});
-  var fo=$("f-docop");
-  if(fo) fo.addEventListener("change",function(){S.docOp=fo.value;S.docPage=1;render();});
-  var fe=$("f-docest");
-  if(fe) fe.addEventListener("change",function(){S.docEstado=fe.value;S.docPage=1;render();});
-  var bn=$("btn-nuevo-cli"); if(bn) bn.addEventListener("click",modalProspecto);
-  var ba=$("btn-nueva-act"); if(ba) ba.addEventListener("click",modalActividad);
-  var bd2=$("btn-nueva-dem"); if(bd2) bd2.addEventListener("click",function(){modalDemanda(null);});
-  var bt=$("btn-nuevo-tra"); if(bt) bt.addEventListener("click",modalTransportista);
-}
-
-/* ===================== ACCIONES ===================== */
-function publicar(id){
-  var d=demBy(id); if(!d)return;
-  d.estado="publicada";
-  renderNav();render();
-  toast("Demanda "+id+" publicada · "+candidatos(d).ok.length+" candidatos compatibles");
-}
-function asignar(id){
-  var d=demBy(id); if(!d)return;
-  var c=candidatos(d);
-  if(!c.ok.length){toast("Ningún transportista cumple los requisitos");return;}
-  var g=c.ok[0];
-  d.tra=g.t.id; d.estado="asignada"; g.t.asignadas30d++;
-  var nv={id:"VJ-"+(1182+VIAJES.length),dem:d.id,cli:d.cli,tra:g.t.id,
-    origen:d.origen,destino:d.destino,estado:"asignado",pct:8,eta:d.entrega+" · 12:00",
-    pos:"Pendiente de confirmación del transportista",inc:null,
-    hitos:[{n:"Asignado",t:HOY,s:"done"},{n:"Confirmado por transportista",t:"pendiente",s:"now"},
-      {n:"En carga",t:"ETA "+d.carga,s:"next"},{n:"En tránsito",t:"—",s:"next"},
-      {n:"En reparto",t:"—",s:"next"},{n:"Entregado",t:"ETA "+d.entrega,s:"next"}],
-    log:[{t:HOY,m:"Transportista asignado: "+g.t.n+" (puntaje "+g.p.total+")"}]};
-  VIAJES.push(nv);
-  S.mod="viajes"; S.viaOpen=nv.id; S.demOpen=null;
-  renderNav();render();window.scrollTo(0,0);
-  toast("Asignado a "+g.t.n+" · viaje "+nv.id+" creado");
-}
-var ORDEN=["pendiente","asignado","confirmado","carga","transito","reparto","entregado"];
-function avanzar(id){
-  var v=viaBy(id); if(!v)return;
-  var cur=v.estado==="incidencia"?"transito":v.estado;
-  var i=ORDEN.indexOf(cur);
-  if(i<0||i>=ORDEN.length-1)return;
-  var next=ORDEN[i+1];
-  v.estado=next; v.inc=null;
-  v.pct=Math.min(100,Math.round((i+2)/ORDEN.length*100));
-  if(next==="entregado"){v.pct=100;v.entregado=HOY+" · 11:30";v.puntual=true;
-    v.pos="Entregado en destino";
-    var d=demBy(v.dem); if(d) d.estado="cerrada";}
-  v.hitos.forEach(function(h,k){
-    if(k<i+1) h.s="done"; else if(k===i+1) h.s="now"; else h.s="next";});
-  if(next==="entregado") v.hitos.forEach(function(h){h.s="done";});
-  v.log.unshift({t:HOY,m:"Estado actualizado a "+VIAJE_EST[next][1]});
-  renderNav();render();
-  toast("Viaje "+id+" → "+VIAJE_EST[next][1]);
-}
-function aprobarCert(tid,cid){
-  var t=traBy(tid); if(!t)return;
-  t.certs[cid].est="aprobado";
-  var st=certEstado(t);
-  renderNav();render();
-  toast(st.code==="ok"?t.n+" quedó certificado":certN(cid)+" aprobada");
-}
-function subirCert(tid,cid){
-  var t=traBy(tid); if(!t)return;
-  t.certs[cid]={est:"pendiente",em:HOY,ven:"22 sep 2029"};
-  renderNav();render();
-  toast(certN(cid)+" enviada · pendiente de validación");
-}
-
-/* ===================== MODALES DE ALTA ===================== */
 function modalProspecto(){
-  openModal("Nuevo prospecto",
+  Modal.open("Nuevo prospecto",
     '<div class="form-grid">'
-    +'<label class="fld"><span class="eyebrow">Razón social</span><input id="p-n" type="text" placeholder="Empresa S.R.L."></label>'
+    +'<label class="fld"><span class="eyebrow">Razón social</span><input id="p-n" type="text" placeholder="Empresa State.R.L."></label>'
     +'<label class="fld"><span class="eyebrow">NIT</span><input id="p-nit" type="text" placeholder="1012345670"></label>'
     +'<label class="fld"><span class="eyebrow">Ciudad</span><select id="p-ciudad">'
       +["La Paz","El Alto","Santa Cruz","Cochabamba","Oruro","Trinidad"].map(function(c){
@@ -2539,47 +2480,47 @@ function modalProspecto(){
     +'</div><div id="p-err" class="t-sub" style="color:var(--crit);margin-top:10px"></div>',
     '<button class="btn" id="m-cancel">Cancelar</button>'
     +'<button class="btn btn-primary" id="m-save">Crear prospecto</button>');
-  $("m-cancel").addEventListener("click",closeModal);
-  $("m-save").addEventListener("click",function(){
-    var n=$("p-n").value.trim(),nit=$("p-nit").value.trim();
-    if(n.length<3||nit.length<5){$("p-err").textContent="Razón social y NIT son obligatorios.";return;}
-    var id="C"+(100+CLIENTES.length);
-    CLIENTES.push({id:id,n:n,nit:nit,ciudad:$("p-ciudad").value,tipo:$("p-tipo").value,
-      etapa:"prospecto",ejecutivo:S.role.name,desde:"—",serv:[],ultima:HOY,proximo:"—",
-      contactos:[{n:$("p-c").value||"—",c:"Contacto",t:"—",m:$("p-m").value||"—"}]});
-    closeModal();S.cliOpen=id;S.cliTab="resumen";S.mod="clientes";
-    renderNav();render();toast("Prospecto "+n+" creado");});
+  Dom.byId("m-cancel").addEventListener("click",Modal.close);
+  Dom.byId("m-save").addEventListener("click",function(){
+    var n=Dom.byId("p-n").value.trim(),nit=Dom.byId("p-nit").value.trim();
+    if(n.length<3||nit.length<5){Dom.byId("p-err").textContent="Razón social y NIT son obligatorios.";return;}
+    var id="C"+(100+Seed.CLIENTES.length);
+    Seed.CLIENTES.push({id:id,n:n,nit:nit,ciudad:Dom.byId("p-ciudad").value,tipo:Dom.byId("p-tipo").value,
+      etapa:"prospecto",ejecutivo:Session.nombre(),desde:"—",serv:[],ultima:HOY,proximo:"—",
+      contactos:[{n:Dom.byId("p-c").value||"—",c:"Contacto",t:"—",m:Dom.byId("p-m").value||"—"}]});
+    Modal.close();State.cliOpen=id;State.cliTab="resumen";State.mod="clientes";
+    Router.refresh();Toast.show("Prospecto "+n+" creado");});
 }
 function modalActividad(){
-  openModal("Nueva actividad",
+  Modal.open("Nueva actividad",
     '<div class="form-grid">'
     +'<label class="fld"><span class="eyebrow">Cliente</span><select id="a-cli">'
-      +CLIENTES.map(function(c){return '<option value="'+c.id+'">'+c.n+'</option>';}).join("")+'</select></label>'
+      +Seed.CLIENTES.map(function(c){return '<option value="'+c.id+'">'+c.n+'</option>';}).join("")+'</select></label>'
     +'<label class="fld"><span class="eyebrow">Tipo</span><select id="a-tipo">'
-      +Object.keys(ACT_TIPOS).map(function(k){return '<option value="'+k+'">'+ACT_TIPOS[k]+'</option>';}).join("")
+      +Object.keys(Seed.ACT_TIPOS).map(function(k){return '<option value="'+k+'">'+Seed.ACT_TIPOS[k]+'</option>';}).join("")
       +'</select></label>'
     +'<label class="fld"><span class="eyebrow">Fecha</span><input id="a-f" type="text" value="25 sep 2026"></label>'
-    +'<label class="fld"><span class="eyebrow">Responsable</span><input id="a-r" type="text" value="'+S.role.name+'"></label>'
+    +'<label class="fld"><span class="eyebrow">Responsable</span><input id="a-r" type="text" value="'+Session.nombre()+'"></label>'
     +'</div>'
     +'<label class="fld" style="margin-top:14px"><span class="eyebrow">Asunto</span>'
     +'<input id="a-as" type="text" placeholder="Asunto de la actividad"></label>'
     +'<div id="a-err" class="t-sub" style="color:var(--crit);margin-top:10px"></div>',
     '<button class="btn" id="m-cancel">Cancelar</button>'
     +'<button class="btn btn-primary" id="m-save">Registrar</button>');
-  $("m-cancel").addEventListener("click",closeModal);
-  $("m-save").addEventListener("click",function(){
-    var as=$("a-as").value.trim();
-    if(as.length<3){$("a-err").textContent="El asunto es obligatorio.";return;}
-    ACTIVIDADES.unshift({id:"A-"+(300+ACTIVIDADES.length),cli:$("a-cli").value,tipo:$("a-tipo").value,
-      fecha:$("a-f").value,asunto:as,estado:"pendiente",resp:$("a-r").value});
-    closeModal();renderNav();render();toast("Actividad registrada");});
+  Dom.byId("m-cancel").addEventListener("click",Modal.close);
+  Dom.byId("m-save").addEventListener("click",function(){
+    var as=Dom.byId("a-as").value.trim();
+    if(as.length<3){Dom.byId("a-err").textContent="El asunto es obligatorio.";return;}
+    Seed.ACTIVIDADES.unshift({id:"A-"+(300+Seed.ACTIVIDADES.length),cli:Dom.byId("a-cli").value,tipo:Dom.byId("a-tipo").value,
+      fecha:Dom.byId("a-f").value,asunto:as,estado:"pendiente",resp:Dom.byId("a-r").value});
+    Modal.close();Router.refresh();Toast.show("Actividad registrada");});
 }
 function modalDemanda(cli){
-  var ops=cli?OPERACIONES.filter(function(o){return o.cli===cli;}):OPERACIONES;
-  openModal("Publicar demanda de carga",
+  var ops=cli?Seed.OPERACIONES.filter(function(o){return o.cli===cli;}):Seed.OPERACIONES;
+  Modal.open("Publicar demanda de carga",
     '<div class="form-grid">'
     +'<label class="fld"><span class="eyebrow">Cliente</span><select id="d-cli">'
-      +CLIENTES.filter(function(c){return c.serv.length;}).map(function(c){
+      +Seed.CLIENTES.filter(function(c){return c.serv.length;}).map(function(c){
         return '<option value="'+c.id+'"'+(cli===c.id?" selected":"")+'>'+c.n+'</option>';}).join("")+'</select></label>'
     +'<label class="fld"><span class="eyebrow">Operación</span><select id="d-op">'
       +ops.map(function(o){return '<option value="'+o.id+'">'+o.id+'</option>';}).join("")+'</select></label>'
@@ -2601,25 +2542,25 @@ function modalDemanda(cli){
     +'<div id="d-err" class="t-sub" style="color:var(--crit);margin-top:10px"></div>',
     '<button class="btn" id="m-cancel">Cancelar</button>'
     +'<button class="btn btn-primary" id="m-save">Publicar</button>');
-  $("m-cancel").addEventListener("click",closeModal);
-  $("m-save").addEventListener("click",function(){
-    var peso=parseInt(String($("d-peso").value).replace(/\D/g,""),10)||0;
-    if(peso<=0){$("d-err").textContent="El peso debe ser mayor a cero.";return;}
-    var corr=$("d-corr").value,p=corr.split("–");
-    var d={id:"DC-0"+(417+DEMANDAS.length),cli:$("d-cli").value,op:$("d-op").value,
-      origen:p[0],destino:p[1],corredor:corr,carga:$("d-carga").value,entrega:$("d-ent").value,
-      entregaISO:isoDe($("d-ent").value),merc:$("d-merc").value,peligrosa:$("d-pel").checked,
-      peso:peso,vol:parseInt($("d-vol").value,10)||0,vehiculo:$("d-veh").value,
-      prior:$("d-prior").value,estado:"publicada",tra:null};
-    DEMANDAS.push(d);
-    closeModal();S.mod="demandas";S.demOpen=d.id;
-    renderNav();render();window.scrollTo(0,0);
-    toast("Demanda "+d.id+" publicada · "+candidatos(d).ok.length+" candidatos");});
+  Dom.byId("m-cancel").addEventListener("click",Modal.close);
+  Dom.byId("m-save").addEventListener("click",function(){
+    var peso=parseInt(String(Dom.byId("d-peso").value).replace(/\D/g,""),10)||0;
+    if(peso<=0){Dom.byId("d-err").textContent="El peso debe ser mayor a cero.";return;}
+    var corr=Dom.byId("d-corr").value,p=corr.split("–");
+    var d={id:"DC-0"+(417+Seed.DEMANDAS.length),cli:Dom.byId("d-cli").value,op:Dom.byId("d-op").value,
+      origen:p[0],destino:p[1],corredor:corr,carga:Dom.byId("d-carga").value,entrega:Dom.byId("d-ent").value,
+      entregaISO:Fmt.iso(Dom.byId("d-ent").value),merc:Dom.byId("d-merc").value,peligrosa:Dom.byId("d-pel").checked,
+      peso:peso,vol:parseInt(Dom.byId("d-vol").value,10)||0,vehiculo:Dom.byId("d-veh").value,
+      prior:Dom.byId("d-prior").value,estado:"publicada",tra:null};
+    Seed.DEMANDAS.push(d);
+    Modal.close();State.mod="demandas";State.demOpen=d.id;
+    Router.refresh();window.scrollTo(0,0);
+    Toast.show("Demanda "+d.id+" publicada · "+Matching.candidatos(d).ok.length+" candidatos");});
 }
 function modalTransportista(){
-  openModal("Registrar transportista",
+  Modal.open("Registrar transportista",
     '<div class="form-grid">'
-    +'<label class="fld"><span class="eyebrow">Empresa</span><input id="t-n" type="text" placeholder="Transportes S.R.L."></label>'
+    +'<label class="fld"><span class="eyebrow">Empresa</span><input id="t-n" type="text" placeholder="Transportes State.R.L."></label>'
     +'<label class="fld"><span class="eyebrow">Contacto</span><input id="t-c" type="text" placeholder="Nombre"></label>'
     +'<label class="fld"><span class="eyebrow">Teléfono</span><input id="t-t" type="text" placeholder="+591 7 000-0000"></label>'
     +'<label class="fld"><span class="eyebrow">Base</span><select id="t-b">'
@@ -2632,34 +2573,266 @@ function modalTransportista(){
     +'</div><div id="t-err" class="t-sub" style="color:var(--crit);margin-top:10px"></div>',
     '<button class="btn" id="m-cancel">Cancelar</button>'
     +'<button class="btn btn-primary" id="m-save">Registrar</button>');
-  $("m-cancel").addEventListener("click",closeModal);
-  $("m-save").addEventListener("click",function(){
-    var n=$("t-n").value.trim();
-    if(n.length<3){$("t-err").textContent="El nombre de la empresa es obligatorio.";return;}
-    var id="T"+(10+TRANSPORTISTAS.length);
+  Dom.byId("m-cancel").addEventListener("click",Modal.close);
+  Dom.byId("m-save").addEventListener("click",function(){
+    var n=Dom.byId("t-n").value.trim();
+    if(n.length<3){Dom.byId("t-err").textContent="El nombre de la empresa es obligatorio.";return;}
+    var id="T"+(10+Seed.TRANSPORTISTAS.length);
     var vac={est:"ausente",em:"—",ven:"—"};
-    TRANSPORTISTAS.push({id:id,n:n,contacto:$("t-c").value||"—",tel:$("t-t").value||"—",
-      tipo:"Internacional",cobertura:[$("t-cob").value],cap:parseInt($("t-cap").value,10)||20,
+    Seed.TRANSPORTISTAS.push({id:id,n:n,contacto:Dom.byId("t-c").value||"—",tel:Dom.byId("t-t").value||"—",
+      tipo:"Internacional",cobertura:[Dom.byId("t-cob").value],cap:parseInt(Dom.byId("t-cap").value,10)||20,
       vehiculos:["Tracto + semirremolque"],disp:"disponible",viajes:0,cumpl:0,nuevo:true,
-      unidad:"—",placa:"—",base:$("t-b").value,asignadas30d:0,en:$("t-b").value,
+      unidad:"—",placa:"—",base:Dom.byId("t-b").value,asignadas30d:0,en:Dom.byId("t-b").value,
       certs:{licencia:vac,seguro:vac,habilitacion:vac,antecedentes:vac,defensivo:vac,peligrosa:vac}});
-    closeModal();S.mod="directorio";S.traOpen=id;
-    renderNav();render();toast(n+" registrado · pendiente de certificación");});
+    Modal.close();State.mod="directorio";State.traOpen=id;
+    Router.refresh();Toast.show(n+" registrado · pendiente de certificación");});
 }
 
-/* ===================== ARRANQUE ===================== */
-function wirePublico(){
-  var b=$("modal-root").querySelector("[data-pubhome]");
-  if(b) b.addEventListener("click",function(){location.hash="";});
+var Modales={
+  doc:modalDoc, subir:modalSubir, pod:modalPOD, incidencia:modalIncidencia,
+  prospecto:modalProspecto, actividad:modalActividad,
+  demanda:modalDemanda, transportista:modalTransportista
+};
+
+function guardarPOD(vid){
+  var v=Viajes.byId(vid); if(!v) return;
+  var mot=Dom.byId("pod-mot")?Dom.byId("pod-mot").value.trim():"";
+  var borrador={receptor:Dom.byId("pod-rec").value.trim(),
+    resultado:Dom.byId("pod-res").value,motivo:mot,
+    firma:podDraft.firma,fotos:podDraft.fotos,obs:Dom.byId("pod-obs").value};
+  var falta=PodService.validar(borrador);
+  if(falta.length){Dom.byId("pod-err").textContent="Falta: "+falta.join(", ")+".";return;}
+  var pod=PodService.registrar(v,borrador);
+  Modal.close(); Router.refresh();
+  Toast.show("POD "+pod.id+" registrado · "+Seed.POD_EST[borrador.resultado][1]);
 }
+
+var DocFiltro={
+  aplicar:function(cli){
+    var base=cli?Documentos.deCliente(cli):Documentos.visibles();
+    return Documentos.filtrar(base,{cat:State.docCat,estado:State.docEstado,
+      op:State.docOp,q:State.docQ});}
+};
+
+var Nav={
+  labels:Seed.MODS,
+  grupos:Seed.GRUPOS,
+  contadores:function(){
+    return {clientes:Clientes.count(),pipeline:Oportunidades.count(),
+      actividades:Actividades.pendientes().length,
+      documentos:Documentos.visibles().length,
+      operaciones:Operaciones.visibles().length,
+      demandas:Demandas.count(),viajes:Viajes.visibles().length,
+      misviajes:Viajes.visibles().length,
+      directorio:Transportistas.count(),
+      certificaciones:Transportistas.pendientesValidacion()};},
+  render:function(){
+    var cnt=Nav.contadores(),html="";
+    Nav.grupos.forEach(function(g){
+      var items=g.items.filter(function(m){return Session.puede(m);});
+      if(!items.length) return;
+      html+='<div class="nav-grp"><div class="nav-grp-t">'+g.t+'</div>'
+        +items.map(function(m){
+          var c=cnt[m]!=null?'<span class="nav-count'
+            +(m==="certificaciones"&&cnt[m]>0?" alert":"")+'">'+cnt[m]+'</span>':'';
+          return '<button class="nav-item" data-mod="'+m+'" aria-current="'
+            +(State.mod===m)+'">'+Nav.labels[m]+c+'</button>';}).join("")+'</div>';});
+    Dom.html("nav",html);
+    Dom.all(Dom.byId("nav"),".nav-item").forEach(function(b){
+      Dom.on(b,"click",function(){Router.go(b.getAttribute("data-mod"));});});}
+};
+
+var Routes={
+  dashboard:vDashboard, clientes:vClientes, pipeline:vPipeline,
+  actividades:vActividades, documentos:vDocumentos, operaciones:vOperaciones,
+  demandas:vDemandas, viajes:vViajes, misviajes:vMisViajes,
+  directorio:vDirectorio, certificaciones:vCertificaciones, reportes:vReportes
+};
+
+var Publico={
+  code:function(){
+    var h=(location.hash||"").replace(/^#\/?/,"");
+    return h.indexOf("tracking/")===0?h.slice(9).toUpperCase():null;},
+  render:function(code){
+    Dom.hide("login",true); Dom.hide("app",true);
+    Dom.html("modal-root",vPublico(code));
+    var b=Dom.byId("modal-root").querySelector("[data-pubhome]");
+    Dom.on(b,"click",function(){location.hash="";});}
+};
+
+var Actions={
+  mod:function(el){Router.go(el.getAttribute("data-mod"));},
+  go:function(el){Router.go(el.getAttribute("data-go"));},
+  back:function(el){Router.go(el.getAttribute("data-back"));},
+  cli:function(el){
+    State.cliOpen=el.getAttribute("data-cli"); State.cliTab="resumen"; State.mod="clientes";
+    State.docCat="todas"; State.docEstado="todos"; State.docOp="todas";
+    State.docQ=""; State.docPage=1; Router.refresh();},
+  clitab:function(el){State.cliTab=el.getAttribute("data-clitab");State.docPage=1;Router.refresh();},
+  op:function(el){
+    var o=Operaciones.byId(el.getAttribute("data-op")); if(!o) return;
+    State.cliOpen=o.cli; State.cliTab="documentos"; State.mod="clientes";
+    State.docOp=o.id; State.docCat="todas"; State.docEstado="todos";
+    State.docQ=""; State.docPage=1; Router.refresh();},
+  dem:function(el){State.demOpen=el.getAttribute("data-dem");State.mod="demandas";Router.refresh();},
+  via:function(el){State.viaOpen=el.getAttribute("data-via");State.mod="viajes";Router.refresh();},
+  viatra:function(el){State.viaOpen=el.getAttribute("data-viatra");State.mod="misviajes";Router.refresh();},
+  tra:function(el){State.traOpen=el.getAttribute("data-tra");State.mod="directorio";Router.refresh();},
+  filtro:function(el){State.filtro=el.getAttribute("data-filtro");State.docPage=1;Router.render();},
+  doccat:function(el){State.docCat=el.getAttribute("data-doccat");State.docPage=1;Router.render();},
+  pg:function(el){
+    var n=parseInt(el.getAttribute("data-pg"),10);
+    if(n>=1){State.docPage=n;Router.render();}},
+  doc:function(el){Modales.doc(el.getAttribute("data-doc"));},
+  subir:function(el){Modales.subir(el.getAttribute("data-subir")||null);},
+  pub:function(el){
+    var d=Demandas.byId(el.getAttribute("data-pub"));
+    if(!d) return;
+    var n=Asignacion.publicar(d);
+    Router.refresh(); Toast.show("Demanda "+d.id+" publicada · "+n+" candidatos");},
+  asig:function(el){
+    var d=Demandas.byId(el.getAttribute("data-asig")); if(!d) return;
+    var r=Asignacion.asignar(d);
+    if(!r){Toast.show("Ningún transportista cumple los requisitos");return;}
+    State.mod="viajes"; State.viaOpen=r.viaje.id; State.demOpen=null;
+    Router.refresh();
+    Toast.show("Asignado a "+r.ganador.t.n+" · viaje "+r.viaje.id+" creado");},
+  avanzar:function(el){
+    var v=Viajes.byId(el.getAttribute("data-avanzar")); if(!v) return;
+    var next=FlujoViaje.avanzarInterno(v);
+    if(!next) return;
+    Router.refresh(); Toast.show("Viaje "+v.id+" → "+FlujoViaje.badge(next)[1]);},
+  traest:function(el){
+    var p=el.getAttribute("data-traest").split("|");
+    var v=Viajes.byId(p[0]); if(!v) return;
+    var lbl=FlujoViaje.avanzarTra(v,p[1]);
+    Router.refresh(); Toast.show("Estado: "+lbl);},
+  sim:function(el){
+    var v=Viajes.byId(el.getAttribute("data-sim")); if(!v) return;
+    if(!Tracking.avanzar(v)){Toast.show("El viaje ya llegó a destino");return;}
+    Router.refresh();
+    Toast.show("Posición actualizada · "+Fmt.num(v.km)+" km de "+Fmt.num(v.kmTotal));},
+  pod:function(el){Modales.pod(el.getAttribute("data-pod"));},
+  inc:function(el){Modales.incidencia(el.getAttribute("data-inc"));},
+  track:function(el){location.hash="#/tracking/"+el.getAttribute("data-track");},
+  "act-ok":function(el){
+    Actividades.completar(el.getAttribute("data-act-ok"));
+    Router.refresh(); Toast.show("Actividad marcada como hecha");},
+  "cert-ok":function(el){
+    var p=el.getAttribute("data-cert-ok").split("|");
+    var t=Transportistas.byId(p[0]); if(!t) return;
+    var st=Certificaciones.aprobar(t,p[1]);
+    Router.refresh();
+    Toast.show(st.code==="ok"?t.n+" quedó certificado"
+      :Transportistas.cert(p[1]).n+" aprobada");},
+  "cert-up":function(el){
+    var p=el.getAttribute("data-cert-up").split("|");
+    var t=Transportistas.byId(p[0]); if(!t) return;
+    Certificaciones.subir(t,p[1]);
+    Router.refresh();
+    Toast.show(Transportistas.cert(p[1]).n+" enviada · pendiente de validación");},
+  "crear-dem":function(el){Modales.demanda(el.getAttribute("data-crear-dem"));}
+};
+
+var Inputs={
+  q:function(){State.q=this.value;Router.render();Inputs.focus("q");},
+  "f-docq":function(){State.docQ=this.value;State.docPage=1;Router.render();Inputs.focus("f-docq");},
+  "f-docop":function(){State.docOp=this.value;State.docPage=1;Router.render();},
+  "f-docest":function(){State.docEstado=this.value;State.docPage=1;Router.render();},
+  focus:function(id){
+    var n=Dom.byId(id);
+    if(n){n.focus();n.setSelectionRange(n.value.length,n.value.length);}}
+};
+
+var Botones={
+  "btn-nuevo-cli":function(){Modales.prospecto();},
+  "btn-nueva-act":function(){Modales.actividad();},
+  "btn-nueva-dem":function(){Modales.demanda(null);},
+  "btn-nuevo-tra":function(){Modales.transportista();}
+};
+
+var Router={
+  render:function(){
+    var code=Publico.code();
+    if(code){Publico.render(code);return;}
+    Dom.html("modal-root","");
+    var view=Routes[State.mod];
+    Dom.html("content",view?view():"");
+    Router.wire();},
+  refresh:function(){Nav.render();Router.render();window.scrollTo(0,0);},
+  go:function(m){State.mod=m;State.reset();Router.refresh();},
+  wire:function(){
+    var root=Dom.byId("content");
+    Object.keys(Actions).forEach(function(k){
+      Dom.all(root,"[data-"+k+"]").forEach(function(el){
+        Dom.on(el,"click",function(e){e.stopPropagation();Actions[k](el);});});});
+    Object.keys(Inputs).forEach(function(k){
+      if(k==="focus") return;
+      var el=Dom.byId(k);
+      if(el) Dom.on(el,el.tagName==="SELECT"?"change":"input",Inputs[k]);});
+    Object.keys(Botones).forEach(function(k){Dom.on(Dom.byId(k),"click",Botones[k]);});}
+};
+
+var Login={
+  pendiente:null,
+  render:function(){
+    Dom.html("roles",Seed.ROLES.map(function(r){
+      return '<button class="role" type="button" role="radio" aria-checked="false" data-role="'+r.id+'">'
+        +'<span class="role-icon" aria-hidden="true"><svg viewBox="0 0 16 16" fill="none" '
+        +'stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round">'
+        +r.icon+'</svg></span>'
+        +'<span class="role-txt"><span class="role-who">'+r.name+'</span>'
+        +'<span class="role-rol">'+r.rol+'</span><span class="role-mail">'+r.mail+'</span></span>'
+        +'<span class="role-chev" aria-hidden="true"><svg viewBox="0 0 16 16" fill="none" '
+        +'stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">'
+        +'<path d="M6 3.5 10.5 8 6 12.5"/></svg></span></button>';}).join(""));
+    Dom.all(Dom.byId("roles"),".role").forEach(function(b){
+      Dom.on(b,"click",function(){Login.pick(b.getAttribute("data-role"));});
+      Dom.on(b,"dblclick",function(){Login.pick(b.getAttribute("data-role"));Login.enter();});});
+    Dom.on(Dom.byId("btn-enter"),"click",Login.enter);
+    document.addEventListener("keydown",function(e){
+      if(e.key==="Escape"&&Modal.isOpen()){Modal.close();return;}
+      if(Dom.byId("login").hidden) return;
+      if(e.key==="Enter"&&Login.pendiente){e.preventDefault();Login.enter();}});
+    Login.reset();},
+  reset:function(){
+    Login.pendiente=null;
+    Dom.all(Dom.byId("roles"),".role").forEach(function(b){
+      b.classList.remove("is-picked");b.setAttribute("aria-checked","false");});
+    Dom.html("login-pick",'<span class="t-sub">Sin rol seleccionado</span>');
+    var b=Dom.byId("btn-enter"); b.disabled=true; b.textContent="Entrar";},
+  pick:function(id){
+    var r=null;
+    Seed.ROLES.forEach(function(x){if(x.id===id)r=x;});
+    if(!r) return;
+    Login.pendiente=r;
+    Dom.all(Dom.byId("roles"),".role").forEach(function(b){
+      var on=b.getAttribute("data-role")===id;
+      b.classList.toggle("is-picked",on);b.setAttribute("aria-checked",on?"true":"false");});
+    Dom.html("login-pick",'<b>'+r.name+'</b><span class="t-sub">'+r.entidad+'</span>');
+    var btn=Dom.byId("btn-enter"); btn.disabled=false; btn.textContent="Entrar";},
+  enter:function(){
+    if(!Login.pendiente) return;
+    Session.set(Login.pendiente);
+    State.mod=Session.modulos()[0]; State.reset(); State.filtro="todos";
+    Dom.hide("login",true); Dom.hide("app",false);
+    Dom.byId("who-name").textContent=Session.nombre();
+    Dom.byId("who-rol").textContent=Session.entidad();
+    Router.refresh();},
+  leave:function(){
+    Session.clear();
+    Dom.hide("app",true); Dom.hide("login",false);
+    Login.reset(); window.scrollTo(0,0);}
+};
+
 window.addEventListener("hashchange",function(){
-  var pub=rutaHash();
-  if(pub){ render(); }
-  else { $("modal-root").innerHTML="";
-    if(S.role){ $("app").hidden=false; render(); } else { $("login").hidden=false; } }
-});
-renderLogin();
-$("btn-salir").addEventListener("click",leave);
-if(rutaHash()) render();
+  if(Publico.code()){Router.render();return;}
+  Dom.html("modal-root","");
+  if(Session.rol()){Dom.hide("app",false);Router.render();}
+  else Dom.hide("login",false);});
+
+Login.render();
+Dom.on(Dom.byId("btn-salir"),"click",Login.leave);
+if(Publico.code()) Router.render();
 })();
 </script>
