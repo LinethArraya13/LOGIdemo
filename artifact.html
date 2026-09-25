@@ -618,6 +618,10 @@ var Rng=(function(){
 var UI={
   badge:function(cls,txt){
     return '<span class="badge '+cls+'"><span class="dot"></span>'+txt+'</span>';},
+  scope:function(tipo){
+    var m={fase1:["b-ok","Fase 1 · Frente interno"],extension:["b-accent","Extensión opcional"],
+      fase2:["b-warn","Concepto Fase 2 · ESP"]};
+    return UI.pair(m[tipo]||["b-neutral",tipo]);},
   pair:function(p){return UI.badge(p[0],p[1]);},
   pill:function(l,v){return '<span class="pill">'+l+' <b>'+v+'</b></span>';},
   head:function(o){
@@ -750,6 +754,7 @@ var Seed={
  {id:"PF-ADM",n:"Administración / Contabilidad",nivel:"Administración",mods:["dashboard","clientes","operaciones","personal","finanzas","reportes"]},
  {id:"PF-CLI",n:"Cliente",nivel:"Portal externo",mods:["dashboard","operaciones","documentos","viajes"]},
  {id:"PF-TRA",n:"Transportista",nivel:"Portal externo",mods:["dashboard","misviajes","demandas","certificaciones"]}],
+  STORAGE: {baseUSD:25,incluyeGB:2,extraUSD:4,nota:"Hipótesis comercial a validar"},
   SERVICIOS: [
  {id:"imp",n:"Importación"},{id:"exp",n:"Exportación"},
  {id:"tnac",n:"Transporte nacional"},{id:"tint",n:"Transporte internacional"},
@@ -1130,10 +1135,9 @@ var Seed={
  reportes:"Reportes",misviajes:"Mis viajes"},
   GRUPOS: [
  {t:"General",items:["dashboard"]},
- {t:"CRM",items:["clientes","pipeline","actividades","documentos"]},
- {t:"Operaciones",items:["operaciones","demandas","viajes","misviajes"]},
- {t:"Transportistas",items:["directorio","certificaciones"]},
- {t:"Administración",items:["personal","finanzas"]},
+ {t:"Fase 1 · Frente interno",items:["clientes","pipeline","actividades","documentos","operaciones"]},
+ {t:"Fase 2 · Ecosistema",items:["demandas","viajes","misviajes","directorio","certificaciones"]},
+ {t:"Extensiones opcionales",items:["personal","finanzas"]},
  {t:"Análisis",items:["reportes"]}],
 };
 
@@ -1348,6 +1352,16 @@ var Documentos=(function(){
     return r;};
   return r;
 })().generar();
+
+var Storage={
+  resumen:function(cli){
+    var docs=cli?Documentos.deCliente(cli):Documentos.all();
+    var mb=Documentos.peso(docs),gb=mb/1024,cfg=Seed.STORAGE;
+    var extra=Math.max(0,gb-cfg.incluyeGB);
+    return {archivos:docs.length,mb:mb,gb:gb,extraGB:extra,
+      mensualUSD:cfg.baseUSD+extra*cfg.extraUSD,config:cfg};
+  }
+};
 
 var Transportistas=(function(){
   var r=Repo(Seed.TRANSPORTISTAS);
@@ -1751,7 +1765,7 @@ function vClientes(){
     .map(function(f){return '<button class="chip'+(State.filtro===f[0]?" is-on":"")+'" data-filtro="'+f[0]+'">'
       +f[1]+'<span class="chip-n">'+f[2]+'</span></button>';}).join("");
   return UI.head({eyebrow:"CRM",t:"Clientes",
-      meta:UI.pill("Total",Seed.CLIENTES.length)+UI.pill("Activos",Seed.CLIENTES.filter(function(c){return c.etapa==="activo"||c.etapa==="fidelizacion";}).length),
+      meta:UI.scope("fase1")+UI.pill("Total",Seed.CLIENTES.length)+UI.pill("Activos",Seed.CLIENTES.filter(function(c){return c.etapa==="activo"||c.etapa==="fidelizacion";}).length),
       act:'<button class="btn btn-primary" id="btn-nuevo-cli">+ Nuevo prospecto</button>'})
     + '<div class="card"><div class="card-body" style="padding-bottom:12px">'
     + '<input id="q" type="search" value="'+Fmt.esc(State.q)+'" placeholder="Buscar por nombre, NIT, ciudad…" style="max-width:380px">'
@@ -1874,7 +1888,7 @@ function vCliente(id){
     acciones+='<button class="btn" data-crear-dem="'+c.id+'">+ Demanda</button>';}
   return '<button class="back" data-back="clientes">← Clientes</button>'
     + UI.head({eyebrow:c.tipo+" · "+c.ciudad,t:c.n,
-        meta:UI.pair(Clientes.badgeEtapa(c.etapa))+UI.pill("NIT",c.nit)+UI.pill("Docs",docs.length),
+        meta:UI.scope("fase1")+UI.pair(Clientes.badgeEtapa(c.etapa))+UI.pill("NIT",c.nit)+UI.pill("Docs",docs.length),
         act:acciones})
     + tabs + body;
 }
@@ -1896,7 +1910,7 @@ function vPipeline(){
       +'</div></div>';}).join("");
   var val=Seed.OPORTUNIDADES.reduce(function(a,o){return a+o.valor;},0);
   return UI.head({eyebrow:"CRM",t:"Pipeline",
-      meta:UI.pill("Oportunidades",Seed.OPORTUNIDADES.length)+UI.pill("Valor","USD "+Fmt.num(val))})
+      meta:UI.scope("fase1")+UI.pill("Oportunidades",Seed.OPORTUNIDADES.length)+UI.pill("Valor","USD "+Fmt.num(val))})
     + '<div class="pipe">'+cols+'</div>'
     + '<div style="height:18px"></div>'
     + UI.card("Oportunidades",
@@ -1918,7 +1932,7 @@ function vActividades(){
     .map(function(f){return '<button class="chip'+(State.filtro===f[0]?" is-on":"")+'" data-filtro="'+f[0]+'">'
       +f[1]+'<span class="chip-n">'+f[2]+'</span></button>';}).join("");
   return UI.head({eyebrow:"CRM",t:"Actividades",
-      meta:UI.pill("Pendientes",Seed.ACTIVIDADES.filter(function(a){return a.estado==="pendiente";}).length),
+      meta:UI.scope("fase1")+UI.pill("Pendientes",Seed.ACTIVIDADES.filter(function(a){return a.estado==="pendiente";}).length),
       act:'<button class="btn btn-primary" id="btn-nueva-act">+ Nueva actividad</button>'})
     + '<div class="card"><div class="card-body" style="padding-bottom:12px"><div class="chips">'+chips+'</div></div>'
     + UI.table([{t:"Fecha"},{t:"Cliente"},{t:"Tipo"},{t:"Asunto"},{t:"Responsable"},{t:"Estado"},{t:""}],
@@ -2010,12 +2024,19 @@ function docPanel(cli){
 }
 
 function vDocumentos(){
-  var base=Documentos.visibles();
+  var base=Documentos.visibles(),cli=Session.clienteId()||null,s=Storage.resumen(cli);
   return UI.head({eyebrow:Session.clienteId()?Clientes.byId(Session.clienteId()).n:"CRM",t:"Documentos",
-      meta:UI.pill("Archivos",Fmt.num(base.length))
+      meta:UI.scope("fase1")+UI.pill("Archivos",Fmt.num(base.length))
         +UI.pill("Pendientes",base.filter(function(d){return d.estado==="pendiente";}).length)
         +UI.pill("Volumen",Fmt.size(base.reduce(function(a,d){return a+d.size;},0)))})
-    + docPanel(Session.clienteId()||null);
+    + docPanel(cli)
+    +(Session.esInterno()?UI.card("Proyección de almacenamiento",
+      '<div class="card-body">'+UI.grid([
+        ["Volumen actual",s.gb.toFixed(2).replace(".",",")+" GB"],
+        ["Incluido",s.config.incluyeGB+" GB"],
+        ["Excedente",s.extraGB.toFixed(2).replace(".",",")+" GB"],
+        ["Proyección mensual","USD "+s.mensualUSD.toFixed(2).replace(".",",")]])+'</div>',null,
+      s.config.nota+" · Base USD "+s.config.baseUSD+"/mes + USD "+s.config.extraUSD+" por GB excedente. El demo conserva metadatos; la persistencia real se dimensiona en implementación."):"");
 }
 
 function modalSubir(cli){
@@ -2185,7 +2206,7 @@ function vOperacion(id){
       +'<div class="card">'+tablaFin(mov,Session.id()==="adm")+'</div>';
   }
   return '<button class="back" data-back="operaciones">← Operaciones</button>'
-    +UI.head({eyebrow:c?c.n:"Operación",t:o.id,meta:UI.pair(Operaciones.badge(o.estado))+UI.pill("Responsable",Personas.nombre(o.responsableId)),
+    +UI.head({eyebrow:c?c.n:"Operación",t:o.id,meta:UI.scope("fase1")+UI.pair(Operaciones.badge(o.estado))+UI.pill("Responsable",Personas.nombre(o.responsableId)),
       act:Session.id()==="adm"?'<button class="btn btn-primary" data-movop="'+o.id+'">+ Movimiento</button>':''})+nav+body;
 }
 
@@ -2202,7 +2223,7 @@ function vOperaciones(){
     .map(function(f){return '<button class="chip'+(State.filtro===f[0]?" is-on":"")+'" data-filtro="'+f[0]+'">'
       +f[1]+'<span class="chip-n">'+f[2]+'</span></button>';}).join("");
   return UI.head({eyebrow:"Operaciones",t:"Operaciones",
-      meta:UI.pill("Total",ops.length)+UI.pill("Abiertas",ops.filter(function(o){return o.estado!=="cerrada";}).length)})
+      meta:UI.scope("fase1")+UI.pill("Total",ops.length)+UI.pill("Abiertas",ops.filter(function(o){return o.estado!=="cerrada";}).length)})
     + '<div class="card"><div class="card-body" style="padding-bottom:12px"><div class="chips">'+chips+'</div></div>'
     + UI.table([{t:"Operación"},{t:"Cliente"},{t:"Tipo"},{t:"Ruta"},{t:"Peso",r:true},{t:"Responsable"},{t:"Estado"},{t:"Docs",r:true}],
         lista.map(function(o){
@@ -2227,7 +2248,7 @@ function vDemandas(){
     .map(function(f){return '<button class="chip'+(State.filtro===f[0]?" is-on":"")+'" data-filtro="'+f[0]+'">'
       +f[1]+'<span class="chip-n">'+f[2]+'</span></button>';}).join("");
   return UI.head({eyebrow:"Operaciones",t:"Demandas de carga",
-      meta:UI.pill("Total",Seed.DEMANDAS.length)
+      meta:UI.scope("fase2")+UI.pill("Total",Seed.DEMANDAS.length)
         +UI.pill("Sin asignar",Seed.DEMANDAS.filter(function(d){return !d.tra;}).length),
       act:Session.traId()?'':'<button class="btn btn-primary" id="btn-nueva-dem">+ Publicar demanda</button>'})
     + '<div class="card"><div class="card-body" style="padding-bottom:12px"><div class="chips">'+chips+'</div></div>'
@@ -2308,7 +2329,7 @@ function vViajes(){
     return (v.id+" "+v.dem+" "+(t?t.n+" "+t.placa:"")+" "+(c?c.n:"")+" "+v.origen+" "+v.destino)
       .toLowerCase().indexOf(q)>=0;});
   return UI.head({eyebrow:"Operaciones",t:"Viajes",
-      meta:UI.pill("Total",todos.length)
+      meta:UI.scope("fase2")+UI.pill("Total",todos.length)
         +UI.pill("En ruta",todos.filter(function(v){return ["confirmado","carga","transito","reparto"].indexOf(v.estado)>=0;}).length)
         +UI.pill("Incidencias",todos.filter(function(v){return v.estado==="incidencia";}).length)})
     + '<div class="card"><div class="card-body" style="padding-bottom:12px">'
@@ -2376,7 +2397,7 @@ function vDirectorio(){
     .map(function(f){return '<button class="chip'+(State.filtro===f[0]?" is-on":"")+'" data-filtro="'+f[0]+'">'
       +f[1]+'<span class="chip-n">'+f[2]+'</span></button>';}).join("");
   return UI.head({eyebrow:"Transportistas",t:"Directorio",
-      meta:UI.pill("Registrados",Seed.TRANSPORTISTAS.length)
+      meta:UI.scope("fase2")+UI.pill("Registrados",Seed.TRANSPORTISTAS.length)
         +UI.pill("Certificados",Seed.TRANSPORTISTAS.filter(function(t){return Transportistas.estado(t).code==="ok";}).length),
       act:'<button class="btn btn-primary" id="btn-nuevo-tra">+ Registrar transportista</button>'})
     + '<div class="card"><div class="card-body" style="padding-bottom:12px"><div class="chips">'+chips+'</div></div>'
@@ -2447,7 +2468,7 @@ function vCertificaciones(){
     .map(function(f){return '<button class="chip'+(State.filtro===f[0]?" is-on":"")+'" data-filtro="'+f[0]+'">'
       +f[1]+'<span class="chip-n">'+f[2]+'</span></button>';}).join("");
   return UI.head({eyebrow:"Transportistas",t:"Certificaciones",
-      meta:UI.pill("Pendientes",filas.filter(function(f){return f.d.est==="pendiente";}).length)
+      meta:UI.scope("fase2")+UI.pill("Pendientes",filas.filter(function(f){return f.d.est==="pendiente";}).length)
         +UI.pill("Vencidas",filas.filter(function(f){return f.d.est==="vencido";}).length)})
     + '<div class="card"><div class="card-body" style="padding-bottom:12px"><div class="chips">'+chips+'</div></div>'
     + UI.table([{t:"Transportista"},{t:"Certificación"},{t:"Emisión"},{t:"Vencimiento"},{t:"Estado"},{t:"",r:true}],
@@ -2490,7 +2511,7 @@ function vFinanzas(){
     .sort(function(a,b){return b.r.margen-a.r.margen;});
   var generales=Finanzas.resumen(Finanzas.generales());
   return UI.head({eyebrow:"Administración",t:"Finanzas",
-      meta:UI.pill("Moneda base","BOB")+UI.pill("Tipo de cambio demo","6,96 BOB/USD"),
+      meta:UI.scope("extension")+UI.pill("Moneda base","BOB")+UI.pill("Tipo de cambio demo","6,96 BOB/USD"),
       act:Session.id()==="adm"?'<button class="btn btn-primary" id="btn-nuevo-mov">+ Nuevo movimiento</button>':''})
     +(Finanzas.vencidos().length?UI.alert(Finanzas.vencidos().length+" cuenta vencida",
       "Requiere seguimiento de cobranza. El vencimiento no bloquea la operación."):"")
@@ -2546,7 +2567,7 @@ function vPersonal(){
       +resp+'</small></span><span class="mono">'+ps.filter(function(p){return p.estado==="activo";}).length+' activas</span></div>';}).join("");
   var gestiona=Session.id()==="adm"||Session.id()==="ger";
   return UI.head({eyebrow:"Administración",t:"Personal",
-      meta:UI.pill("Equipo activo",Personas.activas().length)+UI.pill("Áreas",Areas.count())
+      meta:UI.scope("extension")+UI.pill("Equipo activo",Personas.activas().length)+UI.pill("Áreas",Areas.count())
         +UI.pill("Carga alta",altas.length),
       act:gestiona?'<button class="btn btn-primary" id="btn-nueva-per">+ Nueva persona</button>':''})
     +(altas.length?UI.alert("Carga concentrada en "+altas.length+" persona"+(altas.length>1?"s":""),
