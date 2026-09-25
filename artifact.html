@@ -591,6 +591,9 @@ var Dom={
 
 var Fmt={
   num:function(n){return (n||0).toLocaleString("de-DE");},
+  money:function(n){return "Bs "+(Math.round((n||0)*100)/100).toLocaleString("es-BO",{minimumFractionDigits:2,maximumFractionDigits:2});},
+  original:function(m){return (m.moneda==="USD"?"USD ":"Bs ")
+    +(m.monto||0).toLocaleString("es-BO",{minimumFractionDigits:2,maximumFractionDigits:2});},
   size:function(n){return n>=1024?(n/1024).toFixed(1).replace(".",",")+" GB"
     :n.toFixed(1).replace(".",",")+" MB";},
   pct:function(n){return Math.round(n)+"%";},
@@ -858,6 +861,33 @@ var Seed={
   merc:"Mobiliario y menaje",estado:"transito",abierta:"16 sep 2026",fob:74900,responsableId:"P03"},
  {id:"EXP-2026-0198",cli:"C001",tipo:"exp",ruta:"La Paz → Arica",modal:"LCL",peso:4600,
   merc:"Artesanía y textil andino",estado:"cerrada",abierta:"18 jun 2026",fob:28400,responsableId:"P03"}],
+  FIN_CATS: [
+ {id:"hon",n:"Honorarios DMS",naturaleza:"ingreso"},
+ {id:"trans",n:"Transporte tercerizado",naturaleza:"egreso"},
+ {id:"adu",n:"Servicios aduaneros",naturaleza:"egreso"},
+ {id:"alm",n:"Almacenamiento",naturaleza:"egreso"},
+ {id:"alq",n:"Alquiler",naturaleza:"egreso"},
+ {id:"serv",n:"Servicios básicos",naturaleza:"egreso"},
+ {id:"suel",n:"Sueldos",naturaleza:"egreso"},
+ {id:"soft",n:"Software y licencias",naturaleza:"egreso"}],
+  MOVIMIENTOS: [
+ {id:"MF-001",naturaleza:"ingreso",tipo:"cobro",alcance:"operacion",op:"IMP-2026-0847",cat:"hon",concepto:"Servicio puerta a puerta",contraparte:"Ferretería Illimani S.R.L.",moneda:"USD",monto:1480,tc:6.96,fecha:"05 sep 2026",vence:"20 sep 2026",estado:"parcial",pagado:900},
+ {id:"MF-002",naturaleza:"egreso",tipo:"pago",alcance:"operacion",op:"IMP-2026-0847",cat:"trans",concepto:"Tramo Arica – La Paz",contraparte:"Transportes Illimani S.R.L.",moneda:"USD",monto:820,tc:6.96,fecha:"08 sep 2026",vence:"28 sep 2026",estado:"pendiente",pagado:0},
+ {id:"MF-003",naturaleza:"egreso",tipo:"pago",alcance:"operacion",op:"IMP-2026-0847",cat:"adu",concepto:"Gestión documental y aforo",contraparte:"Agencia aduanera",moneda:"BOB",monto:1150,tc:1,fecha:"10 sep 2026",vence:"18 sep 2026",estado:"pagado",pagado:1150},
+ {id:"MF-004",naturaleza:"ingreso",tipo:"cobro",alcance:"operacion",op:"IMP-2026-0855",cat:"hon",concepto:"Honorarios de importación",contraparte:"Ferretería Illimani S.R.L.",moneda:"BOB",monto:7600,tc:1,fecha:"16 sep 2026",vence:"30 sep 2026",estado:"pendiente",pagado:0},
+ {id:"MF-005",naturaleza:"egreso",tipo:"pago",alcance:"operacion",op:"IMP-2026-0855",cat:"trans",concepto:"Reserva transporte terrestre",contraparte:"Andes Cargo Bolivia",moneda:"BOB",monto:4250,tc:1,fecha:"17 sep 2026",vence:"02 oct 2026",estado:"pendiente",pagado:0},
+ {id:"MF-006",naturaleza:"ingreso",tipo:"cobro",alcance:"operacion",op:"IMP-2026-0839",cat:"hon",concepto:"Importación de carga regulada",contraparte:"Químicos del Altiplano S.R.L.",moneda:"USD",monto:1760,tc:6.96,fecha:"01 sep 2026",vence:"16 sep 2026",estado:"vencido",pagado:0},
+ {id:"MF-007",naturaleza:"egreso",tipo:"pago",alcance:"operacion",op:"IMP-2026-0839",cat:"trans",concepto:"Transporte especializado",contraparte:"Multimodal Andina S.R.L.",moneda:"USD",monto:1040,tc:6.96,fecha:"02 sep 2026",vence:"25 sep 2026",estado:"pendiente",pagado:0},
+ {id:"MF-008",naturaleza:"ingreso",tipo:"cobro",alcance:"operacion",op:"EXP-2026-0213",cat:"hon",concepto:"Servicio integral de exportación",contraparte:"AgroSur Bolivia S.A.",moneda:"USD",monto:2140,tc:6.96,fecha:"10 sep 2026",vence:"10 oct 2026",estado:"parcial",pagado:1000},
+ {id:"MF-009",naturaleza:"egreso",tipo:"pago",alcance:"operacion",op:"EXP-2026-0213",cat:"trans",concepto:"Flete Santa Cruz – Santos",contraparte:"Flota del Sur S.A.",moneda:"USD",monto:1380,tc:6.96,fecha:"11 sep 2026",vence:"05 oct 2026",estado:"pendiente",pagado:0},
+ {id:"MF-010",naturaleza:"ingreso",tipo:"cobro",alcance:"operacion",op:"IMP-2026-0851",cat:"hon",concepto:"Coordinación de importación",contraparte:"Repuestos Tunari S.A.",moneda:"BOB",monto:6100,tc:1,fecha:"09 sep 2026",vence:"24 sep 2026",estado:"pendiente",pagado:0},
+ {id:"MF-011",naturaleza:"egreso",tipo:"pago",alcance:"operacion",op:"IMP-2026-0851",cat:"trans",concepto:"Flete Iquique – Cochabamba",contraparte:"Transportes Quispe",moneda:"BOB",monto:3650,tc:1,fecha:"09 sep 2026",vence:"26 sep 2026",estado:"pendiente",pagado:0},
+ {id:"MF-012",naturaleza:"ingreso",tipo:"cobro",alcance:"operacion",op:"EXP-2026-0209",cat:"hon",concepto:"Honorarios exportación textil",contraparte:"Andina Textil S.A.",moneda:"USD",monto:1920,tc:6.96,fecha:"15 ago 2026",vence:"30 ago 2026",estado:"pagado",pagado:1920},
+ {id:"MF-013",naturaleza:"egreso",tipo:"pago",alcance:"operacion",op:"EXP-2026-0209",cat:"trans",concepto:"Flete La Paz – Callao",contraparte:"Transportes Illimani S.R.L.",moneda:"USD",monto:1210,tc:6.96,fecha:"16 ago 2026",vence:"05 sep 2026",estado:"pagado",pagado:1210},
+ {id:"MF-014",naturaleza:"egreso",tipo:"gasto",alcance:"general",op:null,cat:"alq",concepto:"Alquiler oficina La Paz · septiembre",contraparte:"Inmobiliaria Kantuta",moneda:"BOB",monto:6800,tc:1,fecha:"01 sep 2026",vence:"05 sep 2026",estado:"pagado",pagado:6800},
+ {id:"MF-015",naturaleza:"egreso",tipo:"gasto",alcance:"general",op:null,cat:"suel",concepto:"Planilla de personal · septiembre",contraparte:"Equipo DMS",moneda:"BOB",monto:46500,tc:1,fecha:"20 sep 2026",vence:"30 sep 2026",estado:"pendiente",pagado:0,sensible:true},
+ {id:"MF-016",naturaleza:"egreso",tipo:"gasto",alcance:"general",op:null,cat:"serv",concepto:"Internet, telefonía y energía",contraparte:"Proveedores de servicios",moneda:"BOB",monto:1480,tc:1,fecha:"18 sep 2026",vence:"27 sep 2026",estado:"pendiente",pagado:0},
+ {id:"MF-017",naturaleza:"egreso",tipo:"gasto",alcance:"general",op:null,cat:"soft",concepto:"Licencias y almacenamiento documental",contraparte:"Servicios digitales",moneda:"USD",monto:132,tc:6.96,fecha:"12 sep 2026",vence:"12 sep 2026",estado:"pagado",pagado:132}],
   DOC_CATS: [
  {id:"factura",n:"Factura comercial",fmt:"PDF"},
  {id:"packing",n:"Packing list",fmt:"XLSX"},
@@ -1197,6 +1227,35 @@ var Operaciones=(function(){
   r.visibles=function(){
     var c=Session.clienteId();
     return c?r.deCliente(c):r.all();};
+  return r;
+})();
+
+var CategoriasFin=(function(){
+  var r=Repo(Seed.FIN_CATS);
+  r.nombre=function(id){var x=r.byId(id);return x?x.n:"—";};
+  return r;
+})();
+
+var Finanzas=(function(){
+  var r=Repo(Seed.MOVIMIENTOS);
+  r.deOperacion=function(id){return r.where(function(m){return m.op===id;});};
+  r.base=function(m){return Math.round(m.monto*(m.moneda==="USD"?m.tc:1)*100)/100;};
+  r.pagadoBase=function(m){return Math.round((m.pagado||0)*(m.moneda==="USD"?m.tc:1)*100)/100;};
+  r.estado=function(e){
+    var x={pendiente:["b-warn","Pendiente"],parcial:["b-accent","Parcial"],
+      pagado:["b-ok","Pagado"],vencido:["b-crit","Vencido"],anulado:["b-neutral","Anulado"]};
+    return x[e]||["b-neutral",e];};
+  r.resumen=function(lista){
+    var x={ingresos:0,cobrado:0,egresos:0,pagado:0,porCobrar:0,porPagar:0,margen:0};
+    (lista||r.all()).forEach(function(m){
+      if(m.estado==="anulado")return;
+      var b=r.base(m),p=r.pagadoBase(m);
+      if(m.naturaleza==="ingreso"){x.ingresos+=b;x.cobrado+=p;x.porCobrar+=Math.max(0,b-p);}
+      else{x.egresos+=b;x.pagado+=p;x.porPagar+=Math.max(0,b-p);}});
+    x.margen=x.ingresos-x.egresos;return x;};
+  r.generales=function(){return r.where(function(m){return !m.op;});};
+  r.vencidos=function(){return r.where(function(m){return m.estado==="vencido";});};
+  r.marcarPagado=function(id){var m=r.byId(id);if(m){m.pagado=m.monto;m.estado="pagado";}return m;};
   return r;
 })();
 
@@ -1964,7 +2023,63 @@ function modalDoc(id){
       :'<button class="btn" id="m-cancel">Cerrar</button>'));
 }
 
+function tablaFin(lista,acciones){
+  return UI.table([{t:"Fecha"},{t:"Concepto"},{t:"Categoría"},{t:"Operación"},{t:"Tipo"},
+      {t:"Importe",r:true},{t:"Base BOB",r:true},{t:"Vencimiento"},{t:"Estado"},{t:"",r:true}],
+    lista.map(function(m){
+      return '<tr><td class="mono t-sub">'+m.fecha+'</td><td class="t-strong">'+m.concepto
+        +'<div class="t-sub">'+m.contraparte+'</div></td><td>'+CategoriasFin.nombre(m.cat)+'</td>'
+        +'<td class="mono t-sub">'+(m.op||"General")+'</td>'
+        +'<td>'+UI.badge(m.naturaleza==="ingreso"?"b-ok":"b-neutral",m.tipo.charAt(0).toUpperCase()+m.tipo.slice(1))+'</td>'
+        +'<td class="r mono">'+Fmt.original(m)+'</td><td class="r mono">'+Fmt.money(Finanzas.base(m))+'</td>'
+        +'<td class="mono t-sub">'+m.vence+'</td><td>'+UI.pair(Finanzas.estado(m.estado))+'</td>'
+        +'<td class="r">'+(acciones&&m.estado!=="pagado"&&m.estado!=="anulado"
+          ?'<button class="btn" data-pagar="'+m.id+'">Marcar pagado</button>':'')+'</td></tr>';}).join("")
+      ||UI.empty(10,"Sin movimientos"));
+}
+
+function vOperacion(id){
+  var o=Operaciones.byId(id);if(!o)return "";
+  var c=Clientes.byId(o.cli),docs=Documentos.deOperacion(id);
+  var demandas=Demandas.where(function(d){return d.op===id;});
+  var viajes=Viajes.where(function(v){return demandas.some(function(d){return d.id===v.dem;});});
+  var puedeFin=Session.puede("finanzas"),mov=puedeFin?Finanzas.deOperacion(id):[],rf=Finanzas.resumen(mov);
+  var tabs=[["resumen","Resumen"],["documentos","Documentos"],["viajes","Viajes"]];
+  if(puedeFin)tabs.push(["finanzas","Finanzas"]);
+  var nav='<div class="tabs">'+tabs.map(function(t){return '<button class="tab'+(State.opTab===t[0]?" is-on":"")
+    +'" data-optab="'+t[0]+'">'+t[1]+'</button>';}).join("")+'</div>',body="";
+  if(State.opTab==="resumen"){
+    body=UI.tiles([{k:"Valor mercancía",v:"USD "+Fmt.num(o.fob),n:"FOB informativo · no es ingreso DMS"},
+      {k:"Peso",v:Fmt.num(o.peso),u:" kg",n:o.modal},{k:"Documentos",v:String(docs.length),n:docs.filter(function(d){return d.estado==="pendiente";}).length+" pendientes"},
+      {k:"Viajes",v:String(viajes.length),n:demandas.length+" demandas de carga"}])
+      +'<div class="grid2">'
+      +UI.card("Datos operativos",'<div class="card-body">'+UI.kv([["Cliente",c?c.n:"—"],["Tipo",o.tipo==="imp"?"Importación":"Exportación"],
+        ["Ruta",o.ruta],["Mercancía",o.merc],["Apertura",o.abierta],["Responsable",Personas.nombre(o.responsableId)]])+'</div>')
+      +UI.card("Trazabilidad",UI.table([{t:"Demanda"},{t:"Estado"},{t:"Transportista"}],demandas.map(function(d){var t=d.tra?Transportistas.byId(d.tra):null;
+        return '<tr class="clickable" data-dem="'+d.id+'"><td class="mono t-strong">'+d.id+'</td><td>'+UI.pair(Seed.DEM_EST[d.estado])+'</td><td>'+(t?t.n:"—")+'</td></tr>';}).join("")||UI.empty(3,"Sin demanda asociada")))+'</div>';
+  } else if(State.opTab==="documentos"){
+    body='<div class="card">'+UI.table([{t:"Archivo"},{t:"Categoría"},{t:"Tamaño",r:true},{t:"Fecha"},{t:"Estado"}],
+      docs.map(function(d){return '<tr class="clickable" data-doc="'+d.id+'"><td class="t-strong fname">'+d.n+'</td><td>'+Documentos.categoria(d.cat).n+'</td>'
+        +'<td class="r mono">'+Fmt.size(d.size)+'</td><td class="mono t-sub">'+d.fecha+'</td><td>'+UI.pair(Seed.DOC_ESTADOS[d.estado])+'</td></tr>';}).join("")||UI.empty(5,"Sin documentos"))+'</div>';
+  } else if(State.opTab==="viajes"){
+    body=UI.card("Viajes de la operación",UI.table([{t:"Viaje"},{t:"Origen"},{t:"Destino"},{t:"ETA"},{t:"Estado"}],
+      viajes.map(function(v){return '<tr class="clickable" data-via="'+v.id+'"><td class="mono t-strong">'+v.id+'</td><td>'+v.origen+'</td><td>'+v.destino+'</td>'
+        +'<td class="mono t-sub">'+v.eta+'</td><td>'+UI.pair(Seed.VIAJE_EST[v.estado])+'</td></tr>';}).join("")||UI.empty(5,"Sin viajes")));
+  } else if(State.opTab==="finanzas"&&puedeFin){
+    var pct=rf.ingresos?Math.round(rf.margen/rf.ingresos*100):0;
+    body=UI.tiles([{k:"Ingresos DMS",v:Fmt.money(rf.ingresos),n:Fmt.money(rf.cobrado)+" cobrados"},
+      {k:"Costos directos",v:Fmt.money(rf.egresos),n:Fmt.money(rf.porPagar)+" por pagar"},
+      {k:"Margen proyectado",v:Fmt.money(rf.margen),n:pct+"% sobre ingresos"},
+      {k:"Saldo cliente",v:Fmt.money(rf.porCobrar),n:"Pendiente de cobro"}])
+      +'<div class="card">'+tablaFin(mov,Session.id()==="adm")+'</div>';
+  }
+  return '<button class="back" data-back="operaciones">← Operaciones</button>'
+    +UI.head({eyebrow:c?c.n:"Operación",t:o.id,meta:UI.pair(Operaciones.badge(o.estado))+UI.pill("Responsable",Personas.nombre(o.responsableId)),
+      act:puedeFin?'<button class="btn btn-primary" data-movop="'+o.id+'">+ Movimiento</button>':''})+nav+body;
+}
+
 function vOperaciones(){
+  if(State.opOpen)return vOperacion(State.opOpen);
   var ops=Operaciones.visibles();
   var lista=ops.filter(function(o){return State.filtro==="todos"||o.estado===State.filtro;});
   var chips=[["todos","Todas",ops.length],
@@ -2243,6 +2358,45 @@ function cargaPersona(p){
   if(n>=9) return ["b-crit","Alta · "+n];
   if(n>=5) return ["b-warn","Media · "+n];
   return ["b-ok","Normal · "+n];
+}
+
+function vFinanzas(){
+  var todos=Finanzas.all(),r=Finanzas.resumen(todos);
+  var lista=todos.filter(function(m){
+    if(State.filtro==="todos")return true;
+    if(State.filtro==="vencido")return m.estado==="vencido";
+    return m.tipo===State.filtro;});
+  var chips=UI.chips([["todos","Todos",todos.length],
+    ["cobro","Cobros",todos.filter(function(m){return m.tipo==="cobro";}).length],
+    ["pago","Pagos operativos",todos.filter(function(m){return m.tipo==="pago";}).length],
+    ["gasto","Gastos generales",todos.filter(function(m){return m.tipo==="gasto";}).length],
+    ["vencido","Vencidos",Finanzas.vencidos().length]],State.filtro,"filtro");
+  var porOp=Operaciones.all().map(function(o){
+    var x=Finanzas.resumen(Finanzas.deOperacion(o.id));return {o:o,r:x};})
+    .filter(function(x){return x.r.ingresos||x.r.egresos;})
+    .sort(function(a,b){return b.r.margen-a.r.margen;});
+  var generales=Finanzas.resumen(Finanzas.generales());
+  return UI.head({eyebrow:"Administración",t:"Finanzas",
+      meta:UI.pill("Moneda base","BOB")+UI.pill("Tipo de cambio demo","6,96 BOB/USD"),
+      act:'<button class="btn btn-primary" id="btn-nuevo-mov">+ Nuevo movimiento</button>'})
+    +(Finanzas.vencidos().length?UI.alert(Finanzas.vencidos().length+" cuenta vencida",
+      "Requiere seguimiento de cobranza. El vencimiento no bloquea la operación."):"")
+    +UI.tiles([{k:"Ingresos previstos",v:Fmt.money(r.ingresos),n:Fmt.money(r.cobrado)+" cobrados"},
+      {k:"Por cobrar",v:Fmt.money(r.porCobrar),n:"Incluye saldos parciales"},
+      {k:"Egresos previstos",v:Fmt.money(r.egresos),n:Fmt.money(r.pagado)+" pagados"},
+      {k:"Por pagar",v:Fmt.money(r.porPagar),n:"Operativos y generales"},
+      {k:"Resultado proyectado",v:Fmt.money(r.margen),n:"Antes de impuestos"},
+      {k:"Gastos generales",v:Fmt.money(generales.egresos),n:"No atribuibles a un viaje"}])
+    +'<div class="grid2">'
+    +UI.card("Rentabilidad por operación",UI.table([{t:"Operación"},{t:"Ingresos",r:true},{t:"Costos",r:true},{t:"Margen",r:true}],
+      porOp.map(function(x){return '<tr class="clickable" data-op="'+x.o.id+'"><td class="mono t-strong">'+x.o.id+'</td>'
+        +'<td class="r mono">'+Fmt.money(x.r.ingresos)+'</td><td class="r mono">'+Fmt.money(x.r.egresos)+'</td>'
+        +'<td class="r mono" style="color:'+(x.r.margen>=0?'var(--ok)':'var(--crit)')+'">'+Fmt.money(x.r.margen)+'</td></tr>';}).join("")||UI.empty(4,"Sin movimientos asociados")))
+    +UI.card("Gastos generales",UI.table([{t:"Categoría"},{t:"Concepto"},{t:"Importe",r:true},{t:"Estado"}],
+      Finanzas.generales().map(function(m){return '<tr><td>'+CategoriasFin.nombre(m.cat)+'</td><td>'+m.concepto+'</td>'
+        +'<td class="r mono">'+Fmt.money(Finanzas.base(m))+'</td><td>'+UI.pair(Finanzas.estado(m.estado))+'</td></tr>';}).join("")||UI.empty(4,"Sin gastos generales")))+'</div>'
+    +'<div class="card"><div class="card-body" style="padding-bottom:12px"><div class="chips">'+chips+'</div></div>'
+    +tablaFin(lista,Session.id()==="adm")+'</div>';
 }
 
 function vPersonal(){
@@ -2750,6 +2904,37 @@ function modalTransportista(){
     Router.refresh();Toast.show(n+" registrado · pendiente de certificación");});
 }
 
+function modalMovimiento(opId){
+  Modal.open("Nuevo movimiento financiero",
+    '<div class="form-grid">'
+    +'<label class="fld"><span class="eyebrow">Tipo</span><select id="mf-t"><option value="cobro">Cobro a cliente</option><option value="pago">Pago operativo</option><option value="gasto">Gasto general</option></select></label>'
+    +'<label class="fld"><span class="eyebrow">Operación</span><select id="mf-op"><option value="">Movimiento general</option>'
+      +Operaciones.all().map(function(o){return '<option value="'+o.id+'"'+(o.id===opId?' selected':'')+'>'+o.id+'</option>';}).join("")+'</select></label>'
+    +'<label class="fld"><span class="eyebrow">Categoría</span><select id="mf-cat">'
+      +Seed.FIN_CATS.map(function(c){return '<option value="'+c.id+'">'+c.n+'</option>';}).join("")+'</select></label>'
+    +'<label class="fld"><span class="eyebrow">Concepto</span><input id="mf-con" type="text" placeholder="Descripción del movimiento"></label>'
+    +'<label class="fld"><span class="eyebrow">Contraparte</span><input id="mf-cp" type="text" placeholder="Cliente o proveedor"></label>'
+    +'<label class="fld"><span class="eyebrow">Moneda</span><select id="mf-mon"><option value="BOB">BOB</option><option value="USD">USD</option></select></label>'
+    +'<label class="fld"><span class="eyebrow">Monto</span><input id="mf-m" type="number" min="0" step="0.01" placeholder="0,00"></label>'
+    +'<label class="fld"><span class="eyebrow">Vencimiento</span><input id="mf-v" type="text" value="30 sep 2026"></label>'
+    +'</div><div class="alert good" style="margin-top:14px"><span class="dot"></span><div><b>Conversión controlada</b><p>Los importes USD se consolidan a 6,96 BOB/USD para evitar sumar monedas distintas.</p></div></div>'
+    +'<div id="mf-err" class="t-sub" style="color:var(--crit);margin-top:10px"></div>',
+    '<button class="btn" id="m-cancel">Cancelar</button><button class="btn btn-primary" id="m-save">Registrar</button>');
+  Dom.on(Dom.byId("m-save"),"click",function(){
+    var tipo=Dom.byId("mf-t").value,monto=parseFloat(Dom.byId("mf-m").value)||0,op=Dom.byId("mf-op").value||null;
+    var concepto=Dom.byId("mf-con").value.trim();
+    if(monto<=0||concepto.length<3){Dom.byId("mf-err").textContent="Concepto y monto mayor a cero son obligatorios.";return;}
+    if(tipo!=="gasto"&&!op){Dom.byId("mf-err").textContent="Los cobros y pagos operativos requieren una operación.";return;}
+    var moneda=Dom.byId("mf-mon").value;
+    var m=Finanzas.add({id:"MF-"+("000"+(Finanzas.count()+1)).slice(-3),naturaleza:tipo==="cobro"?"ingreso":"egreso",
+      tipo:tipo,alcance:op?"operacion":"general",op:op,cat:Dom.byId("mf-cat").value,concepto:concepto,
+      contraparte:Dom.byId("mf-cp").value||"—",moneda:moneda,monto:monto,tc:moneda==="USD"?6.96:1,
+      fecha:HOY,vence:Dom.byId("mf-v").value,estado:"pendiente",pagado:0});
+    Modal.close();
+    if(op){State.mod="operaciones";State.opOpen=op;State.opTab="finanzas";}else{State.mod="finanzas";}
+    Router.refresh();Toast.show("Movimiento "+m.id+" registrado");});
+}
+
 function modalPersona(id){
   var p=id?Personas.byId(id):null;
   var cargoId=p?p.cargoId:"CG-EJE",perfilId=p?p.perfilId:"PF-OPE";
@@ -2782,7 +2967,8 @@ function modalPersona(id){
 var Modales={
   doc:modalDoc, subir:modalSubir, pod:modalPOD, incidencia:modalIncidencia,
   prospecto:modalProspecto, actividad:modalActividad,
-  demanda:modalDemanda, transportista:modalTransportista, persona:modalPersona
+  demanda:modalDemanda, transportista:modalTransportista, persona:modalPersona,
+  movimiento:modalMovimiento
 };
 
 function guardarPOD(vid){
@@ -2818,7 +3004,7 @@ var Nav={
       directorio:Transportistas.count(),
       certificaciones:Transportistas.pendientesValidacion(),
       personal:Personas.activas().length,
-      finanzas:0};},
+      finanzas:Finanzas.vencidos().length};},
   render:function(){
     var cnt=Nav.contadores(),html="";
     Nav.grupos.forEach(function(g){
@@ -2840,7 +3026,7 @@ var Routes={
   actividades:vActividades, documentos:vDocumentos, operaciones:vOperaciones,
   demandas:vDemandas, viajes:vViajes, misviajes:vMisViajes,
   directorio:vDirectorio, certificaciones:vCertificaciones, personal:vPersonal,
-  reportes:vReportes
+  finanzas:vFinanzas, reportes:vReportes
 };
 
 var Publico={
@@ -2863,6 +3049,7 @@ var Actions={
     State.docCat="todas"; State.docEstado="todos"; State.docOp="todas";
     State.docQ=""; State.docPage=1; Router.refresh();},
   clitab:function(el){State.cliTab=el.getAttribute("data-clitab");State.docPage=1;Router.refresh();},
+  optab:function(el){State.opTab=el.getAttribute("data-optab");Router.refresh();},
   op:function(el){
     var o=Operaciones.byId(el.getAttribute("data-op")); if(!o) return;
     State.opOpen=o.id;State.opTab="resumen";State.mod="operaciones";Router.refresh();},
@@ -2872,6 +3059,10 @@ var Actions={
     var p=Personas.byId(el.getAttribute("data-toggleper"));if(!p)return;
     p.estado=p.estado==="activo"?"inactivo":"activo";Router.refresh();
     Toast.show(p.n+" quedó "+(p.estado==="activo"?"activa":"inactiva"));},
+  movop:function(el){Modales.movimiento(el.getAttribute("data-movop"));},
+  pagar:function(el){
+    var m=Finanzas.marcarPagado(el.getAttribute("data-pagar"));if(!m)return;
+    Router.refresh();Toast.show(m.id+" marcado como pagado");},
   dem:function(el){State.demOpen=el.getAttribute("data-dem");State.mod="demandas";Router.refresh();},
   via:function(el){State.viaOpen=el.getAttribute("data-via");State.mod="viajes";Router.refresh();},
   viatra:function(el){State.viaOpen=el.getAttribute("data-viatra");State.mod="misviajes";Router.refresh();},
@@ -2947,7 +3138,8 @@ var Botones={
   "btn-nueva-act":function(){Modales.actividad();},
   "btn-nueva-dem":function(){Modales.demanda(null);},
   "btn-nuevo-tra":function(){Modales.transportista();},
-  "btn-nueva-per":function(){Modales.persona(null);}
+  "btn-nueva-per":function(){Modales.persona(null);},
+  "btn-nuevo-mov":function(){Modales.movimiento(null);}
 };
 
 var Router={
