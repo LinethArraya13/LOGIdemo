@@ -5,7 +5,8 @@ agenciamiento aduanal (La Paz). Se muestra en reuniones de venta. No es producci
 
 ## Qué problema demuestra
 
-DMS tiene dos dolores, y el demo cubre los dos en una sola operación:
+DMS parte de dos dolores logísticos y el demo agrega dos capacidades de control
+interno para completar el ciclo:
 
 - **Puertas adentro** — su CRM no soporta el volumen de adjuntos de cada trámite
   de importación/exportación. Las plataformas que probaron fallaron. Un trámite
@@ -13,6 +14,10 @@ DMS tiene dos dolores, y el demo cubre los dos en una sola operación:
   de 30-40 MB.
 - **Puertas afuera** — no tienen forma ágil de conseguir ni verificar
   transportistas para el tramo terrestre, ni de seguir la carga en tránsito.
+- **Responsabilidad interna** — Personal centraliza empleados, cargos, áreas,
+  accesos y asignaciones; además detecta concentración de carga.
+- **Visibilidad financiera** — Finanzas conecta cobros y costos con operaciones,
+  incorpora gastos generales y muestra cuentas pendientes y margen.
 
 ## Regla dura: `artifact.html` es un FRAGMENTO
 
@@ -25,11 +30,12 @@ eso sí es correcto.
 
 ## Cómo levantarlo
 
-```bash
-python3 serve.py      # http://127.0.0.1:5173
+```powershell
+python serve.py      # http://127.0.0.1:5173
 ```
 
-Sin dependencias, sin npm. Guardás `artifact.html`, refrescás, listo.
+Sin dependencias, sin npm. En Linux/macOS puede ser `python3 serve.py`.
+Guardás `artifact.html`, refrescás, listo.
 
 ## Cómo republicar el artifact
 
@@ -44,22 +50,36 @@ actualizar este.
 Un solo archivo: HTML + CSS + JS vanilla en un IIFE. Sin framework, sin build,
 sin dependencias externas salvo Google Fonts (Archivo, IBM Plex Sans, IBM Plex Mono).
 
-Estado en memoria (`var S`). Recargar reinicia el demo — es intencional: cada
+Estado en memoria (`Seed` + repositorios). Recargar reinicia el demo — es intencional: cada
 reunión arranca limpia.
 
 ### Secciones del JS, en orden
 
-1. `CATALOG` / `EXPEDIENTES` / `OCR` — el frente documental
-2. `CERTS` / `CARRIERS` — transportistas y sus certificaciones
-3. `LOADS` + `evaluar()` / `puntaje()` / `evaluarTodos()` — **el motor de asignación**
-4. `SHIPMENTS` — seguimiento de carga
-5. `ROLES` — los cuatro logins seed
-6. `view*()` — una función por pantalla, devuelven strings de HTML
-7. `render()` / `wire()` — render completo + rebind de eventos
+1. Utilidades de DOM, formato, componentes UI, modal, sesión y estado.
+2. `Seed` — datos ficticios de CRM, personal, finanzas, documentos y transporte.
+3. `Repo` y servicios de dominio (`Personas`, `Finanzas`, `Operaciones`, etc.).
+4. Reglas de matching, tracking, POD y asignación.
+5. Funciones `v*()` — una vista por módulo o ficha.
+6. Modales y servicios de mutación en memoria.
+7. `Nav`, `Routes`, `Actions`, `Inputs`, `Botones`, `Router` y `Login`.
 
-`render()` redibuja todo el `#content` y `wire()` vuelve a atar los listeners.
-Es deliberadamente tonto: no hay diffing. Si agregás un botón, agregá su
-handler en `wire()`.
+`Router.render()` redibuja `#content` y `Router.wire()` vuelve a asociar eventos.
+No hay diffing. Una acción nueva debe registrarse en `Actions` o `Botones`.
+
+### Personal y permisos
+
+- `PERSONAS`, `AREAS`, `CARGOS` y `PERFILES_ACCESO` son catálogos separados.
+- Clientes, actividades y operaciones guardan IDs de persona, no nombres libres.
+- `GestionPersonal.reasignar()` transfiere trabajo activo antes de una baja.
+- Cargo y perfil de acceso no deben fusionarse: describen conceptos distintos.
+
+### Finanzas
+
+- `MOVIMIENTOS` contiene cobros, pagos operativos y gastos generales.
+- `op:null` identifica un movimiento general no atribuible a una operación.
+- La moneda base del demo es BOB; `Finanzas.base()` convierte USD usando `tc`.
+- `fob` es valor de mercancía y nunca debe sumarse como ingreso de DMS.
+- Es control financiero interno, no contabilidad fiscal o partida doble.
 
 ### El motor de asignación (el corazón del demo)
 
@@ -74,10 +94,10 @@ es la que se reporta:
 | R03 | Certificación de carga peligrosa si la carga lo exige |
 | R04 | Cubre el corredor |
 | R05 | Capacidad suficiente |
-| R06 | Entre los que pasan, gana el puntaje |
+| R06 | Disponibilidad en la fecha de carga |
 
-Puntaje = calificación (40) + rotación equitativa (35) + unidad en origen (25)
-+ manejo defensivo (5).
+Puntaje = cumplimiento (40) + rotación equitativa (30) + unidad en origen (20)
++ disponibilidad (10).
 
 **La rotación es intencional**: Andes Cargo le gana a Illimani (88 vs 83) pese a
 tener peor calificación, porque lleva 3 cargas en 30 días contra 7. Si DMS
@@ -87,25 +107,25 @@ Las fechas se comparan como strings ISO (`hasta` vs `entregaISO`). Funciona
 porque el formato es `YYYY-MM-DD`. Si agregás fechas, respetá ese formato — el
 campo `vence` es solo para mostrar, el que se compara es `hasta`.
 
-## Los cuatro roles seed
+## Los cinco roles seed
 
-Login sin contraseña, un clic. Cada rol ve solo sus secciones (`ROLES[].secs`).
+Login sin contraseña, un clic. Cada rol obtiene sus módulos desde
+`PERFILES_ACCESO`.
 
 | Rol | Quién | Para qué está |
 |---|---|---|
-| `ops` | Ana Quispe | Operaciones DMS. Aprueba papeles y ejecuta la asignación. |
-| `ger` | Rodrigo Salazar | Gerencia. Ve el antes/ahora y el riesgo. |
-| `cli` | Marcela Ortiz | Cliente importador. Scoped a Ferretería Illimani. Es el rol que deja de llamar. |
-| `tra` | Marco Vargas | Transportista. Sube sus propios papeles. |
+| `ops` | Diego Flores | CRM, documentos, demandas, viajes y consulta de Personal. |
+| `ger` | Rodrigo Salazar | Visión ejecutiva, Personal y Finanzas en consulta. |
+| `adm` | Carla Mendoza | Administra Personal, cobros, pagos y gastos. |
+| `cli` | Cliente externo | Solo sus operaciones, documentos y viajes. |
+| `tra` | Transportista | Solo sus demandas, viajes y certificaciones. |
 
-### El recorrido que se muestra en la reunión
+### Recorridos de demostración
 
-Vargas tiene el seguro vigente **hoy** pero vence el 20 sep, y la entrega es el 21.
-El motor lo excluye por R02.
-
-1. Entrar como **Marco Vargas** → *Mi perfil y papeles* → Subir el seguro
-2. Cambiar a **Ana Quispe** → *Aprobaciones* → Aprobar
-3. *Asignación de carga* → Vargas ya aparece entre los elegibles
+- Flujo integral original: CRM → documentos → demanda → matching → viaje → POD.
+- Ampliación administrativa: rol `adm` → dashboard → Personal → Finanzas
+  → rentabilidad → ficha de operación.
+- Ver el guion detallado en `DEMO_SUPERVISORA.md`.
 
 ## Honestidad de los datos
 
@@ -122,6 +142,10 @@ Todo es ficticio y está marcado como tal en pantalla. Dos cosas a no romper:
 - **Carga de retorno (backhaul)**: el camión que descarga en Arica vuelve vacío.
   Es el único mecanismo que *crearía* carga nueva en vez de repartir la existente.
   Propuesto, no confirmado por el usuario, no implementado.
+- **Producción**: backend, base de datos, autenticación real, auditoría y
+  almacenamiento de archivos.
+- **Contabilidad formal**: plan de cuentas, asientos, impuestos, facturación y
+  conciliación bancaria. La versión actual es control financiero interno.
 
 ## Fuentes del análisis
 

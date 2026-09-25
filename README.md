@@ -3,15 +3,20 @@
 Demo comercial para DMS Bolivia S.R.L. (agente consolidador de carga, La Paz).
 Datos ficticios. No es un sistema en producción.
 
+El flujo integra CRM, documentos, operaciones, transportistas, tracking,
+personal y control financiero interno. La guía de presentación de los módulos
+nuevos está en [DEMO_SUPERVISORA.md](DEMO_SUPERVISORA.md).
+
 ## Desarrollo local
 
-```bash
-python3 serve.py
+```powershell
+python serve.py
 ```
 
 → http://127.0.0.1:5173
 
 Editás `artifact.html`, guardás, refrescás. Sin npm, sin build, sin dependencias.
+En Linux o macOS también puede usarse `python3 serve.py`.
 
 > `artifact.html` es un **fragmento**: no lleva `<!doctype>`, `<html>`, `<head>`
 > ni `<body>`. No se los agregues — ver [CLAUDE.md](CLAUDE.md). `serve.py` los
