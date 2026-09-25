@@ -687,6 +687,12 @@ var Modal=(function(){
 
 var Session=(function(){
   var rol=null;
+  function perfil(){
+    if(!rol||!rol.perfilId||!Seed.PERFILES_ACCESO) return null;
+    for(var i=0;i<Seed.PERFILES_ACCESO.length;i++){
+      if(Seed.PERFILES_ACCESO[i].id===rol.perfilId) return Seed.PERFILES_ACCESO[i];}
+    return null;
+  }
   return {
     set:function(r){rol=r;},
     clear:function(){rol=null;},
@@ -694,8 +700,10 @@ var Session=(function(){
     id:function(){return rol?rol.id:null;},
     nombre:function(){return rol?rol.name:"";},
     entidad:function(){return rol?rol.entidad:"";},
-    modulos:function(){return rol?rol.mods:[];},
-    puede:function(m){return rol&&rol.mods.indexOf(m)>=0;},
+    modulos:function(){var p=perfil();return p?p.mods:(rol&&rol.mods?rol.mods:[]);},
+    puede:function(m){return Session.modulos().indexOf(m)>=0;},
+    perfil:function(){return perfil();},
+    personaId:function(){return rol&&rol.personaId?rol.personaId:null;},
     clienteId:function(){return rol&&rol.cliente?rol.cliente:null;},
     traId:function(){return rol&&rol.traId?rol.traId:null;},
     esInterno:function(){return rol&&!rol.cliente&&!rol.traId;}
@@ -703,14 +711,39 @@ var Session=(function(){
 })();
 
 var State={
-  mod:"dashboard",cliOpen:null,cliTab:"resumen",demOpen:null,viaOpen:null,traOpen:null,
+  mod:"dashboard",cliOpen:null,cliTab:"resumen",opOpen:null,opTab:"resumen",
+  demOpen:null,viaOpen:null,traOpen:null,perOpen:null,
   docCat:"todas",docEstado:"todos",docOp:"todas",docQ:"",docPage:1,
   q:"",filtro:"todos",
   reset:function(){
-    this.cliOpen=null;this.demOpen=null;this.viaOpen=null;this.traOpen=null;
+    this.cliOpen=null;this.opOpen=null;this.demOpen=null;this.viaOpen=null;
+    this.traOpen=null;this.perOpen=null;
     this.docPage=1;this.q="";}
 };
 var Seed={
+  AREAS: [
+ {id:"AR-GER",n:"Gerencia",responsableId:"P02"},
+ {id:"AR-COM",n:"Comercial",responsableId:"P01"},
+ {id:"AR-OPE",n:"Operaciones",responsableId:"P03"},
+ {id:"AR-ADM",n:"Administración y Finanzas",responsableId:"P04"}],
+  CARGOS: [
+ {id:"CG-GER",n:"Gerente general",areaId:"AR-GER"},
+ {id:"CG-EJE",n:"Ejecutiva comercial",areaId:"AR-COM"},
+ {id:"CG-COO",n:"Coordinador de operaciones",areaId:"AR-OPE"},
+ {id:"CG-CON",n:"Responsable de contabilidad",areaId:"AR-ADM"},
+ {id:"CG-AUX",n:"Auxiliar administrativa",areaId:"AR-ADM"}],
+  PERSONAS: [
+ {id:"P01",n:"Ana Quispe",mail:"ana.quispe@dms.demo",tel:"+591 7 210-4401",areaId:"AR-COM",cargoId:"CG-EJE",jefeId:"P02",ingreso:"12 mar 2023",estado:"activo",perfilId:"PF-OPE"},
+ {id:"P02",n:"Rodrigo Salazar",mail:"rodrigo.salazar@dms.demo",tel:"+591 7 210-4402",areaId:"AR-GER",cargoId:"CG-GER",jefeId:null,ingreso:"05 ene 2021",estado:"activo",perfilId:"PF-GER"},
+ {id:"P03",n:"Diego Flores",mail:"diego.flores@dms.demo",tel:"+591 7 210-4403",areaId:"AR-OPE",cargoId:"CG-COO",jefeId:"P02",ingreso:"18 ago 2022",estado:"activo",perfilId:"PF-OPE"},
+ {id:"P04",n:"Carla Mendoza",mail:"carla.mendoza@dms.demo",tel:"+591 7 210-4404",areaId:"AR-ADM",cargoId:"CG-CON",jefeId:"P02",ingreso:"03 feb 2024",estado:"activo",perfilId:"PF-ADM"},
+ {id:"P05",n:"Lucía Rojas",mail:"lucia.rojas@dms.demo",tel:"+591 7 210-4405",areaId:"AR-ADM",cargoId:"CG-AUX",jefeId:"P04",ingreso:"09 jun 2025",estado:"activo",perfilId:"PF-ADM"}],
+  PERFILES_ACCESO: [
+ {id:"PF-OPE",n:"Operaciones",nivel:"Operativo",mods:["dashboard","clientes","pipeline","actividades","documentos","operaciones","demandas","viajes","directorio","certificaciones","personal","reportes"]},
+ {id:"PF-GER",n:"Gerencia",nivel:"Consulta ejecutiva",mods:["dashboard","clientes","pipeline","operaciones","viajes","directorio","personal","finanzas","reportes"]},
+ {id:"PF-ADM",n:"Administración / Contabilidad",nivel:"Administración",mods:["dashboard","clientes","operaciones","personal","finanzas","reportes"]},
+ {id:"PF-CLI",n:"Cliente",nivel:"Portal externo",mods:["dashboard","operaciones","documentos","viajes"]},
+ {id:"PF-TRA",n:"Transportista",nivel:"Portal externo",mods:["dashboard","misviajes","demandas","certificaciones"]}],
   SERVICIOS: [
  {id:"imp",n:"Importación"},{id:"exp",n:"Exportación"},
  {id:"tnac",n:"Transporte nacional"},{id:"tint",n:"Transporte internacional"},
@@ -722,54 +755,54 @@ var Seed={
  {id:"fidelizacion",n:"Fidelización"}],
   CLIENTES: [
  {id:"C001",n:"Comercial Andina S.R.L.",nit:"1028374650",ciudad:"La Paz",tipo:"Importador",
-  etapa:"fidelizacion",ejecutivo:"Ana Quispe",desde:"mar 2023",
+  etapa:"fidelizacion",ejecutivoId:"P01",desde:"mar 2023",
   serv:["imp","adu","tint","alm","p2p"],ultima:"19 sep 2026",proximo:"25 sep 2026",
   contactos:[{n:"Rosa Medina",c:"Gerente de Comercio Exterior",t:"+591 2 244-8890",m:"rmedina@andina.demo"},
              {n:"Luis Paredes",c:"Jefe de Logística",t:"+591 7 112-3345",m:"lparedes@andina.demo"}]},
  {id:"C002",n:"AgroSur Bolivia S.A.",nit:"1099231470",ciudad:"Santa Cruz",tipo:"Exportador",
-  etapa:"activo",ejecutivo:"Ana Quispe",desde:"ago 2024",
+  etapa:"activo",ejecutivoId:"P01",desde:"ago 2024",
   serv:["exp","adu","tint"],ultima:"17 sep 2026",proximo:"24 sep 2026",
   contactos:[{n:"Carlos Vaca",c:"Gerente General",t:"+591 3 336-2210",m:"cvaca@agrosur.demo"}]},
  {id:"C003",n:"Químicos del Altiplano S.R.L.",nit:"1044556780",ciudad:"La Paz",tipo:"Importador",
-  etapa:"activo",ejecutivo:"Rodrigo Salazar",desde:"feb 2025",
+  etapa:"activo",ejecutivoId:"P02",desde:"feb 2025",
   serv:["imp","adu","seg"],ultima:"16 sep 2026",proximo:"26 sep 2026",
   contactos:[{n:"Elena Ríos",c:"Compras",t:"+591 2 279-4412",m:"erios@quimicos.demo"}]},
  {id:"C004",n:"Ferretería Illimani S.R.L.",nit:"1077889230",ciudad:"La Paz",tipo:"Importador",
-  etapa:"activo",ejecutivo:"Ana Quispe",desde:"nov 2025",
+  etapa:"activo",ejecutivoId:"P01",desde:"nov 2025",
   serv:["imp","adu"],ultima:"20 sep 2026",proximo:"23 sep 2026",
   contactos:[{n:"Marcela Ortiz",c:"Gerente de Operaciones",t:"+591 2 231-7788",m:"mortiz@illimani.demo"}]},
  {id:"C005",n:"Andina Textil S.A.",nit:"1033445590",ciudad:"El Alto",tipo:"Exportador",
-  etapa:"fidelizacion",ejecutivo:"Rodrigo Salazar",desde:"ene 2022",
+  etapa:"fidelizacion",ejecutivoId:"P02",desde:"ene 2022",
   serv:["exp","adu","tint","seg","p2p"],ultima:"12 sep 2026",proximo:"29 sep 2026",
   contactos:[{n:"Jorge Ayala",c:"Director Comercial",t:"+591 2 284-9901",m:"jayala@textil.demo"}]},
  {id:"C006",n:"Repuestos Tunari S.A.",nit:"1066778890",ciudad:"Cochabamba",tipo:"Importador",
-  etapa:"activo",ejecutivo:"Ana Quispe",desde:"jun 2025",
+  etapa:"activo",ejecutivoId:"P01",desde:"jun 2025",
   serv:["imp","tnac"],ultima:"08 sep 2026",proximo:"30 sep 2026",
   contactos:[{n:"Pablo Rocha",c:"Gerente",t:"+591 4 452-3310",m:"procha@tunari.demo"}]},
  {id:"C007",n:"Minerales del Sur S.A.",nit:"1011223340",ciudad:"Oruro",tipo:"Exportador",
-  etapa:"oportunidad",ejecutivo:"Rodrigo Salazar",desde:"—",
+  etapa:"oportunidad",ejecutivoId:"P02",desde:"—",
   serv:[],ultima:"18 sep 2026",proximo:"24 sep 2026",
   contactos:[{n:"Silvia Mamani",c:"Gerente de Exportaciones",t:"+591 2 527-1120",m:"smamani@minsur.demo"}]},
  {id:"C008",n:"Distribuidora Oriental Ltda.",nit:"1055667780",ciudad:"Santa Cruz",tipo:"Importador",
-  etapa:"oportunidad",ejecutivo:"Ana Quispe",desde:"—",
+  etapa:"oportunidad",ejecutivoId:"P01",desde:"—",
   serv:[],ultima:"15 sep 2026",proximo:"23 sep 2026",
   contactos:[{n:"Hugo Terceros",c:"Compras",t:"+591 3 341-8820",m:"hterceros@oriental.demo"}]},
  {id:"C009",n:"Farmacéutica Boliviana S.A.",nit:"1088990010",ciudad:"La Paz",tipo:"Importador",
-  etapa:"contactado",ejecutivo:"Ana Quispe",desde:"—",
+  etapa:"contactado",ejecutivoId:"P01",desde:"—",
   serv:[],ultima:"14 sep 2026",proximo:"25 sep 2026",
   contactos:[{n:"Diana Cruz",c:"Cadena de Suministro",t:"+591 2 211-4455",m:"dcruz@farmabol.demo"}]},
  {id:"C010",n:"Maderas del Beni S.R.L.",nit:"1022334450",ciudad:"Trinidad",tipo:"Exportador",
-  etapa:"contactado",ejecutivo:"Rodrigo Salazar",desde:"—",
+  etapa:"contactado",ejecutivoId:"P02",desde:"—",
   serv:[],ultima:"11 sep 2026",proximo:"26 sep 2026",
   contactos:[{n:"Raúl Suárez",c:"Propietario",t:"+591 3 462-7701",m:"rsuarez@maderasbeni.demo"}]},
  {id:"C011",n:"Textiles Pacajes Ltda.",nit:"1077001120",ciudad:"El Alto",tipo:"Exportador",
-  etapa:"prospecto",ejecutivo:"Ana Quispe",desde:"—",serv:[],ultima:"10 sep 2026",proximo:"27 sep 2026",
+  etapa:"prospecto",ejecutivoId:"P01",desde:"—",serv:[],ultima:"10 sep 2026",proximo:"27 sep 2026",
   contactos:[{n:"Nora Choque",c:"Gerente",t:"+591 2 282-3390",m:"nchoque@pacajes.demo"}]},
  {id:"C012",n:"Importadora Central S.A.",nit:"1099887760",ciudad:"Cochabamba",tipo:"Importador",
-  etapa:"prospecto",ejecutivo:"Rodrigo Salazar",desde:"—",serv:[],ultima:"09 sep 2026",proximo:"28 sep 2026",
+  etapa:"prospecto",ejecutivoId:"P02",desde:"—",serv:[],ultima:"09 sep 2026",proximo:"28 sep 2026",
   contactos:[{n:"Iván Peña",c:"Gerente Comercial",t:"+591 4 425-6612",m:"ipena@central.demo"}]},
  {id:"C013",n:"Agroindustrias Yapacaní S.A.",nit:"1044009980",ciudad:"Santa Cruz",tipo:"Exportador",
-  etapa:"prospecto",ejecutivo:"Ana Quispe",desde:"—",serv:[],ultima:"05 sep 2026",proximo:"01 oct 2026",
+  etapa:"prospecto",ejecutivoId:"P01",desde:"—",serv:[],ultima:"05 sep 2026",proximo:"01 oct 2026",
   contactos:[{n:"Tomás Áñez",c:"Operaciones",t:"+591 3 392-4478",m:"tanez@yapacani.demo"}]}],
   OPORTUNIDADES: [
  {id:"OP-041",cli:"C007",t:"Exportación de concentrado de zinc",serv:"exp",valor:48000,etapa:"oportunidad",prob:65,cierre:"10 oct 2026"},
@@ -786,45 +819,45 @@ var Seed={
  {id:"OP-052",cli:"C003",t:"Ampliación: almacenamiento aduanero",serv:"alm",valor:11500,etapa:"oportunidad",prob:50,cierre:"14 oct 2026"}],
   ACT_TIPOS: {llamada:"Llamada",email:"Correo",reunion:"Reunión",visita:"Visita",tarea:"Tarea"},
   ACTIVIDADES: [
- {id:"A-201",cli:"C004",tipo:"llamada",fecha:"23 sep 2026",asunto:"Confirmar retiro en puerto Arica",estado:"pendiente",resp:"Ana Quispe"},
- {id:"A-202",cli:"C008",tipo:"reunion",fecha:"23 sep 2026",asunto:"Presentación de propuesta",estado:"pendiente",resp:"Ana Quispe"},
- {id:"A-203",cli:"C007",tipo:"visita",fecha:"24 sep 2026",asunto:"Visita a planta en Oruro",estado:"pendiente",resp:"Rodrigo Salazar"},
- {id:"A-204",cli:"C002",tipo:"email",fecha:"24 sep 2026",asunto:"Enviar cotización de puerta a puerta",estado:"pendiente",resp:"Ana Quispe"},
- {id:"A-205",cli:"C001",tipo:"tarea",fecha:"25 sep 2026",asunto:"Revisar póliza para ampliación de seguro",estado:"pendiente",resp:"Ana Quispe"},
- {id:"A-206",cli:"C009",tipo:"llamada",fecha:"25 sep 2026",asunto:"Seguimiento de propuesta inicial",estado:"pendiente",resp:"Ana Quispe"},
- {id:"A-207",cli:"C003",tipo:"reunion",fecha:"26 sep 2026",asunto:"Cierre de ampliación de almacenamiento",estado:"pendiente",resp:"Rodrigo Salazar"},
- {id:"A-208",cli:"C010",tipo:"email",fecha:"26 sep 2026",asunto:"Requisitos de certificación forestal",estado:"pendiente",resp:"Rodrigo Salazar"},
- {id:"A-209",cli:"C001",tipo:"reunion",fecha:"19 sep 2026",asunto:"Revisión trimestral de operaciones",estado:"hecha",resp:"Ana Quispe"},
- {id:"A-210",cli:"C004",tipo:"llamada",fecha:"20 sep 2026",asunto:"Aviso de demora en Tambo Quemado",estado:"hecha",resp:"Ana Quispe"},
- {id:"A-211",cli:"C007",tipo:"llamada",fecha:"18 sep 2026",asunto:"Primer contacto comercial",estado:"hecha",resp:"Rodrigo Salazar"},
- {id:"A-212",cli:"C002",tipo:"visita",fecha:"17 sep 2026",asunto:"Inspección de carga en planta",estado:"hecha",resp:"Ana Quispe"},
- {id:"A-213",cli:"C005",tipo:"email",fecha:"12 sep 2026",asunto:"Confirmación de embarque a Callao",estado:"hecha",resp:"Rodrigo Salazar"},
- {id:"A-214",cli:"C006",tipo:"tarea",fecha:"08 sep 2026",asunto:"Cargar documentos de desaduanización",estado:"hecha",resp:"Ana Quispe"}],
+ {id:"A-201",cli:"C004",tipo:"llamada",fecha:"23 sep 2026",asunto:"Confirmar retiro en puerto Arica",estado:"pendiente",responsableId:"P01"},
+ {id:"A-202",cli:"C008",tipo:"reunion",fecha:"23 sep 2026",asunto:"Presentación de propuesta",estado:"pendiente",responsableId:"P01"},
+ {id:"A-203",cli:"C007",tipo:"visita",fecha:"24 sep 2026",asunto:"Visita a planta en Oruro",estado:"pendiente",responsableId:"P02"},
+ {id:"A-204",cli:"C002",tipo:"email",fecha:"24 sep 2026",asunto:"Enviar cotización de puerta a puerta",estado:"pendiente",responsableId:"P01"},
+ {id:"A-205",cli:"C001",tipo:"tarea",fecha:"25 sep 2026",asunto:"Revisar póliza para ampliación de seguro",estado:"pendiente",responsableId:"P01"},
+ {id:"A-206",cli:"C009",tipo:"llamada",fecha:"25 sep 2026",asunto:"Seguimiento de propuesta inicial",estado:"pendiente",responsableId:"P01"},
+ {id:"A-207",cli:"C003",tipo:"reunion",fecha:"26 sep 2026",asunto:"Cierre de ampliación de almacenamiento",estado:"pendiente",responsableId:"P02"},
+ {id:"A-208",cli:"C010",tipo:"email",fecha:"26 sep 2026",asunto:"Requisitos de certificación forestal",estado:"pendiente",responsableId:"P02"},
+ {id:"A-209",cli:"C001",tipo:"reunion",fecha:"19 sep 2026",asunto:"Revisión trimestral de operaciones",estado:"hecha",responsableId:"P01"},
+ {id:"A-210",cli:"C004",tipo:"llamada",fecha:"20 sep 2026",asunto:"Aviso de demora en Tambo Quemado",estado:"hecha",responsableId:"P01"},
+ {id:"A-211",cli:"C007",tipo:"llamada",fecha:"18 sep 2026",asunto:"Primer contacto comercial",estado:"hecha",responsableId:"P02"},
+ {id:"A-212",cli:"C002",tipo:"visita",fecha:"17 sep 2026",asunto:"Inspección de carga en planta",estado:"hecha",responsableId:"P01"},
+ {id:"A-213",cli:"C005",tipo:"email",fecha:"12 sep 2026",asunto:"Confirmación de embarque a Callao",estado:"hecha",responsableId:"P02"},
+ {id:"A-214",cli:"C006",tipo:"tarea",fecha:"08 sep 2026",asunto:"Cargar documentos de desaduanización",estado:"hecha",responsableId:"P01"}],
   OPERACIONES: [
  {id:"IMP-2026-0847",cli:"C004",tipo:"imp",ruta:"Arica → Tambo Quemado → La Paz",modal:"FCL 40'",peso:24100,
-  merc:"Conductores eléctricos de cobre",estado:"transito",abierta:"02 sep 2026",fob:41280},
+  merc:"Conductores eléctricos de cobre",estado:"transito",abierta:"02 sep 2026",fob:41280,responsableId:"P03"},
  {id:"IMP-2026-0855",cli:"C004",tipo:"imp",ruta:"Arica → Tambo Quemado → La Paz",modal:"FCL 20'",peso:18300,
-  merc:"Herramienta manual y ferretería",estado:"puerto",abierta:"15 sep 2026",fob:22750},
+  merc:"Herramienta manual y ferretería",estado:"puerto",abierta:"15 sep 2026",fob:22750,responsableId:"P03"},
  {id:"IMP-2026-0839",cli:"C003",tipo:"imp",ruta:"Ilo → Desaguadero → La Paz",modal:"LCL",peso:6480,
-  merc:"Insumos químicos industriales",estado:"aduana",abierta:"28 ago 2026",fob:68400},
+  merc:"Insumos químicos industriales",estado:"aduana",abierta:"28 ago 2026",fob:68400,responsableId:"P03"},
  {id:"EXP-2026-0213",cli:"C002",tipo:"exp",ruta:"Santa Cruz → Puerto Suárez → Santos",modal:"FCL 40' HC",peso:26000,
-  merc:"Quinua real orgánica en grano",estado:"docs",abierta:"09 sep 2026",fob:78520},
+  merc:"Quinua real orgánica en grano",estado:"docs",abierta:"09 sep 2026",fob:78520,responsableId:"P03"},
  {id:"IMP-2026-0851",cli:"C006",tipo:"imp",ruta:"Iquique → Pisiga → Oruro → Cochabamba",modal:"LCL",peso:3940,
-  merc:"Repuestos automotrices",estado:"transito",abierta:"08 sep 2026",fob:19300},
+  merc:"Repuestos automotrices",estado:"transito",abierta:"08 sep 2026",fob:19300,responsableId:"P03"},
  {id:"EXP-2026-0209",cli:"C005",tipo:"exp",ruta:"La Paz → Arica → Callao",modal:"FCL 20'",peso:8200,
-  merc:"Prendas de punto de alpaca",estado:"cerrada",abierta:"14 ago 2026",fob:96400},
+  merc:"Prendas de punto de alpaca",estado:"cerrada",abierta:"14 ago 2026",fob:96400,responsableId:"P03"},
  {id:"IMP-2026-0801",cli:"C001",tipo:"imp",ruta:"Arica → Tambo Quemado → La Paz",modal:"FCL 40'",peso:27400,
-  merc:"Electrodomésticos de línea blanca",estado:"cerrada",abierta:"05 jul 2026",fob:134800},
+  merc:"Electrodomésticos de línea blanca",estado:"cerrada",abierta:"05 jul 2026",fob:134800,responsableId:"P03"},
  {id:"IMP-2026-0812",cli:"C001",tipo:"imp",ruta:"Ilo → Desaguadero → La Paz",modal:"FCL 40'",peso:25900,
-  merc:"Material de construcción",estado:"cerrada",abierta:"22 jul 2026",fob:88300},
+  merc:"Material de construcción",estado:"cerrada",abierta:"22 jul 2026",fob:88300,responsableId:"P03"},
  {id:"IMP-2026-0826",cli:"C001",tipo:"imp",ruta:"Arica → Tambo Quemado → La Paz",modal:"LCL",peso:7100,
-  merc:"Repuestos y accesorios",estado:"cerrada",abierta:"11 ago 2026",fob:31200},
+  merc:"Repuestos y accesorios",estado:"cerrada",abierta:"11 ago 2026",fob:31200,responsableId:"P03"},
  {id:"IMP-2026-0844",cli:"C001",tipo:"imp",ruta:"Iquique → Pisiga → Oruro → La Paz",modal:"FCL 40'",peso:26800,
-  merc:"Equipos de refrigeración",estado:"aduana",abierta:"30 ago 2026",fob:102600},
+  merc:"Equipos de refrigeración",estado:"aduana",abierta:"30 ago 2026",fob:102600,responsableId:"P03"},
  {id:"IMP-2026-0858",cli:"C001",tipo:"imp",ruta:"Arica → Tambo Quemado → La Paz",modal:"FCL 40' HC",peso:28200,
-  merc:"Mobiliario y menaje",estado:"transito",abierta:"16 sep 2026",fob:74900},
+  merc:"Mobiliario y menaje",estado:"transito",abierta:"16 sep 2026",fob:74900,responsableId:"P03"},
  {id:"EXP-2026-0198",cli:"C001",tipo:"exp",ruta:"La Paz → Arica",modal:"LCL",peso:4600,
-  merc:"Artesanía y textil andino",estado:"cerrada",abierta:"18 jun 2026",fob:28400}],
+  merc:"Artesanía y textil andino",estado:"cerrada",abierta:"18 jun 2026",fob:28400,responsableId:"P03"}],
   DOC_CATS: [
  {id:"factura",n:"Factura comercial",fmt:"PDF"},
  {id:"packing",n:"Packing list",fmt:"XLSX"},
@@ -1034,20 +1067,27 @@ var Seed={
   ROLES: [
  {id:"ops",name:"Operaciones",mail:"operaciones@dms.demo",entidad:"DMS Bolivia S.R.L.",
   rol:"CRM, documentos, demandas y viajes",
+  personaId:"P03",perfilId:"PF-OPE",
   icon:'<path d="M3 5.5h10M3 9h10M3 12.5h7"/>',
-  mods:["dashboard","clientes","pipeline","actividades","documentos","operaciones","demandas","viajes","directorio","certificaciones","reportes"]},
+  mods:[]},
  {id:"ger",name:"Gerencia",mail:"gerencia@dms.demo",entidad:"DMS Bolivia S.R.L.",
   rol:"Tablero, pipeline y reportes",
+  personaId:"P02",perfilId:"PF-GER",
   icon:'<rect x="2.5" y="2.5" width="4.5" height="4.5" rx="1"/><rect x="9" y="2.5" width="4.5" height="4.5" rx="1"/><rect x="2.5" y="9" width="4.5" height="4.5" rx="1"/><rect x="9" y="9" width="4.5" height="4.5" rx="1"/>',
-  mods:["dashboard","clientes","pipeline","operaciones","viajes","directorio","reportes"]},
+  mods:[]},
+ {id:"adm",name:"Administración y Contabilidad",mail:"contabilidad@dms.demo",entidad:"DMS Bolivia S.R.L.",
+  rol:"Personal, cobros, pagos y gastos",personaId:"P04",perfilId:"PF-ADM",
+  icon:'<path d="M3 3h10v10H3z"/><path d="M5.5 6h5M5.5 8.5h5M5.5 11h3"/>',mods:[]},
  {id:"cli",name:"Cliente",mail:"cliente@dms.demo",entidad:"Comercial Andina S.R.L.",
   rol:"Sus operaciones, documentos y viajes",cliente:"C001",
+  perfilId:"PF-CLI",
   icon:'<path d="M2.5 5.5 8 2.5l5.5 3v5L8 13.5l-5.5-3z"/><path d="M2.5 5.5 8 8.5l5.5-3M8 8.5v5"/>',
-  mods:["dashboard","operaciones","documentos","viajes"]},
+  mods:[]},
  {id:"tra",name:"Transportista",mail:"transportista@dms.demo",entidad:"Transportes Illimani S.R.L.",
   rol:"Demandas, viajes y certificaciones",traId:"T01",
+  perfilId:"PF-TRA",
   icon:'<path d="M1.5 4.5h7.5v6H1.5z"/><path d="M9 6.5h2.5L14 9v1.5H9z"/><circle cx="4" cy="11.5" r="1.4"/><circle cx="11" cy="11.5" r="1.4"/>',
-  mods:["dashboard","misviajes","demandas","certificaciones"]}],
+  mods:[]}],
   MODS: {dashboard:"Dashboard",clientes:"Clientes",pipeline:"Pipeline",actividades:"Actividades",
  documentos:"Documentos",operaciones:"Operaciones",demandas:"Demandas de carga",viajes:"Viajes",
  directorio:"Directorio",certificaciones:"Certificaciones",reportes:"Reportes",misviajes:"Mis viajes"},
@@ -1072,6 +1112,38 @@ function Repo(items,clave){
     sum:function(fn){return items.reduce(function(a,x){return a+fn(x);},0);}
   };
 }
+
+var Areas=(function(){
+  var r=Repo(Seed.AREAS);
+  r.nombre=function(id){var x=r.byId(id);return x?x.n:"—";};
+  return r;
+})();
+
+var Cargos=(function(){
+  var r=Repo(Seed.CARGOS);
+  r.nombre=function(id){var x=r.byId(id);return x?x.n:"—";};
+  return r;
+})();
+
+var Perfiles=(function(){
+  var r=Repo(Seed.PERFILES_ACCESO);
+  r.nombre=function(id){var x=r.byId(id);return x?x.n:"—";};
+  return r;
+})();
+
+var Personas=(function(){
+  var r=Repo(Seed.PERSONAS);
+  r.nombre=function(id){var x=r.byId(id);return x?x.n:"—";};
+  r.activas=function(){return r.where(function(p){return p.estado==="activo";});};
+  r.deArea=function(id){return r.where(function(p){return p.areaId===id;});};
+  r.clientes=function(id){return Seed.CLIENTES.filter(function(c){return c.ejecutivoId===id;});};
+  r.actividades=function(id){return Seed.ACTIVIDADES.filter(function(a){return a.responsableId===id;});};
+  r.operaciones=function(id){return Seed.OPERACIONES.filter(function(o){return o.responsableId===id;});};
+  r.carga=function(id){
+    return r.clientes(id).length+r.actividades(id).filter(function(a){return a.estado==="pendiente";}).length
+      +r.operaciones(id).filter(function(o){return o.estado!=="cerrada";}).length;};
+  return r;
+})();
 
 var Clientes=(function(){
   var r=Repo(Seed.CLIENTES);
@@ -1489,13 +1561,13 @@ function vDashboard(){
             var c=Clientes.byId(a.cli);
             return '<tr class="clickable" data-cli="'+a.cli+'"><td class="mono t-sub">'+a.fecha+'</td>'
               +'<td class="t-strong">'+(c?c.n:"—")+'</td><td>'+UI.badge("b-neutral",Seed.ACT_TIPOS[a.tipo])+'</td>'
-              +'<td>'+a.asunto+'</td><td class="t-sub">'+a.resp+'</td></tr>';}).join("")),
+              +'<td>'+a.asunto+'</td><td class="t-sub">'+Personas.nombre(a.responsableId)+'</td></tr>';}).join("")),
         '<button class="btn" data-go="actividades">Ver todas</button>');
 }
 function vDashCliente(){
   var ops=Operaciones.visibles(),docs=Documentos.visibles(),via=Viajes.visibles();
   var c=Clientes.byId(Session.clienteId());
-  return UI.head({eyebrow:c.n,t:"Dashboard",meta:UI.pill("NIT",c.nit)+UI.pill("Ejecutivo",c.ejecutivo)})
+  return UI.head({eyebrow:c.n,t:"Dashboard",meta:UI.pill("NIT",c.nit)+UI.pill("Ejecutivo",Personas.nombre(c.ejecutivoId))})
     + UI.tiles([
       {k:"Operaciones",v:String(ops.length),n:ops.filter(function(o){return o.estado!=="cerrada";}).length+" abiertas"},
       {k:"Documentos",v:String(docs.length),n:docs.filter(function(d){return d.estado==="pendiente";}).length+" pendientes"},
@@ -1505,7 +1577,7 @@ function vDashCliente(){
         UI.table([{t:"Operación"},{t:"Ruta"},{t:"Mercancía"},{t:"Estado"},{t:"Docs",r:true}],
           ops.map(function(o){
             return '<tr class="clickable" data-op="'+o.id+'"><td class="mono t-strong">'+o.id+'</td>'
-              +'<td class="t-sub">'+o.ruta+'</td><td>'+o.merc+'</td><td>'+UI.pair(Operaciones.UI.badge(o.estado))+'</td>'
+              +'<td class="t-sub">'+o.ruta+'</td><td>'+o.merc+'</td><td>'+UI.pair(Operaciones.badge(o.estado))+'</td>'
               +'<td class="r mono">'+Documentos.all().filter(function(d){return d.op===o.id;}).length+'</td></tr>';}).join("")));
 }
 function vDashTransportista(){
@@ -1538,7 +1610,7 @@ function vClientes(){
   var lista=Seed.CLIENTES.filter(function(c){
     if(State.filtro!=="todos"&&c.etapa!==State.filtro) return false;
     if(q.length<2) return true;
-    return (c.n+" "+c.nit+" "+c.ciudad+" "+c.tipo+" "+c.ejecutivo).toLowerCase().indexOf(q)>=0;});
+    return (c.n+" "+c.nit+" "+c.ciudad+" "+c.tipo+" "+Personas.nombre(c.ejecutivoId)).toLowerCase().indexOf(q)>=0;});
   var chips=[["todos","Todos",Seed.CLIENTES.length]].concat(Seed.ETAPAS.map(function(e){
     return [e.id,e.n,Seed.CLIENTES.filter(function(c){return c.etapa===e.id;}).length];}))
     .map(function(f){return '<button class="chip'+(State.filtro===f[0]?" is-on":"")+'" data-filtro="'+f[0]+'">'
@@ -1586,7 +1658,7 @@ function vCliente(id){
         +'<div class="kvrow"><span>NIT</span><span class="mono">'+c.nit+'</span></div>'
         +'<div class="kvrow"><span>Tipo</span><span>'+c.tipo+'</span></div>'
         +'<div class="kvrow"><span>Ciudad</span><span>'+c.ciudad+'</span></div>'
-        +'<div class="kvrow"><span>Ejecutivo</span><span>'+c.ejecutivo+'</span></div>'
+        +'<div class="kvrow"><span>Ejecutivo</span><span>'+Personas.nombre(c.ejecutivoId)+'</span></div>'
         +'<div class="kvrow"><span>Cliente desde</span><span>'+c.desde+'</span></div>'
         +'</div></div>')
     + UI.card("Servicios contratados",'<div class="card-body"><div class="chips">'
@@ -1603,7 +1675,7 @@ function vCliente(id){
         return '<tr class="clickable" data-op="'+o.id+'"><td class="mono t-strong">'+o.id+'</td>'
           +'<td>'+UI.badge("b-neutral",o.tipo==="imp"?"Importación":"Exportación")+'</td>'
           +'<td class="t-sub">'+o.ruta+'</td><td>'+o.merc+'</td>'
-          +'<td class="r mono">'+Fmt.num(o.peso)+' kg</td><td>'+UI.pair(Operaciones.UI.badge(o.estado))+'</td>'
+          +'<td class="r mono">'+Fmt.num(o.peso)+' kg</td><td>'+UI.pair(Operaciones.badge(o.estado))+'</td>'
           +'<td class="r mono">'+Documentos.all().filter(function(d){return d.op===o.id;}).length+'</td></tr>';}).join("")
       ||UI.empty(7,"Sin operaciones"));
     body='<div class="card">'+body+'</div>';
@@ -1635,7 +1707,7 @@ function vCliente(id){
     body='<div class="card">'+UI.table([{t:"Fecha"},{t:"Tipo"},{t:"Asunto"},{t:"Responsable"},{t:"Estado"}],
       acts.map(function(a){
         return '<tr><td class="mono t-sub">'+a.fecha+'</td><td>'+UI.badge("b-neutral",Seed.ACT_TIPOS[a.tipo])+'</td>'
-          +'<td>'+a.asunto+'</td><td class="t-sub">'+a.resp+'</td>'
+          +'<td>'+a.asunto+'</td><td class="t-sub">'+Personas.nombre(a.responsableId)+'</td>'
           +'<td>'+(a.estado==="hecha"?UI.badge("b-ok","Hecha"):UI.badge("b-warn","Pendiente"))+'</td></tr>';}).join("")
       ||UI.empty(5,"Sin actividades"))+'</div>';
   }
@@ -1651,7 +1723,7 @@ function vCliente(id){
       +(hist.length?hist.map(function(a,i){
         return '<li class="hito '+(a.estado==="hecha"?"done":"now")+'">'
           +'<span class="hito-rail"><span class="hito-dot"></span><span class="hito-line"></span></span>'
-          +'<span class="hito-b"><b>'+a.asunto+'</b><span>'+a.fecha+' · '+Seed.ACT_TIPOS[a.tipo]+' · '+a.resp+'</span></span></li>';
+          +'<span class="hito-b"><b>'+a.asunto+'</b><span>'+a.fecha+' · '+Seed.ACT_TIPOS[a.tipo]+' · '+Personas.nombre(a.responsableId)+'</span></span></li>';
         }).join(""):'<li class="t-sub">Sin historial</li>')+'</ol></div>');
   }
 
@@ -1673,7 +1745,7 @@ function vPipeline(){
         var o=Seed.OPORTUNIDADES.filter(function(x){return x.cli===c.id;});
         var v=o.reduce(function(a,x){return a+x.valor;},0);
         return '<button class="pcard" data-cli="'+c.id+'"><b>'+c.n+'</b>'
-          +'<span>'+c.ciudad+' · '+c.ejecutivo+'</span>'
+          +'<span>'+c.ciudad+' · '+Personas.nombre(c.ejecutivoId)+'</span>'
           +(v?'<span class="val">USD '+Fmt.num(v)+'</span>':'')+'</button>';}).join("")
         :'<span class="t-sub" style="padding:6px">—</span>')
       +'</div></div>';}).join("");
@@ -1710,7 +1782,7 @@ function vActividades(){
           return '<tr><td class="mono t-sub">'+a.fecha+'</td>'
             +'<td class="t-strong clickable" data-cli="'+a.cli+'">'+(c?c.n:"—")+'</td>'
             +'<td>'+UI.badge("b-neutral",Seed.ACT_TIPOS[a.tipo])+'</td><td>'+a.asunto+'</td>'
-            +'<td class="t-sub">'+a.resp+'</td>'
+            +'<td class="t-sub">'+Personas.nombre(a.responsableId)+'</td>'
             +'<td>'+(a.estado==="hecha"?UI.badge("b-ok","Hecha"):UI.badge("b-warn","Pendiente"))+'</td>'
             +'<td class="r">'+(a.estado==="pendiente"
               ?'<button class="btn" data-act-ok="'+a.id+'">Marcar hecha</button>':'')+'</td></tr>';}).join("")
@@ -1911,7 +1983,7 @@ function vOperaciones(){
             +'<td>'+(c?c.n:"—")+'</td>'
             +'<td>'+UI.badge("b-neutral",o.tipo==="imp"?"Importación":"Exportación")+'</td>'
             +'<td class="t-sub">'+o.ruta+'</td><td class="r mono">'+Fmt.num(o.peso)+' kg</td>'
-            +'<td>'+UI.pair(Operaciones.UI.badge(o.estado))+'</td>'
+            +'<td>'+UI.pair(Operaciones.badge(o.estado))+'</td>'
             +'<td class="r mono">'+Documentos.all().filter(function(d){return d.op===o.id;}).length+'</td></tr>';}).join("")
         ||UI.empty(7,"Sin operaciones"))
     + '</div>';
@@ -2485,8 +2557,10 @@ function modalProspecto(){
     var n=Dom.byId("p-n").value.trim(),nit=Dom.byId("p-nit").value.trim();
     if(n.length<3||nit.length<5){Dom.byId("p-err").textContent="Razón social y NIT son obligatorios.";return;}
     var id="C"+(100+Seed.CLIENTES.length);
+    var sesionPersona=Personas.byId(Session.personaId());
+    var ejecutivoId=sesionPersona&&sesionPersona.areaId==="AR-COM"?sesionPersona.id:"P01";
     Seed.CLIENTES.push({id:id,n:n,nit:nit,ciudad:Dom.byId("p-ciudad").value,tipo:Dom.byId("p-tipo").value,
-      etapa:"prospecto",ejecutivo:Session.nombre(),desde:"—",serv:[],ultima:HOY,proximo:"—",
+      etapa:"prospecto",ejecutivoId:ejecutivoId,desde:"—",serv:[],ultima:HOY,proximo:"—",
       contactos:[{n:Dom.byId("p-c").value||"—",c:"Contacto",t:"—",m:Dom.byId("p-m").value||"—"}]});
     Modal.close();State.cliOpen=id;State.cliTab="resumen";State.mod="clientes";
     Router.refresh();Toast.show("Prospecto "+n+" creado");});
@@ -2500,7 +2574,9 @@ function modalActividad(){
       +Object.keys(Seed.ACT_TIPOS).map(function(k){return '<option value="'+k+'">'+Seed.ACT_TIPOS[k]+'</option>';}).join("")
       +'</select></label>'
     +'<label class="fld"><span class="eyebrow">Fecha</span><input id="a-f" type="text" value="25 sep 2026"></label>'
-    +'<label class="fld"><span class="eyebrow">Responsable</span><input id="a-r" type="text" value="'+Session.nombre()+'"></label>'
+    +'<label class="fld"><span class="eyebrow">Responsable</span><select id="a-r">'
+      +Personas.activas().map(function(p){return '<option value="'+p.id+'"'
+        +(p.id===(Session.personaId()||"P01")?' selected':'')+'>'+p.n+'</option>';}).join("")+'</select></label>'
     +'</div>'
     +'<label class="fld" style="margin-top:14px"><span class="eyebrow">Asunto</span>'
     +'<input id="a-as" type="text" placeholder="Asunto de la actividad"></label>'
@@ -2512,7 +2588,7 @@ function modalActividad(){
     var as=Dom.byId("a-as").value.trim();
     if(as.length<3){Dom.byId("a-err").textContent="El asunto es obligatorio.";return;}
     Seed.ACTIVIDADES.unshift({id:"A-"+(300+Seed.ACTIVIDADES.length),cli:Dom.byId("a-cli").value,tipo:Dom.byId("a-tipo").value,
-      fecha:Dom.byId("a-f").value,asunto:as,estado:"pendiente",resp:Dom.byId("a-r").value});
+      fecha:Dom.byId("a-f").value,asunto:as,estado:"pendiente",responsableId:Dom.byId("a-r").value});
     Modal.close();Router.refresh();Toast.show("Actividad registrada");});
 }
 function modalDemanda(cli){
