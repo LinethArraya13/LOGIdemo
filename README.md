@@ -28,6 +28,17 @@ En Linux o macOS también puede usarse `python3 serve.py`.
 node build.mjs     # genera public/index.html
 ```
 
+## Prueba de humo
+
+En Windows, con Edge o Chrome instalado:
+
+```powershell
+node smoke-test.mjs
+```
+
+La prueba levanta el servidor y recorre automáticamente login, Personal,
+Finanzas, la ficha financiera de una operación y la restricción del rol Cliente.
+
 ## Despliegue
 
 El proyecto está conectado a Vercel vía GitHub: **cada `git push` a `main`

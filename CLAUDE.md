@@ -37,6 +37,9 @@ python serve.py      # http://127.0.0.1:5173
 Sin dependencias, sin npm. En Linux/macOS puede ser `python3 serve.py`.
 Guardás `artifact.html`, refrescás, listo.
 
+Antes de entregar, ejecutar `node build.mjs` y, en Windows con Edge o Chrome,
+`node smoke-test.mjs`.
+
 ## Cómo republicar el artifact
 
 Está publicado en https://claude.ai/artifact/BzNikeXusGGyfb2Rqwa975
