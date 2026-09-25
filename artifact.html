@@ -721,7 +721,7 @@ var State={
   reset:function(){
     this.cliOpen=null;this.opOpen=null;this.demOpen=null;this.viaOpen=null;
     this.traOpen=null;this.perOpen=null;
-    this.docPage=1;this.q="";}
+    this.cliTab="resumen";this.opTab="resumen";this.docPage=1;this.q="";}
 };
 var Seed={
   AREAS: [
@@ -1177,6 +1177,17 @@ var Personas=(function(){
   return r;
 })();
 
+var GestionPersonal={
+  reasignar:function(origenId,destinoId){
+    var n=0;
+    Seed.CLIENTES.forEach(function(c){if(c.ejecutivoId===origenId){c.ejecutivoId=destinoId;n++;}});
+    Seed.ACTIVIDADES.forEach(function(a){if(a.responsableId===origenId&&a.estado==="pendiente"){a.responsableId=destinoId;n++;}});
+    Seed.OPERACIONES.forEach(function(o){if(o.responsableId===origenId&&o.estado!=="cerrada"){o.responsableId=destinoId;n++;}});
+    Seed.AREAS.forEach(function(a){if(a.responsableId===origenId)a.responsableId=destinoId;});
+    Seed.PERSONAS.forEach(function(p){if(p.jefeId===origenId)p.jefeId=destinoId;});
+    return n;}
+};
+
 var Clientes=(function(){
   var r=Repo(Seed.CLIENTES);
   r.etapa=function(id){
@@ -1564,9 +1575,39 @@ var Certificaciones={
 
 Tracking.init();
 
+function vDashAdministracion(){
+  var r=Finanzas.resumen(Finanzas.all());
+  var pendientes=Finanzas.all().filter(function(m){return m.estado!=="pagado"&&m.estado!=="anulado";});
+  var conFin=Operaciones.all().filter(function(o){return Finanzas.deOperacion(o.id).length;});
+  var altas=Personas.activas().filter(function(p){return Personas.carga(p.id)>=9;});
+  return UI.head({eyebrow:"DMS Bolivia S.R.L.",t:"Administración y Contabilidad",
+      meta:UI.pill("Hoy",HOY)+UI.pill("Responsable",Personas.nombre(Session.personaId()))})
+    +UI.tiles([{k:"Por cobrar",v:Fmt.money(r.porCobrar),n:Finanzas.vencidos().length+" cuenta vencida"},
+      {k:"Por pagar",v:Fmt.money(r.porPagar),n:"Operación y gastos generales"},
+      {k:"Resultado proyectado",v:Fmt.money(r.margen),n:"Antes de impuestos"},
+      {k:"Cobertura financiera",v:conFin.length+"/"+Operaciones.count(),n:"Operaciones con movimientos"},
+      {k:"Equipo activo",v:String(Personas.activas().length),n:Areas.count()+" áreas"},
+      {k:"Carga alta",v:String(altas.length),n:"Requiere redistribución"}])
+    +(Finanzas.vencidos().length?UI.alert("Cobranza vencida por "+Fmt.money(Finanzas.resumen(Finanzas.vencidos()).porCobrar),
+      "Abrir Finanzas para revisar cliente, operación y vencimiento."):"")
+    +(Operaciones.count()-conFin.length?UI.alert((Operaciones.count()-conFin.length)+" operaciones sin registro financiero",
+      "El control detecta servicios que todavía no tienen cobro ni costo asociado.","good"):"")
+    +'<div class="grid2">'
+    +UI.card("Compromisos pendientes",UI.table([{t:"Vence"},{t:"Concepto"},{t:"Tipo"},{t:"Saldo",r:true},{t:"Estado"}],
+      pendientes.slice(0,7).map(function(m){return '<tr><td class="mono t-sub">'+m.vence+'</td><td class="t-strong">'+m.concepto+'</td>'
+        +'<td>'+m.tipo+'</td><td class="r mono">'+Fmt.money(Finanzas.base(m)-Finanzas.pagadoBase(m))+'</td><td>'+UI.pair(Finanzas.estado(m.estado))+'</td></tr>';}).join("")),
+      '<button class="btn" data-go="finanzas">Ver Finanzas</button>')
+    +UI.card("Carga del equipo",UI.table([{t:"Persona"},{t:"Área"},{t:"Carga"},{t:"Estado"}],
+      Personas.activas().slice().sort(function(a,b){return Personas.carga(b.id)-Personas.carga(a.id);}).map(function(p){
+        return '<tr class="clickable" data-per="'+p.id+'"><td class="t-strong">'+p.n+'</td><td>'+Areas.nombre(p.areaId)+'</td>'
+          +'<td class="mono">'+Personas.carga(p.id)+'</td><td>'+UI.pair(cargaPersona(p))+'</td></tr>';}).join("")),
+      '<button class="btn" data-go="personal">Ver Personal</button>')+'</div>';
+}
+
 function vDashboard(){
   if(Session.clienteId()) return vDashCliente();
   if(Session.traId()) return vDashTransportista();
+  if(Session.id()==="adm") return vDashAdministracion();
   var act=Seed.CLIENTES.filter(function(c){return c.etapa==="activo"||c.etapa==="fidelizacion";});
   var pros=Seed.CLIENTES.filter(function(c){return c.etapa==="prospecto"||c.etapa==="contactado";});
   var opAb=Seed.OPORTUNIDADES.filter(function(o){return o.etapa!=="activo";});
@@ -1584,8 +1625,9 @@ function vDashboard(){
     var o=Seed.OPORTUNIDADES.filter(function(x){return x.etapa===e.id;});
     return {n:e.n,c:o.length,v:o.reduce(function(a,x){return a+x.valor;},0)};});
 
-  return UI.head({eyebrow:"DMS Bolivia State.R.L.",t:"Dashboard",
-      meta:UI.pill("Hoy",HOY)+UI.pill("Ejecutivo","Ana Quispe")})
+  var fin=Finanzas.resumen(Finanzas.all());
+  return UI.head({eyebrow:"DMS Bolivia S.R.L.",t:"Dashboard",
+      meta:UI.pill("Hoy",HOY)+UI.pill("Responsable",Personas.nombre(Session.personaId()))})
     + UI.tiles([
       {k:"Clientes",v:String(Seed.CLIENTES.length),n:act.length+" activos"},
       {k:"Prospectos",v:String(pros.length),n:"En captación"},
@@ -1600,6 +1642,10 @@ function vDashboard(){
       {k:"Transportistas libres",v:String(dispo.length)+"/"+Seed.TRANSPORTISTAS.length,n:"Certificados y disponibles"},
       {k:"Entrega a tiempo",v:String(Math.round(Seed.PERF.aTiempo/Seed.PERF.total*100)),u:"%",n:Seed.PERF.periodo},
       {k:"Tránsito medio",v:String(Seed.PERF.horas),u:" h",n:"Puerta a puerta"}])
+    +(Session.puede("finanzas")?UI.tiles([
+      {k:"Por cobrar",v:Fmt.money(fin.porCobrar),n:Finanzas.vencidos().length+" vencida"},
+      {k:"Por pagar",v:Fmt.money(fin.porPagar),n:"Incluye gastos generales"},
+      {k:"Resultado proyectado",v:Fmt.money(fin.margen),n:"Antes de impuestos"}]):"")
     + (inci.length?UI.alert(inci.length+" viaje con incidencia activa",
         inci.map(function(v){return v.id+" · "+v.inc;}).join(" "),""):"")
     + '<div class="grid2">'
@@ -1682,16 +1728,17 @@ function vClientes(){
     + '<div class="card"><div class="card-body" style="padding-bottom:12px">'
     + '<input id="q" type="search" value="'+Fmt.esc(State.q)+'" placeholder="Buscar por nombre, NIT, ciudad…" style="max-width:380px">'
     + '<div class="chips" style="margin-top:12px">'+chips+'</div></div>'
-    + UI.table([{t:"Cliente"},{t:"Tipo"},{t:"Ciudad"},{t:"Etapa"},{t:"Servicios",r:true},{t:"Docs",r:true},{t:"Próximo seg."}],
+    + UI.table([{t:"Cliente"},{t:"Tipo"},{t:"Ciudad"},{t:"Ejecutivo"},{t:"Etapa"},{t:"Servicios",r:true},{t:"Docs",r:true},{t:"Próximo seg."}],
         lista.map(function(c){
           return '<tr class="clickable" data-cli="'+c.id+'">'
             +'<td class="t-strong">'+c.n+'<div class="t-sub mono">'+c.nit+'</div></td>'
             +'<td class="t-sub">'+c.tipo+'</td><td class="t-sub">'+c.ciudad+'</td>'
+            +'<td class="t-sub">'+Personas.nombre(c.ejecutivoId)+'</td>'
             +'<td>'+UI.pair(Clientes.badgeEtapa(c.etapa))+'</td>'
             +'<td class="r mono">'+c.serv.length+'</td>'
             +'<td class="r mono">'+Documentos.deCliente(c.id).length+'</td>'
             +'<td class="mono t-sub">'+c.proximo+'</td></tr>';}).join("")
-        ||UI.empty(7,"Sin resultados"))
+        ||UI.empty(8,"Sin resultados"))
     + '</div>';
 }
 
@@ -2075,7 +2122,7 @@ function vOperacion(id){
   }
   return '<button class="back" data-back="operaciones">← Operaciones</button>'
     +UI.head({eyebrow:c?c.n:"Operación",t:o.id,meta:UI.pair(Operaciones.badge(o.estado))+UI.pill("Responsable",Personas.nombre(o.responsableId)),
-      act:puedeFin?'<button class="btn btn-primary" data-movop="'+o.id+'">+ Movimiento</button>':''})+nav+body;
+      act:Session.id()==="adm"?'<button class="btn btn-primary" data-movop="'+o.id+'">+ Movimiento</button>':''})+nav+body;
 }
 
 function vOperaciones(){
@@ -2093,16 +2140,17 @@ function vOperaciones(){
   return UI.head({eyebrow:"Operaciones",t:"Operaciones",
       meta:UI.pill("Total",ops.length)+UI.pill("Abiertas",ops.filter(function(o){return o.estado!=="cerrada";}).length)})
     + '<div class="card"><div class="card-body" style="padding-bottom:12px"><div class="chips">'+chips+'</div></div>'
-    + UI.table([{t:"Operación"},{t:"Cliente"},{t:"Tipo"},{t:"Ruta"},{t:"Peso",r:true},{t:"Estado"},{t:"Docs",r:true}],
+    + UI.table([{t:"Operación"},{t:"Cliente"},{t:"Tipo"},{t:"Ruta"},{t:"Peso",r:true},{t:"Responsable"},{t:"Estado"},{t:"Docs",r:true}],
         lista.map(function(o){
           var c=Clientes.byId(o.cli);
           return '<tr class="clickable" data-op="'+o.id+'"><td class="mono t-strong">'+o.id+'</td>'
             +'<td>'+(c?c.n:"—")+'</td>'
             +'<td>'+UI.badge("b-neutral",o.tipo==="imp"?"Importación":"Exportación")+'</td>'
             +'<td class="t-sub">'+o.ruta+'</td><td class="r mono">'+Fmt.num(o.peso)+' kg</td>'
+            +'<td class="t-sub">'+Personas.nombre(o.responsableId)+'</td>'
             +'<td>'+UI.pair(Operaciones.badge(o.estado))+'</td>'
             +'<td class="r mono">'+Documentos.all().filter(function(d){return d.op===o.id;}).length+'</td></tr>';}).join("")
-        ||UI.empty(7,"Sin operaciones"))
+        ||UI.empty(8,"Sin operaciones"))
     + '</div>';
 }
 
@@ -2362,6 +2410,7 @@ function cargaPersona(p){
 
 function vFinanzas(){
   var todos=Finanzas.all(),r=Finanzas.resumen(todos);
+  var sinFin=Operaciones.all().filter(function(o){return !Finanzas.deOperacion(o.id).length;});
   var lista=todos.filter(function(m){
     if(State.filtro==="todos")return true;
     if(State.filtro==="vencido")return m.estado==="vencido";
@@ -2378,9 +2427,11 @@ function vFinanzas(){
   var generales=Finanzas.resumen(Finanzas.generales());
   return UI.head({eyebrow:"Administración",t:"Finanzas",
       meta:UI.pill("Moneda base","BOB")+UI.pill("Tipo de cambio demo","6,96 BOB/USD"),
-      act:'<button class="btn btn-primary" id="btn-nuevo-mov">+ Nuevo movimiento</button>'})
+      act:Session.id()==="adm"?'<button class="btn btn-primary" id="btn-nuevo-mov">+ Nuevo movimiento</button>':''})
     +(Finanzas.vencidos().length?UI.alert(Finanzas.vencidos().length+" cuenta vencida",
       "Requiere seguimiento de cobranza. El vencimiento no bloquea la operación."):"")
+    +(sinFin.length?UI.alert(sinFin.length+" operaciones sin movimientos",
+      "Posible fuga de facturación: todavía no tienen honorarios ni costos registrados.","good"):"")
     +UI.tiles([{k:"Ingresos previstos",v:Fmt.money(r.ingresos),n:Fmt.money(r.cobrado)+" cobrados"},
       {k:"Por cobrar",v:Fmt.money(r.porCobrar),n:"Incluye saldos parciales"},
       {k:"Egresos previstos",v:Fmt.money(r.egresos),n:Fmt.money(r.pagado)+" pagados"},
@@ -2429,10 +2480,11 @@ function vPersonal(){
     var ps=Personas.deArea(a.id),resp=Personas.nombre(a.responsableId);
     return '<div class="kvrow"><span><b>'+a.n+'</b><small class="t-sub" style="display:block">Responsable: '
       +resp+'</small></span><span class="mono">'+ps.filter(function(p){return p.estado==="activo";}).length+' activas</span></div>';}).join("");
+  var gestiona=Session.id()==="adm"||Session.id()==="ger";
   return UI.head({eyebrow:"Administración",t:"Personal",
       meta:UI.pill("Equipo activo",Personas.activas().length)+UI.pill("Áreas",Areas.count())
         +UI.pill("Carga alta",altas.length),
-      act:'<button class="btn btn-primary" id="btn-nueva-per">+ Nueva persona</button>'})
+      act:gestiona?'<button class="btn btn-primary" id="btn-nueva-per">+ Nueva persona</button>':''})
     +(altas.length?UI.alert("Carga concentrada en "+altas.length+" persona"+(altas.length>1?"s":""),
       altas.map(function(p){return p.n+" ("+Personas.carga(p.id)+")";}).join(" · ")):"")
     +'<div class="grid2">'+UI.card("Equipo",'<div class="card-body"><input id="q" type="search" value="'
@@ -2448,11 +2500,12 @@ function vPersona(id){
   var pend=acts.filter(function(a){return a.estado==="pendiente";});
   var ab=ops.filter(function(o){return o.estado!=="cerrada";});
   var jefe=p.jefeId?Personas.nombre(p.jefeId):"—";
+  var gestiona=Session.id()==="adm"||Session.id()==="ger";
   return '<button class="back" data-back="personal">← Personal</button>'
     +UI.head({eyebrow:Areas.nombre(p.areaId),t:p.n,
       meta:UI.pair(cargaPersona(p))+(p.estado==="activo"?UI.badge("b-ok","Activa"):UI.badge("b-neutral","Inactiva")),
-      act:'<button class="btn" data-editper="'+p.id+'">Editar</button>'
-        +'<button class="btn" data-toggleper="'+p.id+'">'+(p.estado==="activo"?"Desactivar":"Reactivar")+'</button>'})
+      act:gestiona?'<button class="btn" data-editper="'+p.id+'">Editar</button>'
+        +'<button class="btn" data-toggleper="'+p.id+'">'+(p.estado==="activo"?"Desactivar":"Reactivar")+'</button>':''})
     +UI.tiles([{k:"Clientes",v:String(cls.length),n:"Bajo su responsabilidad"},
       {k:"Tareas pendientes",v:String(pend.length),n:acts.length+" actividades totales"},
       {k:"Operaciones abiertas",v:String(ab.length),n:ops.length+" asignadas"},
@@ -2780,7 +2833,7 @@ function vPublico(code){
 function modalProspecto(){
   Modal.open("Nuevo prospecto",
     '<div class="form-grid">'
-    +'<label class="fld"><span class="eyebrow">Razón social</span><input id="p-n" type="text" placeholder="Empresa State.R.L."></label>'
+    +'<label class="fld"><span class="eyebrow">Razón social</span><input id="p-n" type="text" placeholder="Empresa S.R.L."></label>'
     +'<label class="fld"><span class="eyebrow">NIT</span><input id="p-nit" type="text" placeholder="1012345670"></label>'
     +'<label class="fld"><span class="eyebrow">Ciudad</span><select id="p-ciudad">'
       +["La Paz","El Alto","Santa Cruz","Cochabamba","Oruro","Trinidad"].map(function(c){
@@ -2789,6 +2842,9 @@ function modalProspecto(){
       +'<option>Importador</option><option>Exportador</option><option>Importador y exportador</option></select></label>'
     +'<label class="fld"><span class="eyebrow">Contacto</span><input id="p-c" type="text" placeholder="Nombre"></label>'
     +'<label class="fld"><span class="eyebrow">Correo</span><input id="p-m" type="text" placeholder="contacto@empresa.demo"></label>'
+    +'<label class="fld"><span class="eyebrow">Ejecutivo</span><select id="p-eje">'
+      +Personas.activas().filter(function(p){return p.areaId==="AR-COM"||p.areaId==="AR-GER";}).map(function(p){
+        return '<option value="'+p.id+'">'+p.n+'</option>';}).join("")+'</select></label>'
     +'</div><div id="p-err" class="t-sub" style="color:var(--crit);margin-top:10px"></div>',
     '<button class="btn" id="m-cancel">Cancelar</button>'
     +'<button class="btn btn-primary" id="m-save">Crear prospecto</button>');
@@ -2797,10 +2853,8 @@ function modalProspecto(){
     var n=Dom.byId("p-n").value.trim(),nit=Dom.byId("p-nit").value.trim();
     if(n.length<3||nit.length<5){Dom.byId("p-err").textContent="Razón social y NIT son obligatorios.";return;}
     var id="C"+(100+Seed.CLIENTES.length);
-    var sesionPersona=Personas.byId(Session.personaId());
-    var ejecutivoId=sesionPersona&&sesionPersona.areaId==="AR-COM"?sesionPersona.id:"P01";
     Seed.CLIENTES.push({id:id,n:n,nit:nit,ciudad:Dom.byId("p-ciudad").value,tipo:Dom.byId("p-tipo").value,
-      etapa:"prospecto",ejecutivoId:ejecutivoId,desde:"—",serv:[],ultima:HOY,proximo:"—",
+      etapa:"prospecto",ejecutivoId:Dom.byId("p-eje").value,desde:"—",serv:[],ultima:HOY,proximo:"—",
       contactos:[{n:Dom.byId("p-c").value||"—",c:"Contacto",t:"—",m:Dom.byId("p-m").value||"—"}]});
     Modal.close();State.cliOpen=id;State.cliTab="resumen";State.mod="clientes";
     Router.refresh();Toast.show("Prospecto "+n+" creado");});
@@ -2876,7 +2930,7 @@ function modalDemanda(cli){
 function modalTransportista(){
   Modal.open("Registrar transportista",
     '<div class="form-grid">'
-    +'<label class="fld"><span class="eyebrow">Empresa</span><input id="t-n" type="text" placeholder="Transportes State.R.L."></label>'
+    +'<label class="fld"><span class="eyebrow">Empresa</span><input id="t-n" type="text" placeholder="Transportes S.R.L."></label>'
     +'<label class="fld"><span class="eyebrow">Contacto</span><input id="t-c" type="text" placeholder="Nombre"></label>'
     +'<label class="fld"><span class="eyebrow">Teléfono</span><input id="t-t" type="text" placeholder="+591 7 000-0000"></label>'
     +'<label class="fld"><span class="eyebrow">Base</span><select id="t-b">'
@@ -2935,6 +2989,22 @@ function modalMovimiento(opId){
     Router.refresh();Toast.show("Movimiento "+m.id+" registrado");});
 }
 
+function modalReasignarPersona(id){
+  var p=Personas.byId(id);if(!p)return;
+  var destinos=Personas.activas().filter(function(x){return x.id!==id;});
+  Modal.open("Reasignar antes de desactivar",
+    UI.alert(p.n+" tiene "+Personas.carga(id)+" asignaciones activas",
+      "Los clientes, tareas pendientes y operaciones abiertas deben conservar un responsable.")
+    +'<label class="fld" style="margin-top:16px"><span class="eyebrow">Transferir responsabilidad a</span><select id="reas-d">'
+      +destinos.map(function(x){return '<option value="'+x.id+'">'+x.n+' · '+Areas.nombre(x.areaId)+'</option>';}).join("")+'</select></label>'
+    +'<p class="t-sub" style="margin-top:12px">Las actividades y operaciones cerradas permanecen asociadas a '+p.n+' para conservar el historial.</p>',
+    '<button class="btn" id="m-cancel">Cancelar</button><button class="btn btn-primary" id="m-save">Reasignar y desactivar</button>');
+  Dom.on(Dom.byId("m-save"),"click",function(){
+    var destino=Dom.byId("reas-d").value,n=GestionPersonal.reasignar(id,destino);
+    p.estado="inactivo";Modal.close();Router.refresh();
+    Toast.show(n+" asignaciones transferidas a "+Personas.nombre(destino));});
+}
+
 function modalPersona(id){
   var p=id?Personas.byId(id):null;
   var cargoId=p?p.cargoId:"CG-EJE",perfilId=p?p.perfilId:"PF-OPE";
@@ -2968,7 +3038,7 @@ var Modales={
   doc:modalDoc, subir:modalSubir, pod:modalPOD, incidencia:modalIncidencia,
   prospecto:modalProspecto, actividad:modalActividad,
   demanda:modalDemanda, transportista:modalTransportista, persona:modalPersona,
-  movimiento:modalMovimiento
+  movimiento:modalMovimiento, reasignarPersona:modalReasignarPersona
 };
 
 function guardarPOD(vid){
@@ -3057,6 +3127,7 @@ var Actions={
   editper:function(el){Modales.persona(el.getAttribute("data-editper"));},
   toggleper:function(el){
     var p=Personas.byId(el.getAttribute("data-toggleper"));if(!p)return;
+    if(p.estado==="activo"&&Personas.carga(p.id)>0){Modales.reasignarPersona(p.id);return;}
     p.estado=p.estado==="activo"?"inactivo":"activo";Router.refresh();
     Toast.show(p.n+" quedó "+(p.estado==="activo"?"activa":"inactiva"));},
   movop:function(el){Modales.movimiento(el.getAttribute("data-movop"));},
@@ -3151,7 +3222,7 @@ var Router={
     Dom.html("content",view?view():"");
     Router.wire();},
   refresh:function(){Nav.render();Router.render();window.scrollTo(0,0);},
-  go:function(m){State.mod=m;State.reset();Router.refresh();},
+  go:function(m){State.mod=m;State.reset();State.filtro="todos";Router.refresh();},
   wire:function(){
     var root=Dom.byId("content");
     Object.keys(Actions).forEach(function(k){
