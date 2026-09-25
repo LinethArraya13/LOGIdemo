@@ -703,6 +703,9 @@ var Session=(function(){
     id:function(){return rol?rol.id:null;},
     nombre:function(){return rol?rol.name:"";},
     entidad:function(){return rol?rol.entidad:"";},
+    actor:function(){
+      if(!rol)return "";
+      return rol.personaId?Personas.nombre(rol.personaId):rol.entidad;},
     modulos:function(){var p=perfil();return p?p.mods:(rol&&rol.mods?rol.mods:[]);},
     puede:function(m){return Session.modulos().indexOf(m)>=0;},
     perfil:function(){return perfil();},
@@ -1287,6 +1290,10 @@ var Documentos=(function(){
   r.peso=function(list){return (list||r.all()).reduce(function(a,d){return a+d.size;},0);};
   r.esDuplicado=function(op,nombre){
     return r.all().some(function(d){return d.op===op&&d.n===nombre;});};
+  r.revisar=function(id,estado,observacion){
+    var d=r.byId(id);if(!d)return null;
+    d.estado=estado;d.revisadoPor=Session.actor();d.fechaRevision=HOY;
+    d.observacion=observacion||"Sin observaciones";return d;};
   r.filtrar=function(base,f){
     var q=(f.q||"").toLowerCase();
     return base.filter(function(d){
@@ -2034,13 +2041,16 @@ function listarArchivos(files){
 function subirArchivos(cli){
   var op=Dom.byId("f-upop")?Dom.byId("f-upop").value:"";
   var cat=Dom.byId("f-upcat")?Dom.byId("f-upcat").value:"factura";
-  var lote=pendientesSubida.length?pendientesSubida
-    :[{n:"documento_"+Date.now()+".pdf",size:2.4},{n:"anexo_"+Date.now()+".pdf",size:5.1}];
+  var operacion=Operaciones.byId(op);
+  if(!operacion){Toast.show("Seleccioná una operación válida");return;}
+  if(!pendientesSubida.length){Toast.show("Seleccioná al menos un archivo");return;}
+  cli=operacion.cli;
+  var lote=pendientesSubida;
   var nuevos=0,dups=0;
   lote.forEach(function(f){
     var existe=Documentos.all().some(function(d){return d.op===op&&d.n===f.n;});
     Documentos.all().push({id:"D"+(9000+Documentos.all().length),cli:cli,op:op,cat:cat,fmt:Documentos.categoria(cat).fmt,
-      n:f.n,size:f.size,estado:"pendiente",fecha:"22 sep 2026",por:Session.nombre(),dup:existe});
+      n:f.n,size:f.size,estado:"pendiente",fecha:HOY,por:Session.actor(),dup:existe});
     if(existe) dups++; else nuevos++;});
   pendientesSubida=[];
   Modal.close();
@@ -2062,12 +2072,36 @@ function modalDoc(id){
     +'<div class="kvrow"><span>Tamaño</span><span class="mono">'+Fmt.size(d.size)+'</span></div>'
     +'<div class="kvrow"><span>Subido</span><span>'+d.fecha+' · '+d.por+'</span></div>'
     +'<div class="kvrow"><span>Estado</span><span>'+UI.pair(Seed.DOC_ESTADOS[d.estado])+'</span></div>'
+    +(d.revisadoPor?'<div class="kvrow"><span>Revisión</span><span>'+d.fechaRevision+' · '+d.revisadoPor+'</span></div>':'')
+    +(d.observacion?'<div class="kvrow"><span>Observación</span><span>'+Fmt.esc(d.observacion)+'</span></div>':'')
     +(d.dup?'<div class="kvrow"><span>Duplicado</span><span>'+UI.badge("b-warn","Mismo nombre en la operación")+'</span></div>':'')
     +'</div>',
-    (d.estado==="pendiente"
+    (d.estado==="pendiente"&&Session.esInterno()&&Session.puede("documentos")
       ?'<button class="btn" data-doc-rech="'+d.id+'">Rechazar</button>'
        +'<button class="btn btn-primary" data-doc-ok="'+d.id+'">Aprobar</button>'
-      :'<button class="btn" id="m-cancel">Cerrar</button>'));
+      :'<button class="btn" id="m-cancel">Cerrar</button>'),function(){
+        Dom.on(document.querySelector("[data-doc-ok]"),"click",function(){
+          var x=Documentos.revisar(d.id,"aprobado","Documento validado");
+          Modal.close();Router.refresh();Toast.show(x.n+" aprobado por "+x.revisadoPor);});
+        Dom.on(document.querySelector("[data-doc-rech]"),"click",function(){
+          Modal.close();modalRechazoDoc(d.id);});
+      });
+}
+
+function modalRechazoDoc(id){
+  var d=Documentos.byId(id);if(!d)return;
+  Modal.open("Rechazar documento",
+    '<p class="t-sub">La observación quedará visible en el expediente.</p>'
+    +'<label class="fld" style="margin-top:14px"><span class="eyebrow">Motivo</span>'
+    +'<textarea id="doc-obs" rows="4" placeholder="Ej.: imagen ilegible o documento incompleto"></textarea></label>'
+    +'<div id="doc-err" class="t-sub" style="color:var(--crit);margin-top:8px"></div>',
+    '<button class="btn" id="m-cancel">Cancelar</button><button class="btn btn-primary" id="m-save">Confirmar rechazo</button>',function(){
+      Dom.on(Dom.byId("m-save"),"click",function(){
+        var obs=Dom.byId("doc-obs").value.trim();
+        if(obs.length<5){Dom.byId("doc-err").textContent="Indicá un motivo de al menos 5 caracteres.";return;}
+        var x=Documentos.revisar(id,"rechazado",obs);
+        Modal.close();Router.refresh();Toast.show(x.n+" rechazado con observación");});
+    });
 }
 
 function tablaFin(lista,acciones){
