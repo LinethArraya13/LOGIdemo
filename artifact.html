@@ -1090,12 +1090,14 @@ var Seed={
   mods:[]}],
   MODS: {dashboard:"Dashboard",clientes:"Clientes",pipeline:"Pipeline",actividades:"Actividades",
  documentos:"Documentos",operaciones:"Operaciones",demandas:"Demandas de carga",viajes:"Viajes",
- directorio:"Directorio",certificaciones:"Certificaciones",reportes:"Reportes",misviajes:"Mis viajes"},
+ directorio:"Directorio",certificaciones:"Certificaciones",personal:"Personal",finanzas:"Finanzas",
+ reportes:"Reportes",misviajes:"Mis viajes"},
   GRUPOS: [
  {t:"General",items:["dashboard"]},
  {t:"CRM",items:["clientes","pipeline","actividades","documentos"]},
  {t:"Operaciones",items:["operaciones","demandas","viajes","misviajes"]},
  {t:"Transportistas",items:["directorio","certificaciones"]},
+ {t:"Administración",items:["personal","finanzas"]},
  {t:"Análisis",items:["reportes"]}],
 };
 
@@ -2236,6 +2238,90 @@ function vCertificaciones(){
     + '</div>';
 }
 
+function cargaPersona(p){
+  var n=Personas.carga(p.id);
+  if(n>=9) return ["b-crit","Alta · "+n];
+  if(n>=5) return ["b-warn","Media · "+n];
+  return ["b-ok","Normal · "+n];
+}
+
+function vPersonal(){
+  if(State.perOpen) return vPersona(State.perOpen);
+  var q=State.q.toLowerCase();
+  var lista=Personas.all().filter(function(p){
+    if(State.filtro!=="todos"&&p.estado!==State.filtro) return false;
+    if(q.length<2) return true;
+    return (p.n+" "+p.mail+" "+Areas.nombre(p.areaId)+" "+Cargos.nombre(p.cargoId)).toLowerCase().indexOf(q)>=0;});
+  var altas=Personas.activas().filter(function(p){return Personas.carga(p.id)>=9;});
+  var chips=UI.chips([
+    ["todos","Todas",Personas.count()],
+    ["activo","Activas",Personas.count(function(p){return p.estado==="activo";})],
+    ["inactivo","Inactivas",Personas.count(function(p){return p.estado==="inactivo";})]
+  ],State.filtro,"filtro");
+  var tabla=UI.table([{t:"Persona"},{t:"Cargo"},{t:"Área"},{t:"Clientes",r:true},
+      {t:"Tareas pend.",r:true},{t:"Operaciones",r:true},{t:"Carga"},{t:"Acceso"},{t:"Estado"}],
+    lista.map(function(p){
+      var acts=Personas.actividades(p.id).filter(function(a){return a.estado==="pendiente";});
+      var ops=Personas.operaciones(p.id).filter(function(o){return o.estado!=="cerrada";});
+      return '<tr class="clickable" data-per="'+p.id+'"><td class="t-strong">'+p.n
+        +'<div class="t-sub">'+p.mail+'</div></td><td>'+Cargos.nombre(p.cargoId)+'</td>'
+        +'<td class="t-sub">'+Areas.nombre(p.areaId)+'</td>'
+        +'<td class="r mono">'+Personas.clientes(p.id).length+'</td>'
+        +'<td class="r mono">'+acts.length+'</td><td class="r mono">'+ops.length+'</td>'
+        +'<td>'+UI.pair(cargaPersona(p))+'</td><td class="t-sub">'+Perfiles.nombre(p.perfilId)+'</td>'
+        +'<td>'+(p.estado==="activo"?UI.badge("b-ok","Activa"):UI.badge("b-neutral","Inactiva"))+'</td></tr>';}).join("")
+      ||UI.empty(9,"Sin personas para este filtro"));
+  var areas=Seed.AREAS.map(function(a){
+    var ps=Personas.deArea(a.id),resp=Personas.nombre(a.responsableId);
+    return '<div class="kvrow"><span><b>'+a.n+'</b><small class="t-sub" style="display:block">Responsable: '
+      +resp+'</small></span><span class="mono">'+ps.filter(function(p){return p.estado==="activo";}).length+' activas</span></div>';}).join("");
+  return UI.head({eyebrow:"Administración",t:"Personal",
+      meta:UI.pill("Equipo activo",Personas.activas().length)+UI.pill("Áreas",Areas.count())
+        +UI.pill("Carga alta",altas.length),
+      act:'<button class="btn btn-primary" id="btn-nueva-per">+ Nueva persona</button>'})
+    +(altas.length?UI.alert("Carga concentrada en "+altas.length+" persona"+(altas.length>1?"s":""),
+      altas.map(function(p){return p.n+" ("+Personas.carga(p.id)+")";}).join(" · ")):"")
+    +'<div class="grid2">'+UI.card("Equipo",'<div class="card-body"><input id="q" type="search" value="'
+      +Fmt.esc(State.q)+'" placeholder="Buscar persona, cargo o área…"><div class="chips" style="margin-top:12px">'
+      +chips+'</div></div>')
+    +UI.card("Áreas y responsables",'<div class="card-body"><div class="kvlist">'+areas+'</div></div>')+'</div>'
+    +'<div class="card">'+tabla+'</div>';
+}
+
+function vPersona(id){
+  var p=Personas.byId(id); if(!p) return "";
+  var cls=Personas.clientes(id),acts=Personas.actividades(id),ops=Personas.operaciones(id);
+  var pend=acts.filter(function(a){return a.estado==="pendiente";});
+  var ab=ops.filter(function(o){return o.estado!=="cerrada";});
+  var jefe=p.jefeId?Personas.nombre(p.jefeId):"—";
+  return '<button class="back" data-back="personal">← Personal</button>'
+    +UI.head({eyebrow:Areas.nombre(p.areaId),t:p.n,
+      meta:UI.pair(cargaPersona(p))+(p.estado==="activo"?UI.badge("b-ok","Activa"):UI.badge("b-neutral","Inactiva")),
+      act:'<button class="btn" data-editper="'+p.id+'">Editar</button>'
+        +'<button class="btn" data-toggleper="'+p.id+'">'+(p.estado==="activo"?"Desactivar":"Reactivar")+'</button>'})
+    +UI.tiles([{k:"Clientes",v:String(cls.length),n:"Bajo su responsabilidad"},
+      {k:"Tareas pendientes",v:String(pend.length),n:acts.length+" actividades totales"},
+      {k:"Operaciones abiertas",v:String(ab.length),n:ops.length+" asignadas"},
+      {k:"Carga combinada",v:String(Personas.carga(id)),n:"Clientes + tareas + operaciones"}])
+    +'<div class="grid2">'
+    +UI.card("Datos y acceso",'<div class="card-body">'+UI.kv([
+      ["Cargo",Cargos.nombre(p.cargoId)],["Área",Areas.nombre(p.areaId)],["Responsable",jefe],
+      ["Correo",'<span class="mono">'+p.mail+'</span>'],["Teléfono",'<span class="mono">'+p.tel+'</span>'],
+      ["Ingreso",p.ingreso],["Perfil",Perfiles.nombre(p.perfilId)]])+'</div>')
+    +UI.card("Clientes asignados",UI.table([{t:"Cliente"},{t:"Etapa"},{t:"Próximo seguimiento"}],
+      cls.map(function(c){return '<tr class="clickable" data-cli="'+c.id+'"><td class="t-strong">'+c.n+'</td>'
+        +'<td>'+UI.pair(Clientes.badgeEtapa(c.etapa))+'</td><td class="mono t-sub">'+c.proximo+'</td></tr>';}).join("")
+        ||UI.empty(3,"Sin clientes asignados")))+'</div>'
+    +UI.card("Actividades",UI.table([{t:"Fecha"},{t:"Cliente"},{t:"Asunto"},{t:"Estado"}],
+      acts.slice(0,8).map(function(a){var c=Clientes.byId(a.cli);return '<tr><td class="mono t-sub">'+a.fecha+'</td>'
+        +'<td>'+(c?c.n:"—")+'</td><td>'+a.asunto+'</td><td>'+(a.estado==="hecha"?UI.badge("b-ok","Hecha"):UI.badge("b-warn","Pendiente"))+'</td></tr>';}).join("")
+        ||UI.empty(4,"Sin actividades")))
+    +UI.card("Operaciones asignadas",UI.table([{t:"Operación"},{t:"Cliente"},{t:"Ruta"},{t:"Estado"}],
+      ops.map(function(o){var c=Clientes.byId(o.cli);return '<tr class="clickable" data-op="'+o.id+'"><td class="mono t-strong">'+o.id+'</td>'
+        +'<td>'+(c?c.n:"—")+'</td><td class="t-sub">'+o.ruta+'</td><td>'+UI.pair(Operaciones.badge(o.estado))+'</td></tr>';}).join("")
+        ||UI.empty(4,"Sin operaciones asignadas")));
+}
+
 function vReportes(){
   var pct=Math.round(Seed.PERF.aTiempo/Seed.PERF.total*100);
   var valor=Seed.OPORTUNIDADES.reduce(function(a,o){return a+o.valor;},0);
@@ -2664,10 +2750,39 @@ function modalTransportista(){
     Router.refresh();Toast.show(n+" registrado · pendiente de certificación");});
 }
 
+function modalPersona(id){
+  var p=id?Personas.byId(id):null;
+  var cargoId=p?p.cargoId:"CG-EJE",perfilId=p?p.perfilId:"PF-OPE";
+  Modal.open(p?"Editar persona":"Nueva persona",
+    '<div class="form-grid">'
+    +'<label class="fld"><span class="eyebrow">Nombre completo</span><input id="per-n" type="text" value="'+Fmt.esc(p?p.n:"")+'"></label>'
+    +'<label class="fld"><span class="eyebrow">Correo</span><input id="per-m" type="email" value="'+Fmt.esc(p?p.mail:"")+'"></label>'
+    +'<label class="fld"><span class="eyebrow">Teléfono</span><input id="per-t" type="text" value="'+Fmt.esc(p?p.tel:"")+'"></label>'
+    +'<label class="fld"><span class="eyebrow">Cargo</span><select id="per-c">'
+      +Seed.CARGOS.map(function(c){return '<option value="'+c.id+'"'+(c.id===cargoId?' selected':'')+'>'+c.n+' · '+Areas.nombre(c.areaId)+'</option>';}).join("")+'</select></label>'
+    +'<label class="fld"><span class="eyebrow">Responsable directo</span><select id="per-j"><option value="">Sin responsable</option>'
+      +Personas.activas().filter(function(x){return !p||x.id!==p.id;}).map(function(x){return '<option value="'+x.id+'"'
+        +(p&&x.id===p.jefeId?' selected':'')+'>'+x.n+'</option>';}).join("")+'</select></label>'
+    +'<label class="fld"><span class="eyebrow">Perfil de acceso</span><select id="per-p">'
+      +Seed.PERFILES_ACCESO.filter(function(x){return x.n.indexOf("Cliente")<0&&x.n.indexOf("Transportista")<0;})
+        .map(function(x){return '<option value="'+x.id+'"'+(x.id===perfilId?' selected':'')+'>'+x.n+'</option>';}).join("")+'</select></label>'
+    +'</div><div id="per-err" class="t-sub" style="color:var(--crit);margin-top:10px"></div>',
+    '<button class="btn" id="m-cancel">Cancelar</button><button class="btn btn-primary" id="m-save">Guardar</button>');
+  Dom.on(Dom.byId("m-save"),"click",function(){
+    var n=Dom.byId("per-n").value.trim(),mail=Dom.byId("per-m").value.trim();
+    if(n.length<3||mail.indexOf("@")<1){Dom.byId("per-err").textContent="Nombre y correo válido son obligatorios.";return;}
+    var cargo=Cargos.byId(Dom.byId("per-c").value);
+    var data={n:n,mail:mail,tel:Dom.byId("per-t").value||"—",cargoId:cargo.id,areaId:cargo.areaId,
+      jefeId:Dom.byId("per-j").value||null,perfilId:Dom.byId("per-p").value};
+    if(p){Object.keys(data).forEach(function(k){p[k]=data[k];});}
+    else {data.id="P"+("0"+(Personas.count()+1)).slice(-2);data.ingreso=HOY;data.estado="activo";p=Personas.add(data);}
+    Modal.close();State.perOpen=p.id;State.mod="personal";Router.refresh();Toast.show(p.n+" guardada en Personal");});
+}
+
 var Modales={
   doc:modalDoc, subir:modalSubir, pod:modalPOD, incidencia:modalIncidencia,
   prospecto:modalProspecto, actividad:modalActividad,
-  demanda:modalDemanda, transportista:modalTransportista
+  demanda:modalDemanda, transportista:modalTransportista, persona:modalPersona
 };
 
 function guardarPOD(vid){
@@ -2701,7 +2816,9 @@ var Nav={
       demandas:Demandas.count(),viajes:Viajes.visibles().length,
       misviajes:Viajes.visibles().length,
       directorio:Transportistas.count(),
-      certificaciones:Transportistas.pendientesValidacion()};},
+      certificaciones:Transportistas.pendientesValidacion(),
+      personal:Personas.activas().length,
+      finanzas:0};},
   render:function(){
     var cnt=Nav.contadores(),html="";
     Nav.grupos.forEach(function(g){
@@ -2722,7 +2839,8 @@ var Routes={
   dashboard:vDashboard, clientes:vClientes, pipeline:vPipeline,
   actividades:vActividades, documentos:vDocumentos, operaciones:vOperaciones,
   demandas:vDemandas, viajes:vViajes, misviajes:vMisViajes,
-  directorio:vDirectorio, certificaciones:vCertificaciones, reportes:vReportes
+  directorio:vDirectorio, certificaciones:vCertificaciones, personal:vPersonal,
+  reportes:vReportes
 };
 
 var Publico={
@@ -2747,9 +2865,13 @@ var Actions={
   clitab:function(el){State.cliTab=el.getAttribute("data-clitab");State.docPage=1;Router.refresh();},
   op:function(el){
     var o=Operaciones.byId(el.getAttribute("data-op")); if(!o) return;
-    State.cliOpen=o.cli; State.cliTab="documentos"; State.mod="clientes";
-    State.docOp=o.id; State.docCat="todas"; State.docEstado="todos";
-    State.docQ=""; State.docPage=1; Router.refresh();},
+    State.opOpen=o.id;State.opTab="resumen";State.mod="operaciones";Router.refresh();},
+  per:function(el){State.perOpen=el.getAttribute("data-per");State.mod="personal";Router.refresh();},
+  editper:function(el){Modales.persona(el.getAttribute("data-editper"));},
+  toggleper:function(el){
+    var p=Personas.byId(el.getAttribute("data-toggleper"));if(!p)return;
+    p.estado=p.estado==="activo"?"inactivo":"activo";Router.refresh();
+    Toast.show(p.n+" quedó "+(p.estado==="activo"?"activa":"inactiva"));},
   dem:function(el){State.demOpen=el.getAttribute("data-dem");State.mod="demandas";Router.refresh();},
   via:function(el){State.viaOpen=el.getAttribute("data-via");State.mod="viajes";Router.refresh();},
   viatra:function(el){State.viaOpen=el.getAttribute("data-viatra");State.mod="misviajes";Router.refresh();},
@@ -2824,7 +2946,8 @@ var Botones={
   "btn-nuevo-cli":function(){Modales.prospecto();},
   "btn-nueva-act":function(){Modales.actividad();},
   "btn-nueva-dem":function(){Modales.demanda(null);},
-  "btn-nuevo-tra":function(){Modales.transportista();}
+  "btn-nuevo-tra":function(){Modales.transportista();},
+  "btn-nueva-per":function(){Modales.persona(null);}
 };
 
 var Router={
