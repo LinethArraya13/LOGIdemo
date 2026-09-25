@@ -839,6 +839,9 @@ var Seed={
  {id:"A-212",cli:"C002",tipo:"visita",fecha:"17 sep 2026",asunto:"Inspección de carga en planta",estado:"hecha",responsableId:"P01"},
  {id:"A-213",cli:"C005",tipo:"email",fecha:"12 sep 2026",asunto:"Confirmación de embarque a Callao",estado:"hecha",responsableId:"P02"},
  {id:"A-214",cli:"C006",tipo:"tarea",fecha:"08 sep 2026",asunto:"Cargar documentos de desaduanización",estado:"hecha",responsableId:"P01"}],
+  CRM_HIST: [
+ {id:"H-001",cli:"C001",fecha:"19 sep 2026",detalle:"Cliente mantenido en fidelización",por:"Ana Quispe"},
+ {id:"H-002",cli:"C004",fecha:"20 sep 2026",detalle:"Seguimiento operativo registrado",por:"Ana Quispe"}],
   OPERACIONES: [
  {id:"IMP-2026-0847",cli:"C004",tipo:"imp",ruta:"Arica → Tambo Quemado → La Paz",modal:"FCL 40'",peso:24100,
   merc:"Conductores eléctricos de cobre",estado:"transito",abierta:"02 sep 2026",fob:41280,responsableId:"P03"},
@@ -1229,6 +1232,24 @@ var Actividades=(function(){
   r.completar=function(id){var a=r.byId(id);if(a)a.estado="hecha";return a;};
   return r;
 })();
+
+var HistorialCRM=(function(){
+  var r=Repo(Seed.CRM_HIST);
+  r.deCliente=function(id){return r.where(function(h){return h.cli===id;});};
+  return r;
+})();
+
+var FlujoCRM={
+  orden:["prospecto","contactado","oportunidad","activo","fidelizacion"],
+  siguiente:function(etapa){var i=FlujoCRM.orden.indexOf(etapa);return i>=0&&i<FlujoCRM.orden.length-1?FlujoCRM.orden[i+1]:null;},
+  avanzar:function(c){
+    var next=FlujoCRM.siguiente(c.etapa);if(!next)return null;
+    var antes=Clientes.etapa(c.etapa);c.etapa=next;c.ultima=HOY;
+    if(next==="activo"&&c.desde==="—")c.desde="sep 2026";
+    HistorialCRM.add({id:"H-"+("000"+(HistorialCRM.count()+1)).slice(-3),cli:c.id,fecha:HOY,
+      detalle:"Etapa actualizada: "+antes+" → "+Clientes.etapa(next),por:Session.actor()});
+    return next;}
+};
 
 var Operaciones=(function(){
   var r=Repo(Seed.OPERACIONES);
@@ -1751,6 +1772,7 @@ function vClientes(){
 
 function vCliente(id){
   var c=Clientes.byId(id); if(!c) return "";
+  var gestiona=Session.esInterno()&&Session.puede("clientes");
   var ops=Seed.OPERACIONES.filter(function(o){return o.cli===id;});
   var docs=Documentos.deCliente(id);
   var acts=Seed.ACTIVIDADES.filter(function(a){return a.cli===id;});
@@ -1810,7 +1832,8 @@ function vCliente(id){
             return '<tr><td class="t-strong">'+Servicios.nombre(o.serv)+'</td><td>'+o.t+'</td>'
               +'<td class="r mono">'+Fmt.num(o.valor)+'</td><td class="r mono">'+o.prob+'%</td>'
               +'<td>'+UI.pair(Clientes.badgeEtapa(o.etapa))+'</td></tr>';}).join("")
-            :UI.empty(5,"Sin oportunidades registradas"))))
+            :UI.empty(5,"Sin oportunidades registradas"))),
+          gestiona?'<button class="btn" data-nueva-oport="'+c.id+'">+ Oportunidad</button>':'')
       + UI.card("Sin contratar",UI.table([{t:"Servicio"},{t:"Oportunidad"}],
           (noTiene2.length?noTiene2.map(function(sv){
             var tiene=oport.filter(function(o){return o.serv===sv.id;}).length>0;
@@ -1833,19 +1856,26 @@ function vCliente(id){
           +'<td class="mono t-sub">'+k.t+'</td><td class="mono t-sub">'+k.m+'</td></tr>';}).join(""))+'</div>';
   }
   else {
-    var hist=acts.slice().reverse();
+    var hist=acts.map(function(a){return {fecha:a.fecha,detalle:a.asunto,por:Personas.nombre(a.responsableId),done:a.estado==="hecha"};})
+      .concat(HistorialCRM.deCliente(id).map(function(h){return {fecha:h.fecha,detalle:h.detalle,por:h.por,done:true};}))
+      .reverse();
     body=UI.card("Historial",'<div class="card-body"><ol class="hitos">'
-      +(hist.length?hist.map(function(a,i){
-        return '<li class="hito '+(a.estado==="hecha"?"done":"now")+'">'
+      +(hist.length?hist.map(function(h){
+        return '<li class="hito '+(h.done?"done":"now")+'">'
           +'<span class="hito-rail"><span class="hito-dot"></span><span class="hito-line"></span></span>'
-          +'<span class="hito-b"><b>'+a.asunto+'</b><span>'+a.fecha+' · '+Seed.ACT_TIPOS[a.tipo]+' · '+Personas.nombre(a.responsableId)+'</span></span></li>';
+          +'<span class="hito-b"><b>'+h.detalle+'</b><span>'+h.fecha+' · '+h.por+'</span></span></li>';
         }).join(""):'<li class="t-sub">Sin historial</li>')+'</ol></div>');
   }
 
+  var next=FlujoCRM.siguiente(c.etapa),acciones="";
+  if(gestiona&&next)acciones+='<button class="btn" data-cli-avanzar="'+c.id+'">Avanzar a '+Clientes.etapa(next)+'</button>';
+  if(gestiona&&(c.etapa==="activo"||c.etapa==="fidelizacion")){
+    acciones+='<button class="btn btn-primary" data-nueva-op="'+c.id+'">+ Operación</button>';
+    acciones+='<button class="btn" data-crear-dem="'+c.id+'">+ Demanda</button>';}
   return '<button class="back" data-back="clientes">← Clientes</button>'
     + UI.head({eyebrow:c.tipo+" · "+c.ciudad,t:c.n,
         meta:UI.pair(Clientes.badgeEtapa(c.etapa))+UI.pill("NIT",c.nit)+UI.pill("Docs",docs.length),
-        act:'<button class="btn btn-primary" data-crear-dem="'+c.id+'">+ Demanda de carga</button>'})
+        act:acciones})
     + tabs + body;
 }
 
@@ -2919,6 +2949,60 @@ function modalActividad(){
       fecha:Dom.byId("a-f").value,asunto:as,estado:"pendiente",responsableId:Dom.byId("a-r").value});
     Modal.close();Router.refresh();Toast.show("Actividad registrada");});
 }
+
+function modalOportunidad(cliId){
+  var c=Clientes.byId(cliId);if(!c)return;
+  var faltantes=Servicios.faltantes(c);
+  Modal.open("Nueva oportunidad para "+c.n,
+    '<div class="form-grid">'
+    +'<label class="fld"><span class="eyebrow">Servicio</span><select id="opp-serv">'
+      +(faltantes.length?faltantes:Servicios.all()).map(function(s){return '<option value="'+s.id+'">'+s.n+'</option>';}).join("")+'</select></label>'
+    +'<label class="fld"><span class="eyebrow">Valor estimado USD</span><input id="opp-val" type="number" min="1" value="12000"></label>'
+    +'<label class="fld"><span class="eyebrow">Probabilidad</span><select id="opp-prob"><option value="25">25%</option><option value="50" selected>50%</option><option value="75">75%</option></select></label>'
+    +'<label class="fld"><span class="eyebrow">Cierre estimado</span><input id="opp-cierre" type="text" value="30 oct 2026"></label>'
+    +'</div><label class="fld" style="margin-top:14px"><span class="eyebrow">Descripción</span><input id="opp-t" type="text" value="Ampliación de servicios para '+Fmt.esc(c.n)+'"></label>'
+    +'<div id="opp-err" class="t-sub" style="color:var(--crit);margin-top:8px"></div>',
+    '<button class="btn" id="m-cancel">Cancelar</button><button class="btn btn-primary" id="m-save">Registrar oportunidad</button>',function(){
+      Dom.on(Dom.byId("m-save"),"click",function(){
+        var t=Dom.byId("opp-t").value.trim(),valor=parseFloat(Dom.byId("opp-val").value)||0;
+        if(t.length<5||valor<=0){Dom.byId("opp-err").textContent="Descripción y valor son obligatorios.";return;}
+        var o={id:"OP-"+("000"+(60+Oportunidades.count())).slice(-3),cli:cliId,t:t,serv:Dom.byId("opp-serv").value,
+          valor:valor,etapa:"oportunidad",prob:parseInt(Dom.byId("opp-prob").value,10),cierre:Dom.byId("opp-cierre").value};
+        Oportunidades.add(o);HistorialCRM.add({id:"H-"+("000"+(HistorialCRM.count()+1)).slice(-3),cli:cliId,
+          fecha:HOY,detalle:"Oportunidad creada: "+t,por:Session.actor()});
+        Modal.close();State.cliTab="servicios";Router.refresh();Toast.show(o.id+" registrada");});
+    });
+}
+
+function modalOperacion(cliId){
+  var c=Clientes.byId(cliId);if(!c)return;
+  Modal.open("Nueva operación · "+c.n,
+    '<div class="form-grid">'
+    +'<label class="fld"><span class="eyebrow">Tipo</span><select id="op-tipo"><option value="imp">Importación</option><option value="exp">Exportación</option></select></label>'
+    +'<label class="fld"><span class="eyebrow">Modalidad</span><select id="op-modal"><option>FCL 40\'</option><option>FCL 20\'</option><option>LCL</option><option>Aéreo</option></select></label>'
+    +'<label class="fld"><span class="eyebrow">Ruta</span><select id="op-ruta">'
+      +["Arica → Tambo Quemado → La Paz","Ilo → Desaguadero → La Paz","Iquique → Pisiga → Oruro","Santa Cruz → Puerto Suárez → Santos"].map(function(x){return '<option>'+x+'</option>';}).join("")+'</select></label>'
+    +'<label class="fld"><span class="eyebrow">Peso (kg)</span><input id="op-peso" type="number" min="1" value="18000"></label>'
+    +'<label class="fld"><span class="eyebrow">Valor FOB USD</span><input id="op-fob" type="number" min="0" value="45000"></label>'
+    +'<label class="fld"><span class="eyebrow">Responsable</span><select id="op-resp">'
+      +Personas.activas().filter(function(p){return p.areaId==="AR-OPE";}).map(function(p){return '<option value="'+p.id+'">'+p.n+'</option>';}).join("")+'</select></label>'
+    +'</div><label class="fld" style="margin-top:14px"><span class="eyebrow">Mercancía</span><input id="op-merc" type="text" placeholder="Descripción de la mercancía"></label>'
+    +'<div id="op-err" class="t-sub" style="color:var(--crit);margin-top:8px"></div>',
+    '<button class="btn" id="m-cancel">Cancelar</button><button class="btn btn-primary" id="m-save">Crear expediente</button>',function(){
+      Dom.on(Dom.byId("m-save"),"click",function(){
+        var merc=Dom.byId("op-merc").value.trim(),peso=parseInt(Dom.byId("op-peso").value,10)||0;
+        if(merc.length<4||peso<=0){Dom.byId("op-err").textContent="Mercancía y peso mayor a cero son obligatorios.";return;}
+        var tipo=Dom.byId("op-tipo").value,pref=tipo==="imp"?"IMP":"EXP";
+        var id=pref+"-2026-"+("0000"+(900+Operaciones.count())).slice(-4);
+        var o=Operaciones.add({id:id,cli:cliId,tipo:tipo,ruta:Dom.byId("op-ruta").value,modal:Dom.byId("op-modal").value,
+          peso:peso,merc:merc,estado:"docs",abierta:HOY,fob:parseFloat(Dom.byId("op-fob").value)||0,
+          responsableId:Dom.byId("op-resp").value||"P03"});
+        HistorialCRM.add({id:"H-"+("000"+(HistorialCRM.count()+1)).slice(-3),cli:cliId,fecha:HOY,
+          detalle:"Operación "+o.id+" creada",por:Session.actor()});
+        Modal.close();State.mod="operaciones";State.opOpen=o.id;State.opTab="resumen";
+        Router.refresh();Toast.show(o.id+" creado con expediente documental");});
+    });
+}
 function modalDemanda(cli){
   var ops=cli?Seed.OPERACIONES.filter(function(o){return o.cli===cli;}):Seed.OPERACIONES;
   Modal.open("Publicar demanda de carga",
@@ -3070,8 +3154,8 @@ function modalPersona(id){
 
 var Modales={
   doc:modalDoc, subir:modalSubir, pod:modalPOD, incidencia:modalIncidencia,
-  prospecto:modalProspecto, actividad:modalActividad,
-  demanda:modalDemanda, transportista:modalTransportista, persona:modalPersona,
+  prospecto:modalProspecto, actividad:modalActividad, oportunidad:modalOportunidad,
+  operacion:modalOperacion, demanda:modalDemanda, transportista:modalTransportista, persona:modalPersona,
   movimiento:modalMovimiento, reasignarPersona:modalReasignarPersona
 };
 
@@ -3153,6 +3237,12 @@ var Actions={
     State.docCat="todas"; State.docEstado="todos"; State.docOp="todas";
     State.docQ=""; State.docPage=1; Router.refresh();},
   clitab:function(el){State.cliTab=el.getAttribute("data-clitab");State.docPage=1;Router.refresh();},
+  "cli-avanzar":function(el){
+    var c=Clientes.byId(el.getAttribute("data-cli-avanzar"));if(!c)return;
+    var next=FlujoCRM.avanzar(c);if(!next)return;
+    Router.refresh();Toast.show(c.n+" avanzó a "+Clientes.etapa(next));},
+  "nueva-oport":function(el){Modales.oportunidad(el.getAttribute("data-nueva-oport"));},
+  "nueva-op":function(el){Modales.operacion(el.getAttribute("data-nueva-op"));},
   optab:function(el){State.opTab=el.getAttribute("data-optab");Router.refresh();},
   op:function(el){
     var o=Operaciones.byId(el.getAttribute("data-op")); if(!o) return;
