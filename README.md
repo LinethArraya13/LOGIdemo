@@ -7,6 +7,10 @@ El flujo integra CRM, documentos, operaciones, transportistas, tracking,
 personal y control financiero interno. La guía de presentación de los módulos
 nuevos está en [DEMO_SUPERVISORA.md](DEMO_SUPERVISORA.md).
 
+La interfaz separa el alcance comercial en **Fase 1 · Frente interno**,
+**Extensiones opcionales** y **Fase 2 · Ecosistema (ESP)**. Esta separación es
+parte del mensaje del demo y no debe eliminarse.
+
 ## Desarrollo local
 
 ```powershell
@@ -30,14 +34,15 @@ node build.mjs     # genera public/index.html
 
 ## Prueba de humo
 
-En Windows, con Edge o Chrome instalado:
+En Windows, con Brave, Edge o Chrome instalado:
 
 ```powershell
 node smoke-test.mjs
 ```
 
-La prueba levanta el servidor y recorre automáticamente login, Personal,
-Finanzas, la ficha financiera de una operación y la restricción del rol Cliente.
+La prueba levanta el servidor y recorre automáticamente login, avance CRM,
+creación de operación, aprobación documental, costo de almacenamiento,
+Personal, Finanzas y restricciones del rol Cliente.
 
 ## Despliegue
 

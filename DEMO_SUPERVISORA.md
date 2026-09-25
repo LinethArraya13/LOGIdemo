@@ -19,6 +19,31 @@ Personal aporta el responsable y la continuidad en cada etapa. Finanzas aporta
 el resultado económico y evita que una operación terminada quede sin cobrar o
 sin registrar sus costos.
 
+## Diferencias entre `main` y esta rama
+
+Punto de comparación: `main` en el commit `f0bdf82`. La rama de demostración es
+`feature/personal-contabilidad`.
+
+| Tema | En `main` | En esta rama | Por qué importa |
+|---|---|---|---|
+| Alcance comercial | CRM, documentos y ecosistema de transporte aparecían mezclados | La navegación distingue Fase 1, extensiones opcionales y Fase 2/ESP | Evita prometer el marketplace dentro del frente interno urgente |
+| Responsables | Ejecutivos y responsables eran nombres de texto | Personas, cargos, áreas, responsables y accesos relacionados por ID | Evita duplicados y permite ver la carga real de cada persona |
+| Continuidad | No existía tratamiento de bajas | Una baja exige reasignar clientes, tareas y operaciones activas | No deja trabajo sin dueño |
+| Finanzas | Solo había valores comerciales o FOB | Cobros, pagos, gastos, saldos y margen por operación | Permite saber si la operación genera resultado y si fue cobrada |
+| Ficha de operación | Al abrir una operación se llegaba a documentos del cliente | Resumen, Documentos, Viajes y Finanzas en una ficha propia | El expediente pasa a ser el centro del flujo |
+| Ciclo CRM | Pipeline principalmente visual | Se puede avanzar la etapa y queda registro en historial | Demuestra gestión, no solo consulta |
+| Ampliación de servicios | Oportunidades precargadas | Se pueden crear oportunidades desde la ficha del cliente | Conecta fidelización con venta cruzada |
+| Alta de operación | Las operaciones eran datos precargados | Un cliente activo puede originar una nueva operación y expediente | Completa cliente → operación → documentos |
+| Revisión documental | Aprobar/Rechazar eran controles sin acción | Operaciones aprueba o rechaza con responsable, fecha y observación | Cierra el circuito cliente → revisión interna |
+| Permisos documentales | El cliente podía ver controles internos | El cliente solo consulta/sube; Operaciones revisa | Evita autoaprobación y separa responsabilidades |
+| Asociación documental | Una carga global podía quedar en el cliente equivocado | El cliente se deriva de la operación elegida | Preserva integridad del expediente |
+| Almacenamiento | Se mostraba volumen, pero sin costo | Proyección mensual configurable con base, GB incluidos y excedente | Hace visible el costo recurrente pedido en DOC-01 |
+| Verificación | Build manual | Prueba de humo automatizada del recorrido principal | Reduce riesgo antes de una reunión |
+
+Lo que **sigue siendo una simulación** en ambas ramas: persistencia, archivos
+reales en almacenamiento de objetos, autenticación de servidor, GPS real y
+auditoría productiva. Debe declararse con claridad.
+
 ## Qué se implementó
 
 ### Personal
@@ -48,91 +73,138 @@ sin registrar sus costos.
 ### Integración adicional
 
 - Nueva ficha de operación con Resumen, Documentos, Viajes y Finanzas.
+- Avance de etapa CRM con historial de responsable y fecha.
+- Alta de oportunidades de ampliación desde el cliente.
+- Creación de operaciones y expedientes desde clientes activos.
+- Aprobación y rechazo documental restringidos a Operaciones.
+- Proyección configurable de almacenamiento para contemplar DOC-01.
+- Etiquetas visibles de Fase 1, extensión opcional y Fase 2/ESP.
 - El valor FOB queda separado de los ingresos de DMS.
 - Tablero específico para Administración y Contabilidad.
 - Gerencia tiene consulta; Administración puede registrar y pagar movimientos.
 - Operaciones puede consultar el directorio de personal, pero no datos financieros.
 
-## Guion sugerido — 8 a 10 minutos
+## Guion sugerido — 12 a 15 minutos
 
-### 1. Presentar el problema — 1 minuto
+El orden es deliberado: primero el compromiso vigente, después las diferencias
+contra `main`, luego las extensiones y al final el concepto ESP separado.
 
-Mensaje:
+### 1. Enmarcar alcance y diferencia contra `main` — 1 minuto
 
-> El demo ya resolvía documentos, asignación de transporte y seguimiento. Faltaba
-> conectar la operación con las personas responsables y con su resultado económico.
+En el login seleccionar **Operaciones**. Mostrar en la navegación los tres bloques:
 
-Explicar que no se busca reemplazar un ERP contable o de RR. HH. en esta fase. Se
-busca control interno y trazabilidad para tomar decisiones.
-
-### 2. Entrar como Administración y Contabilidad — 2 minutos
-
-Seleccionar el rol **Administración y Contabilidad**.
-
-Mostrar en el tablero:
-
-- Por cobrar y por pagar.
-- Resultado proyectado.
-- Cobertura financiera de operaciones.
-- Operaciones sin registro financiero.
-- Personas con carga alta.
+1. **Fase 1 · Frente interno** — compromiso urgente.
+2. **Extensiones opcionales** — Personal y Finanzas.
+3. **Fase 2 · Ecosistema** — `ESP-01`, fuera de la propuesta inicial.
 
 Mensaje:
 
-> El tablero no solo muestra cuánto se mueve; también detecta lo que puede quedar
-> sin facturar y dónde existe dependencia excesiva de una persona.
+> En `main` las capacidades aparecían juntas. Esta rama hace explícito qué está
+> incluido, qué agrega valor de forma opcional y qué requiere propuesta propia.
 
-### 3. Mostrar Personal — 2 minutos
+### 2. Demostrar el ciclo CRM — 2 minutos
 
-Abrir **Personal**.
+Abrir **Clientes** y entrar a un prospecto, por ejemplo `Textiles Pacajes Ltda.`.
 
-1. Mostrar áreas y responsables.
-2. Señalar las personas con carga alta.
-3. Abrir la ficha de Ana Quispe.
-4. Mostrar clientes y tareas asignadas.
-5. Pulsar **Desactivar** para enseñar la protección de continuidad.
-6. Mostrar el selector de reasignación y cancelar el diálogo.
+1. Mostrar etapa, ejecutivo y servicios.
+2. Pulsar **Avanzar a Contactado**.
+3. Abrir la pestaña **Historial** y mostrar el cambio con persona y fecha.
+4. En **Servicios**, registrar una oportunidad de ampliación o explicar el botón.
 
-Mensaje:
+Justificación:
 
-> Una baja no deja clientes ni operaciones huérfanos. El sistema exige transferir
-> el trabajo activo y conserva el historial cerrado con la persona original.
+> `main` mostraba el pipeline; esta rama permite gestionarlo y deja trazabilidad.
 
-### 4. Mostrar Finanzas — 2 minutos
+### 3. Crear operación y expediente — 2 minutos
+
+Volver a **Clientes** y abrir un cliente activo, por ejemplo `Ferretería Illimani`.
+
+1. Pulsar **+ Operación**.
+2. Completar mercancía y crear el expediente.
+3. Mostrar la nueva ficha con responsable, ruta, peso y valor FOB.
+4. Aclarar que el FOB es valor de mercancía, no ingreso de DMS.
+
+Justificación:
+
+> El CRM rodea al expediente: el cliente origina una operación y la operación
+> concentra documentos, transporte y, opcionalmente, finanzas.
+
+### 4. Mostrar control documental — 3 minutos
+
+Abrir **Documentos** dentro de un cliente u operación con archivos precargados.
+
+1. Mostrar búsqueda, categorías, operación, estado, volumen y duplicados.
+2. Abrir un documento pendiente.
+3. Aprobarlo y señalar responsable y fecha de revisión.
+4. En otro documento, abrir **Rechazar**, escribir una observación y cancelar si
+   no se desea alterar el resto de la demostración.
+5. Mostrar **Proyección de almacenamiento** al final del módulo.
+
+Justificación:
+
+> Esta es la mejora central: el expediente organiza adjuntos por cliente y
+> operación, separa carga de revisión y hace visible el costo recurrente DOC-01.
+
+Declaración obligatoria:
+
+> El demo conserva metadatos en memoria. El almacenamiento persistente y las
+> cargas reanudables son parte de la implementación productiva, no de este prototipo.
+
+### 5. Mostrar permisos — 1 minuto
+
+Cambiar al rol **Cliente**.
+
+1. Abrir Documentos.
+2. Mostrar que puede consultar y subir.
+3. Abrir un pendiente y confirmar que no aparecen Aprobar/Rechazar.
+
+Justificación:
+
+> La carga y la aprobación pertenecen a actores distintos. En producción esta
+> regla se aplicará también en el servidor.
+
+### 6. Mostrar Personal como extensión — 2 minutos
+
+Entrar como **Administración y Contabilidad** y abrir **Personal**.
+
+1. Mostrar áreas, responsables y carga alta.
+2. Abrir la ficha de Ana Quispe.
+3. Mostrar clientes, tareas y operaciones.
+4. Pulsar **Desactivar**, enseñar la reasignación obligatoria y cancelar.
+
+Justificación:
+
+> La nueva operación no solo tiene datos: tiene un responsable y continuidad si
+> esa persona deja el equipo.
+
+### 7. Mostrar Finanzas como extensión — 2 minutos
 
 Abrir **Finanzas**.
 
-1. Señalar la cuenta vencida.
-2. Mostrar cobros, pagos y gastos generales en una sola vista.
-3. Explicar que alquiler o planilla no necesitan una operación.
-4. Mostrar la rentabilidad por operación.
-5. Abrir `IMP-2026-0847` desde la tabla de rentabilidad.
+1. Mostrar cuentas vencidas, por cobrar y por pagar.
+2. Diferenciar costos por operación de alquiler, servicios o planilla.
+3. Abrir `IMP-2026-0847` desde rentabilidad.
+4. Mostrar ingresos DMS, costos, saldo y margen.
+
+Justificación:
+
+> El valor FOB no se confunde con ingreso. La operación muestra lo que DMS cobra,
+> lo que paga y el margen que proyecta.
+
+### 8. Cerrar con Fase 2/ESP — 1 minuto
+
+Mostrar brevemente el grupo **Fase 2 · Ecosistema** sin recorrerlo completo.
 
 Mensaje:
 
-> Los gastos generales afectan el resultado de empresa; los costos directos afectan
-> además el margen de la operación a la que pertenecen.
+> Directorio, certificación, demandas y tracking validan una visión futura, pero
+> son un producto de dos lados y deben tener discovery, alcance y precio separados.
 
-### 5. Mostrar la ficha de operación — 2 minutos
+### 9. Cierre
 
-En `IMP-2026-0847`:
-
-1. Mostrar el responsable interno.
-2. Explicar que el FOB es el valor de la mercancía y no un ingreso de DMS.
-3. Recorrer Documentos y Viajes.
-4. Abrir Finanzas y mostrar ingresos, costos, saldo y margen.
-5. Usar **+ Movimiento** para enseñar el formulario y cancelarlo.
-
-Mensaje:
-
-> La operación deja de ser solo un expediente logístico: ahora tiene dueño,
-> documentos, transporte y resultado económico en una misma ficha.
-
-### 6. Cierre — 1 minuto
-
-> Personal reduce dependencia y falta de responsables. Finanzas reduce fugas de
-> facturación y operaciones sin margen visible. Juntos completan el flujo que ya
-> demostraba Puerto a Puerta sin convertir el demo en un ERP pesado.
+> Frente a `main`, esta rama convierte pantallas aisladas en un flujo demostrable:
+> prospecto → cliente → operación → expediente → revisión. Personal y Finanzas
+> completan la gestión interna; ESP queda claramente identificado como Fase 2.
 
 ## Valor adicional incorporado
 
@@ -187,7 +259,7 @@ auditoría, integración bancaria/contable, reglas tributarias y pruebas automat
 2. Ejecutar `python serve.py`.
 3. Abrir `http://127.0.0.1:5173`.
 4. Confirmar que aparece el rol **Administración y Contabilidad**.
-5. Recargar la página para reiniciar todos los datos antes de presentar.
-6. Mantener el navegador en zoom 90–100 %.
-7. Tener este documento abierto como guía.
-
+5. Ejecutar `node smoke-test.mjs` y confirmar todos los mensajes `OK`.
+6. Recargar la página para reiniciar todos los datos antes de presentar.
+7. Mantener el navegador en zoom 90–100 %.
+8. Tener este documento abierto como guía.

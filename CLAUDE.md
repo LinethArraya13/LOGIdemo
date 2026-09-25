@@ -76,6 +76,16 @@ No hay diffing. Una acción nueva debe registrarse en `Actions` o `Botones`.
 - `GestionPersonal.reasignar()` transfiere trabajo activo antes de una baja.
 - Cargo y perfil de acceso no deben fusionarse: describen conceptos distintos.
 
+### CRM y expedientes
+
+- `FlujoCRM.avanzar()` mueve al cliente por las cinco etapas y registra historial.
+- Un cliente activo o en fidelización puede crear una operación y expediente.
+- La revisión documental solo se ofrece a un usuario interno con el módulo
+  Documentos; el cliente nunca aprueba su propia carga.
+- El cliente de un documento se deriva de la operación seleccionada.
+- `Seed.STORAGE` controla la hipótesis de base mensual, GB incluidos y excedente.
+  Es una proyección comercial, no una tarifa acordada.
+
 ### Finanzas
 
 - `MOVIMIENTOS` contiene cobros, pagos operativos y gastos generales.
