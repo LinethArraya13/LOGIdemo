@@ -11,6 +11,22 @@ La interfaz separa el alcance comercial en **Fase 1 · Frente interno**,
 **Extensiones opcionales** y **Fase 2 · Ecosistema (ESP)**. Esta separación es
 parte del mensaje del demo y no debe eliminarse.
 
+## Roles
+
+El login no pide contraseña: se elige un rol y se entra. Los permisos salen de
+un **perfil** (`perfilId`), no de una lista fija por rol.
+
+| Rol | Perfil | Alcance |
+|---|---|---|
+| Operaciones | `PF-OPE` | CRM, documentos, demandas y viajes |
+| Gerencia | `PF-GER` | Tablero, pipeline y reportes |
+| **Administración y Contabilidad** | `PF-ADM` | Personal, cobros, pagos y gastos |
+| Cliente | `PF-CLI` | Solo sus operaciones, documentos y viajes |
+| Transportista | `PF-TRA` | Demandas, sus viajes y sus certificaciones |
+
+Administración y Contabilidad ve Dashboard, Clientes, Operaciones, Personal,
+Finanzas y Reportes. No accede a Demandas, Viajes, Directorio ni Certificaciones.
+
 ## Desarrollo local
 
 ```powershell
@@ -57,17 +73,27 @@ git push
 
 Vercel corre `node build.mjs` y sirve `public/` (configurado en `vercel.json`).
 
-### Conexión inicial, una sola vez
+## Trabajar sobre el repo
 
-1. Crear un repo **privado** vacío en https://github.com/new
-   (sin README, sin .gitignore, sin licencia — este proyecto ya los tiene)
-2. Conectar y subir:
-   ```bash
-   git remote add origin git@github.com:USUARIO/REPO.git
-   git push -u origin main
-   ```
-3. Importar el repo en https://vercel.com/new — Vercel lee `vercel.json` solo,
-   no hay que configurar nada.
+El repositorio es **público**: cualquiera puede clonarlo. Pushear requiere ser
+colaborador con permiso de escritura; sin eso, el camino es *fork* y Pull Request.
+
+```bash
+git clone https://github.com/LinethArraya13/LOGIdemo.git
+cd LOGIdemo
+git checkout -b feature/mi-cambio
+git push -u origin feature/mi-cambio
+```
+
+Configurá tu identidad de git antes del primer commit. Vercel bloquea los
+deploys cuyo email de autor no corresponde a una cuenta de GitHub:
+
+```bash
+git config user.email "tu-email-de-github@ejemplo.com"
+```
+
+Un push a una rama distinta de `main` genera un *preview deployment* con su
+propia URL. Solo `main` actualiza producción.
 
 ## Sobre la exposición pública
 
