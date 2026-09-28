@@ -203,6 +203,14 @@ td.r,th.r{text-align:right}
 .t-sub{font-size:11.5px; color:var(--muted)}
 tr.excl td{background:var(--surface-3)}
 tr.excl td:first-child{color:var(--muted)}
+
+tr.clickable td:last-child{position:relative;padding-right:30px}
+tr.clickable td:last-child::after{content:"›";position:absolute;right:12px;top:50%;
+  transform:translateY(-52%);font-size:17px;line-height:1;color:var(--line-2);
+  transition:color .13s, transform .13s}
+tr.clickable:hover td:last-child::after{color:var(--accent);transform:translateY(-52%) translateX(2px)}
+tr.clickable:hover td{background:var(--accent-soft)}
+tr.clickable:hover td:first-child{box-shadow:inset 2px 0 0 var(--accent)}
 tr.pick td{background:var(--ok-soft)}
 
 /* Meter */
@@ -2265,7 +2273,8 @@ function vDemandas(){
       +f[1]+'<span class="chip-n">'+f[2]+'</span></button>';}).join("");
   return UI.head({eyebrow:"Operaciones",t:"Demandas de carga",
       meta:UI.scope("fase2")+UI.pill("Total",Seed.DEMANDAS.length)
-        +UI.pill("Sin asignar",Seed.DEMANDAS.filter(function(d){return !d.tra;}).length),
+        +UI.pill("Sin asignar",Seed.DEMANDAS.filter(function(d){return !d.tra;}).length)
+        +'<span class="pill hint">Abrí una demanda para ver candidatos y descartados</span>',
       act:Session.traId()?'':'<button class="btn btn-primary" id="btn-nueva-dem">+ Publicar demanda</button>'})
     + '<div class="card"><div class="card-body" style="padding-bottom:12px"><div class="chips">'+chips+'</div></div>'
     + UI.table([{t:"Demanda"},{t:"Cliente"},{t:"Origen → Destino"},{t:"Carga"},{t:"Peso",r:true},
