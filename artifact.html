@@ -540,6 +540,14 @@ tr.excl td:first-child{color:var(--muted)}
 .doc-i{font-family:"IBM Plex Mono",monospace; font-size:9.5px; font-weight:500; letter-spacing:.04em;
   display:inline-block; min-width:38px; text-align:center; padding:3px 5px; border-radius:4px;
   background:var(--surface-2); color:var(--muted)}
+.alert.crit{background:var(--crit-soft); color:var(--crit); border-color:color-mix(in srgb,var(--crit) 26%, transparent)}
+.msg-list{display:flex; flex-direction:column; gap:9px; max-height:46vh; overflow:auto; padding:2px}
+.msg{background:var(--surface-2); border:1px solid var(--line); border-radius:10px; padding:9px 12px; max-width:86%; align-self:flex-start}
+.msg-me{background:var(--accent-soft); border-color:color-mix(in srgb,var(--accent) 26%, transparent); align-self:flex-end}
+.msg-h{display:flex; gap:10px; justify-content:space-between; align-items:baseline; margin-bottom:3px}
+.msg-h b{font-size:12.5px}
+.msg-b{font-size:14px; color:var(--ink)}
+@media print{.rail,.topbar{display:none!important} [data-rep-csv],[data-rep-print]{display:none!important} .content{padding:0!important}}
 </style>
 
 <div id="login" class="login">
@@ -1163,6 +1171,21 @@ var Seed={
  {t:"Fase 2 · Ecosistema",items:["demandas","viajes","misviajes","directorio","certificaciones"]},
  {t:"Extensiones opcionales",items:["personal","finanzas"]},
  {t:"Análisis",items:["reportes"]}],
+  PROC_ETAPAS: [
+ {id:"docs",n:"Documentación"},{id:"puerto",n:"Puerto / arribo"},
+ {id:"aduana",n:"Aduana / aforo"},{id:"transito",n:"Tránsito terrestre"},
+ {id:"entrega",n:"Entrega final"}],
+  PROC_RESP: {docs:"P01",puerto:"P03",aduana:"P05",transito:"P03",entrega:"P03"},
+  BLOQUEOS: [
+ {op:"IMP-2026-0839",etapa:"aduana",tipo:"bloqueo",motivo:"Aforo físico retenido · discrepancia en la partida arancelaria",desde:"19 sep 2026",dias:4},
+ {op:"IMP-2026-0855",etapa:"puerto",tipo:"retraso",motivo:"BL llegó con 2 días de atraso · liberación demorada",desde:"21 sep 2026",dias:2},
+ {op:"IMP-2026-0844",etapa:"aduana",tipo:"retraso",motivo:"Cola de aforo en el recinto aduanero",desde:"22 sep 2026",dias:1},
+ {op:"IMP-2026-0851",etapa:"transito",tipo:"bloqueo",motivo:"Retención en frontera Pisiga por control de documentos",desde:"22 sep 2026",dias:1}],
+  MENSAJES: [
+ {op:"IMP-2026-0839",etapa:"aduana",autor:"P02",texto:"¿Por qué sigue retenida en aforo? Llevamos 4 días.",cuando:"22 sep · 09:10"},
+ {op:"IMP-2026-0839",etapa:"aduana",autor:"P05",texto:"La aduana observó la partida arancelaria. Presentamos el descargo hoy al mediodía.",cuando:"22 sep · 09:42"},
+ {op:"IMP-2026-0855",etapa:"puerto",autor:"P02",texto:"¿El BL ya llegó? El cliente está preguntando.",cuando:"22 sep · 15:20"},
+ {op:"IMP-2026-0855",etapa:"puerto",autor:"P03",texto:"Llegó esta mañana, liberamos mañana a primera hora.",cuando:"23 sep · 08:05"}],
 };
 
 function Repo(items,clave){
@@ -1291,6 +1314,36 @@ var Operaciones=(function(){
     var c=Session.clienteId();
     return c?r.deCliente(c):r.all();};
   return r;
+})();
+
+var Proceso=(function(){
+  var orden=["docs","puerto","aduana","transito","entrega"];
+  function idx(estado){if(estado==="cerrada")return orden.length;var i=orden.indexOf(estado);return i<0?0:i;}
+  function etapaNombre(id){for(var i=0;i<Seed.PROC_ETAPAS.length;i++){if(Seed.PROC_ETAPAS[i].id===id)return Seed.PROC_ETAPAS[i].n;}return id;}
+  function bloqueo(op,etapa){for(var i=0;i<Seed.BLOQUEOS.length;i++){var b=Seed.BLOQUEOS[i];if(b.op===op&&b.etapa===etapa)return b;}return null;}
+  function responsable(o,etapa){return (Seed.PROC_RESP&&Seed.PROC_RESP[etapa])||o.responsableId||"P03";}
+  function hitos(o){
+    var cur=idx(o.estado);
+    return Seed.PROC_ETAPAS.map(function(e,i){
+      return {etapa:e.id,n:e.n,estado:i<cur?"hecho":(i===cur?"curso":"pendiente"),
+        respId:responsable(o,e.id),bloqueo:bloqueo(o.id,e.id)};});}
+  function problemasDe(o){return hitos(o).filter(function(h){return h.bloqueo&&h.estado!=="hecho";});}
+  function conProblema(){return Operaciones.all().filter(function(o){return problemasDe(o).length>0;});}
+  function etapaActual(o){var h=hitos(o).filter(function(x){return x.estado==="curso";});return h[0]||null;}
+  return {orden:orden,etapaNombre:etapaNombre,bloqueo:bloqueo,responsable:responsable,
+    hitos:hitos,problemasDe:problemasDe,conProblema:conProblema,etapaActual:etapaActual};
+})();
+
+var Mensajeria=(function(){
+  function dd(n){return (n<10?"0":"")+n;}
+  function hora(){var d=new Date();return dd(d.getHours())+":"+dd(d.getMinutes());}
+  function hilo(op,etapa){return Seed.MENSAJES.filter(function(m){return m.op===op&&m.etapa===etapa;});}
+  function total(op){return Seed.MENSAJES.filter(function(m){return m.op===op;}).length;}
+  function enviar(op,etapa,texto){
+    var m={op:op,etapa:etapa,autor:Session.personaId()||"P02",texto:texto,
+      cuando:HOY.replace(" 2026","")+" · "+hora()};
+    Seed.MENSAJES.push(m);return m;}
+  return {hilo:hilo,total:total,enviar:enviar};
 })();
 
 var CategoriasFin=(function(){
@@ -1714,6 +1767,9 @@ function vDashboard(){
       {k:"Resultado proyectado",v:Fmt.money(fin.margen),n:"Antes de impuestos"}]):"")
     + (inci.length?UI.alert(inci.length+" viaje con incidencia activa",
         inci.map(function(v){return v.id+" · "+v.inc;}).join(" "),""):"")
+    + (Proceso.conProblema().length?UI.alert(Proceso.conProblema().length+(Proceso.conProblema().length===1?" proceso con bloqueo o retraso":" procesos con bloqueo o retraso"),
+        Proceso.conProblema().map(function(o){var h=Proceso.problemasDe(o)[0];
+          return o.id+" · "+h.n+" ("+Personas.nombre(h.respId)+")";}).join(" · "),"crit"):"")
     + '<div class="grid2">'
     + UI.card("Oportunidades por etapa",
         UI.table([{t:"Etapa"},{t:"Oportunidades",r:true},{t:"Valor USD",r:true}],
@@ -2200,7 +2256,7 @@ function vOperacion(id){
   var demandas=Demandas.where(function(d){return d.op===id;});
   var viajes=Viajes.where(function(v){return demandas.some(function(d){return d.id===v.dem;});});
   var puedeFin=Session.puede("finanzas"),mov=puedeFin?Finanzas.deOperacion(id):[],rf=Finanzas.resumen(mov);
-  var tabs=[["resumen","Resumen"],["documentos","Documentos"],["viajes","Viajes"]];
+  var tabs=[["resumen","Resumen"],["proceso","Proceso"],["documentos","Documentos"],["viajes","Viajes"]];
   if(puedeFin)tabs.push(["finanzas","Finanzas"]);
   var nav='<div class="tabs">'+tabs.map(function(t){return '<button class="tab'+(State.opTab===t[0]?" is-on":"")
     +'" data-optab="'+t[0]+'">'+t[1]+'</button>';}).join("")+'</div>',body="";
@@ -2213,6 +2269,21 @@ function vOperacion(id){
         ["Ruta",o.ruta],["Mercancía",o.merc],["Apertura",o.abierta],["Responsable",Personas.nombre(o.responsableId)]])+'</div>')
       +UI.card("Trazabilidad",UI.table([{t:"Demanda"},{t:"Estado"},{t:"Transportista"}],demandas.map(function(d){var t=d.tra?Transportistas.byId(d.tra):null;
         return '<tr class="clickable" data-dem="'+d.id+'"><td class="mono t-strong">'+d.id+'</td><td>'+UI.pair(Seed.DEM_EST[d.estado])+'</td><td>'+(t?t.n:"—")+'</td></tr>';}).join("")||UI.empty(3,"Sin demanda asociada")))+'</div>';
+  } else if(State.opTab==="proceso"){
+    var hs=Proceso.hitos(o);
+    body=UI.card("Proceso de la operación",
+      UI.table([{t:"Etapa"},{t:"Responsable"},{t:"Estado"},{t:"Situación"},{t:"",r:true}],
+        hs.map(function(h){
+          var est=h.estado==="hecho"?UI.badge("b-ok","Completado"):(h.estado==="curso"?UI.badge("b-accent","En curso"):UI.badge("b-neutral","Pendiente"));
+          var sit=h.bloqueo
+            ?(h.bloqueo.tipo==="bloqueo"?UI.badge("b-crit","Bloqueo"):UI.badge("b-warn","Retraso"))
+              +' <span class="t-sub">'+h.bloqueo.motivo+' · '+h.bloqueo.dias+' d</span>'
+            :'<span class="t-sub">Sin novedad</span>';
+          var nm=Mensajeria.hilo(o.id,h.etapa).length;
+          return '<tr><td class="t-strong">'+h.n+'</td><td class="t-sub">'+Personas.nombre(h.respId)+'</td>'
+            +'<td>'+est+'</td><td>'+sit+'</td>'
+            +'<td class="r"><button class="btn" data-msg="'+o.id+'|'+h.etapa+'">Hablar'+(nm?' ('+nm+')':'')+'</button></td></tr>';}).join("")),
+      '','Mensajería interna simulada · se reinicia al recargar.');
   } else if(State.opTab==="documentos"){
     body='<div class="card">'+UI.table([{t:"Archivo"},{t:"Categoría"},{t:"Tamaño",r:true},{t:"Fecha"},{t:"Estado"}],
       docs.map(function(d){return '<tr class="clickable" data-doc="'+d.id+'"><td class="t-strong fname">'+d.n+'</td><td>'+Documentos.categoria(d.cat).n+'</td>'
@@ -2677,7 +2748,27 @@ function vReportes(){
                 +'<td class="r mono">'+Fmt.num(d.length)+'</td>'
                 +'<td class="r mono">'+Fmt.size(d.reduce(function(a,x){return a+x.size;},0))+'</td>'
                 +'<td class="r mono">'+d.filter(function(x){return x.estado==="pendiente";}).length+'</td>'
-                +'<td class="r mono">'+Seed.OPERACIONES.filter(function(o){return o.cli===c.id;}).length+'</td></tr>';}).join("")));
+                +'<td class="r mono">'+Seed.OPERACIONES.filter(function(o){return o.cli===c.id;}).length+'</td></tr>';}).join("")))
+    + UI.card("Responsables por proceso",
+        UI.table([{t:"Operación"},{t:"Cliente"},{t:"Etapa actual"},{t:"Responsable"},{t:"Situación"}],
+          Operaciones.all().filter(function(o){return o.estado!=="cerrada";}).map(function(o){
+            var cur=Proceso.etapaActual(o),c=Clientes.byId(o.cli),b=cur?cur.bloqueo:null;
+            var sit=b?(b.tipo==="bloqueo"?UI.badge("b-crit","Bloqueo"):UI.badge("b-warn","Retraso")):UI.badge("b-ok","En curso");
+            return '<tr class="clickable" data-op="'+o.id+'"><td class="mono t-strong">'+o.id+'</td>'
+              +'<td>'+(c?c.n:"—")+'</td><td>'+(cur?cur.n:"—")+'</td>'
+              +'<td class="t-sub">'+(cur?Personas.nombre(cur.respId):"—")+'</td><td>'+sit+'</td></tr>';}).join("")
+            ||UI.empty(5,"Sin operaciones abiertas")),
+        '<button class="btn" data-rep-csv="1">Descargar CSV</button>'
+        +'<button class="btn" data-rep-print="1">Imprimir</button>')
+    + UI.card("Procesos con bloqueo o retraso",
+        UI.table([{t:"Operación"},{t:"Etapa"},{t:"Tipo"},{t:"Responsable"},{t:"Motivo"},{t:"Días",r:true}],
+          Proceso.conProblema().reduce(function(acc,o){
+            Proceso.problemasDe(o).forEach(function(h){
+              acc.push('<tr class="clickable" data-op="'+o.id+'"><td class="mono t-strong">'+o.id+'</td>'
+                +'<td>'+h.n+'</td><td>'+(h.bloqueo.tipo==="bloqueo"?UI.badge("b-crit","Bloqueo"):UI.badge("b-warn","Retraso"))+'</td>'
+                +'<td class="t-sub">'+Personas.nombre(h.respId)+'</td><td class="t-sub">'+h.bloqueo.motivo+'</td>'
+                +'<td class="r mono">'+h.bloqueo.dias+'</td></tr>');});
+            return acc;},[]).join("")||UI.empty(6,"Sin bloqueos ni retrasos")));
 }
 
 var podDe=function(vid){for(var i=0;i<Seed.PODS.length;i++){if(Seed.PODS[i].viaje===vid)return Seed.PODS[i];}return null;};
@@ -3198,11 +3289,49 @@ function modalPersona(id){
     Modal.close();State.perOpen=p.id;State.mod="personal";Router.refresh();Toast.show(p.n+" guardada en Personal");});
 }
 
+function modalMensaje(arg){
+  var p=(arg||"").split("|"),opId=p[0],etapa=p[1];
+  var o=Operaciones.byId(opId); if(!o) return;
+  var respId=Proceso.responsable(o,etapa);
+  function pinta(){
+    var yo=Session.personaId();
+    var h=Mensajeria.hilo(opId,etapa);
+    Dom.html("msg-list",h.length?h.map(function(m){
+      var mine=m.autor===yo;
+      return '<div class="msg'+(mine?' msg-me':'')+'">'
+        +'<div class="msg-h"><b>'+Personas.nombre(m.autor)+'</b><span class="t-sub">'+m.cuando+'</span></div>'
+        +'<div class="msg-b">'+Fmt.esc(m.texto)+'</div></div>';}).join("")
+      :'<div class="t-sub" style="padding:8px 2px">Sin mensajes todavía.</div>');
+    var l=Dom.byId("msg-list"); if(l) l.scrollTop=l.scrollHeight;}
+  Modal.open("Mensajes · "+Proceso.etapaNombre(etapa),
+    '<div class="t-sub" style="margin-bottom:12px">'+o.id+' · a cargo de <b>'+Personas.nombre(respId)+'</b></div>'
+    +'<div id="msg-list" class="msg-list"></div>'
+    +'<label class="fld" style="margin-top:14px"><span class="eyebrow">Nuevo mensaje</span>'
+    +'<input id="msg-in" type="text" autocomplete="off" placeholder="Escribe un mensaje para '+Fmt.esc(Personas.nombre(respId).split(" ")[0])+'"></label>'
+    +'<div id="msg-err" class="t-sub" style="color:var(--crit);margin-top:8px"></div>',
+    '<button class="btn" id="m-cancel">Cerrar</button>'
+    +'<button class="btn btn-primary" id="msg-send">Enviar</button>',
+    function(){
+      pinta();
+      Dom.on(Dom.byId("m-cancel"),"click",function(){Modal.close();Router.refresh();});
+      function send(){
+        var t=Dom.byId("msg-in").value.trim();
+        if(!t){Dom.byId("msg-err").textContent="Escribe un mensaje.";return;}
+        Dom.byId("msg-err").textContent="";
+        Mensajeria.enviar(opId,etapa,t);
+        Dom.byId("msg-in").value=""; pinta();
+        Toast.show("Mensaje enviado a "+Personas.nombre(respId));}
+      Dom.on(Dom.byId("msg-send"),"click",send);
+      Dom.on(Dom.byId("msg-in"),"keydown",function(e){if(e.key==="Enter"){e.preventDefault();send();}});
+      var inp=Dom.byId("msg-in"); if(inp) inp.focus();
+    });
+}
+
 var Modales={
   doc:modalDoc, subir:modalSubir, pod:modalPOD, incidencia:modalIncidencia,
   prospecto:modalProspecto, actividad:modalActividad, oportunidad:modalOportunidad,
   operacion:modalOperacion, demanda:modalDemanda, transportista:modalTransportista, persona:modalPersona,
-  movimiento:modalMovimiento, reasignarPersona:modalReasignarPersona
+  movimiento:modalMovimiento, reasignarPersona:modalReasignarPersona, mensaje:modalMensaje
 };
 
 function guardarPOD(vid){
@@ -3274,8 +3403,25 @@ var Publico={
     Dom.on(b,"click",function(){location.hash="";});}
 };
 
+function descargarProcesosCSV(){
+  var rows=[["Operación","Cliente","Etapa actual","Responsable","Estado","Situación","Motivo","Días"]];
+  Operaciones.all().forEach(function(o){
+    var cur=Proceso.etapaActual(o),c=Clientes.byId(o.cli),b=cur?cur.bloqueo:null;
+    rows.push([o.id,(c?c.n:""),cur?cur.n:"Cerrada",cur?Personas.nombre(cur.respId):"—",o.estado,
+      b?(b.tipo==="bloqueo"?"Bloqueo":"Retraso"):"Sin novedad",b?b.motivo:"",b?String(b.dias):""]);});
+  var csv=rows.map(function(r){return r.map(function(v){return '"'+String(v).replace(/"/g,'""')+'"';}).join(",");}).join("\r\n");
+  var blob=new Blob(["﻿"+csv],{type:"text/csv;charset=utf-8;"});
+  var url=URL.createObjectURL(blob),a=document.createElement("a");
+  a.href=url;a.download="reporte-procesos-dms.csv";document.body.appendChild(a);a.click();
+  document.body.removeChild(a);setTimeout(function(){URL.revokeObjectURL(url);},1000);
+  Toast.show("Reporte CSV descargado");
+}
+
 var Actions={
   mod:function(el){Router.go(el.getAttribute("data-mod"));},
+  msg:function(el){Modales.mensaje(el.getAttribute("data-msg"));},
+  "rep-csv":function(){descargarProcesosCSV();},
+  "rep-print":function(){window.print();},
   go:function(el){Router.go(el.getAttribute("data-go"));},
   back:function(el){Router.go(el.getAttribute("data-back"));},
   cli:function(el){
